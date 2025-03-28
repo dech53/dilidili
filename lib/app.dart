@@ -2,8 +2,8 @@ import 'package:dilidili/pages/root/root_page.dart';
 import 'package:dilidili/pages/theme/dark_theme.dart';
 import 'package:dilidili/pages/theme/theme_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:provider/provider.dart';
 
 Size get designSize {
   final firstView = WidgetsBinding.instance.platformDispatcher.views.first;
@@ -18,18 +18,20 @@ Size get designSize {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 //适配屏幕尺寸
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeData = ref.watch(themeProvider);
     return ScreenUtilInit(
       designSize: designSize,
       builder: (context, child) {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
-          theme: Provider.of<ThemeProvider>(context, listen: true).themeData,
+          theme: themeData,
           darkTheme: darkMode,
+          themeMode: ThemeMode.system,
           home: const RootPage(),
         );
       },

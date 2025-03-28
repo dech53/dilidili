@@ -33,16 +33,16 @@ class NumUtils {
     int timeDifference = currentTime - timestamp;
 
     if (timeDifference < 60) {
-      return '${timeDifference}秒前';
+      return '$timeDifference秒前';
     } else if (timeDifference < 3600) {
       int minutes = (timeDifference / 60).floor();
-      return '${minutes}分钟前';
+      return '$minutes分钟前';
     } else if (timeDifference < 86400) {
       int hours = (timeDifference / 3600).floor();
-      return '${hours}小时前';
+      return '$hours小时前';
     } else {
       int days = (timeDifference / 86400).floor();
-      return '${days}天前';
+      return '$days天前';
     }
   }
 }

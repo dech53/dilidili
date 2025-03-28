@@ -7,6 +7,7 @@ import 'package:dilidili/model/rcmd_video.dart';
 import 'package:dilidili/model/root_data.dart';
 import 'package:dilidili/pages/video_detail/video_page.dart';
 import 'package:dilidili/utils/string_utils.dart';
+import 'package:dilidili/utils/wbi_utils.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -19,7 +20,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<VideoItem> _videoList = [];
+  final List<VideoItem> _videoList = [];
   int _currentPage = Random().nextInt(500);
   final ScrollController _scrollController = ScrollController();
 
@@ -41,16 +42,16 @@ class _HomePageState extends State<HomePage> {
     try {
       Response response = await DioInstance.instance().get(
         path: ApiString.baseUrl + ApiString.getRcmdVideo,
-        param: {
+        param: await WbiUtils.getWbi({
           "fresh_idx": _currentPage,
-        },
+        }),
       );
-      Rootdata<RcmdVideo> parsedData = Rootdata.fromJson(
+      RcmdVideo parsedData = Rootdata.fromJson(
         response.data,
         (dynamic data) => RcmdVideo.fromJson(data),
-      );
+      ).data;
       setState(() {
-        _videoList.addAll(parsedData.data.item);
+        _videoList.addAll(parsedData.item);
       });
       _currentPage++;
     } catch (e) {

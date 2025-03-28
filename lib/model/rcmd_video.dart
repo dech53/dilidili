@@ -1,3 +1,7 @@
+import 'package:json_annotation/json_annotation.dart';
+part 'rcmd_video.g.dart';
+
+@JsonSerializable()
 class RcmdVideo {
   List<VideoItem> item;
   dynamic business_card;
@@ -17,21 +21,11 @@ class RcmdVideo {
     required this.mid,
   });
 
-  factory RcmdVideo.fromJson(Map<String, dynamic> json) {
-    return RcmdVideo(
-      item: json["item"] != null
-          ? List<VideoItem>.from(json["item"].map((x) => VideoItem.fromJson(x)))
-          : [],
-      business_card: json["business_card"] ?? null,
-      floor_info: json["floor_info"] ?? null,
-      user_feature: json["user_feature"] ?? null,
-      preload_expose_pct: json["preload_expose_pct"] ?? 0,
-      preload_floor_expose_pct: json["preload_floor_expose_pct"] ?? 0,
-      mid: json["mid"] ?? 0,
-    );
-  }
+  factory RcmdVideo.fromJson(Map<String, dynamic> json) =>
+      _$RcmdVideoFromJson(json);
 }
 
+@JsonSerializable()
 class VideoItem {
   int id;
   String bvid;
@@ -89,44 +83,11 @@ class VideoItem {
     required this.dislike_switch_pc,
   });
 
-  factory VideoItem.fromJson(Map<String, dynamic> json) {
-    return VideoItem(
-      id: json["id"] ?? 0,
-      bvid: json["bvid"] ?? "",
-      cid: json["cid"] ?? 0,
-      goto: json["goto"] ?? "",
-      uri: json["uri"] ?? "",
-      pic: json["pic"] ?? "",
-      pic_4_3: json["pic_4_3"] ?? "",
-      title: json["title"] ?? "",
-      duration: json["duration"] ?? 0,
-      pubdate: json["pubdate"] ?? 0,
-      owner: json["owner"] != null
-          ? Owner.fromJson(json["owner"])
-          : Owner(mid: 0, name: "", face: ""),
-      stat: json["stat"] != null
-          ? Stat.fromJson(json["stat"])
-          : Stat(view: 0, like: 0, danmaku: 0, vt: 0),
-      av_feature: json["av_feature"] ?? null,
-      is_followed: json["is_followed"] ?? 0,
-      rcmd_reason: json["rcmd_reason"] != null
-          ? RcmdReason.fromJson(json["rcmd_reason"])
-          : null,
-      show_info: json["show_info"] ?? 0,
-      track_id: json["track_id"] ?? "",
-      pos: json["pos"] ?? 0,
-      room_info: json["room_info"] ?? null,
-      ogv_info: json["ogv_info"] ?? null,
-      business_info: json["business_info"] ?? null,
-      is_stock: json["is_stock"] ?? 0,
-      enable_vt: json["enable_vt"] ?? 0,
-      vt_display: json["vt_display"] ?? "",
-      dislike_switch: json["dislike_switch"] ?? 0,
-      dislike_switch_pc: json["dislike_switch_pc"] ?? 0,
-    );
-  }
+  factory VideoItem.fromJson(Map<String, dynamic> json) =>
+      _$VideoItemFromJson(json);
 }
 
+@JsonSerializable()
 class Owner {
   int mid;
   String name;
@@ -137,13 +98,10 @@ class Owner {
     required this.name,
     required this.face,
   });
-  factory Owner.fromJson(Map<String, dynamic> json) => Owner(
-        mid: json["mid"],
-        name: json["name"],
-        face: json["face"],
-      );
+  factory Owner.fromJson(Map<String, dynamic> json) => _$OwnerFromJson(json);
 }
 
+@JsonSerializable()
 class RcmdReason {
   int? reasonType;
   String? content;
@@ -153,15 +111,11 @@ class RcmdReason {
     this.content,
   });
 
-  factory RcmdReason.fromJson(Map<String, dynamic>? json) {
-    if (json == null) return RcmdReason();
-    return RcmdReason(
-      reasonType: json["reason_type"] ?? null,
-      content: json["content"] ?? null,
-    );
-  }
+  factory RcmdReason.fromJson(Map<String, dynamic> json) =>
+      _$RcmdReasonFromJson(json);
 }
 
+@JsonSerializable()
 class Stat {
   int view;
   int like;
@@ -175,10 +129,5 @@ class Stat {
     required this.vt,
   });
 
-  factory Stat.fromJson(Map<String, dynamic> json) => Stat(
-        view: json["view"],
-        like: json["like"],
-        danmaku: json["danmaku"],
-        vt: json["vt"],
-      );
+  factory Stat.fromJson(Map<String, dynamic> json) => _$StatFromJson(json);
 }
