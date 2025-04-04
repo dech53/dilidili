@@ -76,6 +76,7 @@ class WbiUtils {
     44,
     52,
   ];
+  //根据传入的参数返回带wbi签名的参数
   static Future<Map<String, dynamic>> getWbi(
       Map<String, dynamic> params) async {
     final prefs = await SharedPreferencesInstance.instance();
