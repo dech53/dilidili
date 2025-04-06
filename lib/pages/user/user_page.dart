@@ -13,6 +13,7 @@ class UserPage extends StatefulWidget {
 
 class _UserPageState extends State<UserPage> {
   final UserPageViewModel _viewModel = UserPageViewModel();
+
   @override
   void initState() {
     super.initState();
@@ -41,14 +42,14 @@ class _UserPageState extends State<UserPage> {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  if (qrCode?.url != null && qrCode!.url.isNotEmpty)
+                  if (_viewModel.hasUser)
+                    Text(_viewModel.ID!)
+                  else if (qrCode?.url != null && qrCode!.url.isNotEmpty)
                     QrImageView(
                       data: qrCode.url,
                       version: QrVersions.auto,
                       size: 250.r,
-                    )
-                  else
-                    const CircularProgressIndicator(),
+                    ),
                 ],
               ),
             ),

@@ -5,4 +5,6 @@ class ApiString {
   static const String navInterface = "x/web-interface/nav";
   static const String apply_QRCode = "x/passport-login/web/qrcode/generate";
   static const String check_QRCode = "x/passport-login/web/qrcode/poll";
+  static const String user_info = "x/space/wbi/acc/info";
+  static const String video_playurl = "x/player/wbi/playurl";
 }

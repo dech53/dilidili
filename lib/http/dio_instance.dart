@@ -2,6 +2,9 @@ import 'package:dilidili/http/http_methods.dart';
 import 'package:dilidili/http/print_log_interceptor.dart';
 import 'package:dilidili/http/response_interceptor.dart';
 import 'package:dio/dio.dart';
+import 'package:cookie_jar/cookie_jar.dart';
+import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:path_provider/path_provider.dart';
 
 class DioInstance {
   static DioInstance? _instance;
@@ -30,6 +33,15 @@ class DioInstance {
     );
     _dio.interceptors.add(ResponseInterceptor());
     _dio.interceptors.add(PrintLogInterceptor());
+    _dio.interceptors.add(
+      CookieManager(
+        PersistCookieJar(
+          persistSession: true,
+          storage: FileStorage(
+              "${getApplicationDocumentsDirectory()}/.cookies/"),
+        ),
+      ),
+    );
   }
 
   //get请求

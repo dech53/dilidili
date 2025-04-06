@@ -10,7 +10,7 @@ import 'package:dilidili/utils/regex_utils.dart';
 import 'package:dio/dio.dart';
 
 class WbiUtils {
-  static final mixinKeyEncTab = [
+  static final List<int> mixinKeyEncTab = <int>[
     46,
     47,
     18,
@@ -74,7 +74,7 @@ class WbiUtils {
     20,
     34,
     44,
-    52,
+    52
   ];
   //根据传入的参数返回带wbi签名的参数
   static Future<Map<String, dynamic>> getWbi(
@@ -108,8 +108,7 @@ class WbiUtils {
       prefs.setString("sub_key", sub_key);
       prefs.setString("img_sub_created_at", DateTime.now().toIso8601String());
     }
-    final raw_wbi_key = img_key + sub_key;
-    final mixin_key = genMixinKey(raw_wbi_key);
+    final String mixin_key = getMixinKey(img_key + sub_key);
     var signedParams = signParams(params, mixin_key);
     Logutils.println(signedParams.toString());
     return signedParams;
@@ -124,13 +123,12 @@ class WbiUtils {
   }
 
   //生成加密key
-  static String genMixinKey(String rawWbiKey) {
-    assert(rawWbiKey.length >= 64, "rawWbiKey 长度必须至少为 64 字符");
-
-    final mixedChars =
-        mixinKeyEncTab.map((index) => rawWbiKey[index]).toList(growable: false);
-
-    return mixedChars.join().substring(0, 32);
+  static String getMixinKey(String orig) {
+    String temp = '';
+    for (int i = 0; i < mixinKeyEncTab.length; i++) {
+      temp += orig.split('')[mixinKeyEncTab[i]];
+    }
+    return temp.substring(0, 32);
   }
 
   //生成w_rid
@@ -138,19 +136,18 @@ class WbiUtils {
     Map<String, dynamic> params,
     String mixinKey,
   ) {
-    final wts = (DateTime.now().millisecondsSinceEpoch ~/ 1000).toString();
-    final paramsWithWts = Map<String, dynamic>.from(params)..['wts'] = wts;
-    final sortedEntries = paramsWithWts.entries.toList()
-      ..sort((a, b) => a.key.compareTo(b.key));
-    final queryString = sortedEntries.map((entry) {
-      final key = Uri.encodeQueryComponent(entry.key);
-      final value = Uri.encodeQueryComponent(entry.value.toString());
-      return '$key=$value';
-    }).join('&');
-    final data = queryString + mixinKey;
-    final wRid = md5.convert(utf8.encode(data)).toString();
-    return Map<String, dynamic>.from(params)
-      ..['w_rid'] = wRid
-      ..['wts'] = wts;
+    final List<String> query = <String>[];
+    final RegExp chrFilter = RegExp(r"[!\'\(\)*]");
+    final wts = (DateTime.now().millisecondsSinceEpoch / 1000).round();
+    final Map<String, dynamic> newParams = Map.from(params)
+      ..addAll({"wts": wts});
+    for (String i in newParams.keys.toList()) {
+      query.add(
+          '${Uri.encodeComponent(i)}=${Uri.encodeComponent(newParams[i].toString().replaceAll(chrFilter, ''))}');
+    }
+    final String queryStr = query.join('&');
+    final w_rid = md5.convert(utf8.encode(queryStr + mixinKey)).toString();
+    newParams.addAll({'w_rid': w_rid});
+    return newParams;
   }
 }
