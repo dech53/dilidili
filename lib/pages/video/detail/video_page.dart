@@ -1,8 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dilidili/model/rcmd_video.dart';
-import 'package:dilidili/pages/video_detail/video_page_vm.dart';
+import 'package:dilidili/pages/video/detail/video_page_vm.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:media_kit_video/media_kit_video.dart';
 import 'package:provider/provider.dart';
 
 class VideoPage extends StatefulWidget {
@@ -14,6 +15,13 @@ class VideoPage extends StatefulWidget {
 
 class _VideoPageState extends State<VideoPage> {
   final VideoPageViewModel _viewmodel = VideoPageViewModel();
+
+  @override
+  void dispose() {
+    super.dispose();
+    _viewmodel.player.dispose();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -26,7 +34,8 @@ class _VideoPageState extends State<VideoPage> {
     return ChangeNotifierProvider.value(
       value: _viewmodel,
       child: Scaffold(
-        appBar: AppBar(),
+        appBar: AppBar(
+        ),
         backgroundColor: Theme.of(context).colorScheme.surface,
         body: _getBodyUI(),
       ),
@@ -38,17 +47,30 @@ class _VideoPageState extends State<VideoPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Selector<VideoPageViewModel, VideoItem?>(
-              builder: (context, video, child) {
-                return AspectRatio(
-                  aspectRatio: 16 / 9,
-                  child: CachedNetworkImage(
-                    fit: BoxFit.cover,
-                    imageUrl: video?.pic??"",
-                  ),
-                );
-              },
-              selector: (_,viewModel)=>viewModel.video),
+          Selector<VideoPageViewModel, VideoController?>(
+            builder: (context, controller, child) {
+              return (controller != null)
+                  ? AspectRatio(
+                      aspectRatio: 16 / 9,
+                      child: CupertinoVideoControlsTheme(
+                          normal: const CupertinoVideoControlsThemeData(),
+                          fullscreen: const CupertinoVideoControlsThemeData(),
+                          child: Video(
+                            controller: controller,
+                            controls: NoVideoControls,
+                          )),
+                    )
+                  : const AspectRatio(
+                      aspectRatio: 16 / 9,
+                      child: SizedBox(
+                        child: Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      ),
+                    );
+            },
+            selector: (_, viewModel) => viewModel.main_controller,
+          ),
           Padding(
             padding: EdgeInsets.all(5.w),
             child: Column(

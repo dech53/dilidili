@@ -1,6 +1,7 @@
 import 'package:dilidili/http/http_methods.dart';
 import 'package:dilidili/http/print_log_interceptor.dart';
 import 'package:dilidili/http/response_interceptor.dart';
+import 'package:dilidili/utils/header_utils.dart';
 import 'package:dio/dio.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
@@ -37,8 +38,8 @@ class DioInstance {
       CookieManager(
         PersistCookieJar(
           persistSession: true,
-          storage: FileStorage(
-              "${getApplicationDocumentsDirectory()}/.cookies/"),
+          storage:
+              FileStorage("${getApplicationDocumentsDirectory()}/.cookies/"),
         ),
       ),
     );
@@ -59,6 +60,9 @@ class DioInstance {
       cancelToken: cancelToken,
       options: options ??
           Options(
+            headers: {
+              'user-agent': HeaderUtil.randomHeader(),
+            },
             method: HttpMethods.get,
             receiveTimeout: _defaultTimeout,
             sendTimeout: _defaultTimeout,
