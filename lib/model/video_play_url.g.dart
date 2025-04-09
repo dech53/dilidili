@@ -164,3 +164,29 @@ Map<String, dynamic> _$FlacToJson(Flac instance) => <String, dynamic>{
       'display': instance.display,
       'audio': instance.audio,
     };
+
+VideoOnlinePeople _$VideoOnlinePeopleFromJson(Map<String, dynamic> json) =>
+    VideoOnlinePeople(
+      total: json['total'] as String,
+      count: json['count'] as String,
+      showSwitch:
+          ShowSwitch.fromJson(json['show_switch'] as Map<String, dynamic>),
+    );
+
+Map<String, dynamic> _$VideoOnlinePeopleToJson(VideoOnlinePeople instance) =>
+    <String, dynamic>{
+      'total': instance.total,
+      'count': instance.count,
+      'show_switch': instance.showSwitch,
+    };
+
+ShowSwitch _$ShowSwitchFromJson(Map<String, dynamic> json) => ShowSwitch(
+      total: json['total'] as bool,
+      count: json['count'] as bool,
+    );
+
+Map<String, dynamic> _$ShowSwitchToJson(ShowSwitch instance) =>
+    <String, dynamic>{
+      'total': instance.total,
+      'count': instance.count,
+    };

@@ -7,4 +7,7 @@ class ApiString {
   static const String check_QRCode = "x/passport-login/web/qrcode/poll";
   static const String user_info = "x/space/wbi/acc/info";
   static const String video_playurl = "x/player/wbi/playurl";
+  static const String video_online_people = "x/player/online/total";
+  static const String video_basic_info = "x/web-interface/view";
+  static const String video_desc_info ="x/web-interface/archive/desc";
 }

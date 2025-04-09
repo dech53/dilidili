@@ -165,3 +165,23 @@ class Flac {
   Flac({required this.display, this.audio});
   factory Flac.fromJson(Map<String, dynamic> json) => _$FlacFromJson(json);
 }
+
+@JsonSerializable(fieldRename: FieldRename.snake)
+class VideoOnlinePeople {
+  String total;
+  String count;
+  ShowSwitch showSwitch;
+  VideoOnlinePeople(
+      {required this.total, required this.count, required this.showSwitch});
+  factory VideoOnlinePeople.fromJson(Map<String, dynamic> json) =>
+      _$VideoOnlinePeopleFromJson(json);
+}
+
+@JsonSerializable()
+class ShowSwitch {
+  bool total;
+  bool count;
+  ShowSwitch({required this.total, required this.count});
+  factory ShowSwitch.fromJson(Map<String, dynamic> json) =>
+      _$ShowSwitchFromJson(json);
+}

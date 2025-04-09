@@ -1,11 +1,12 @@
 import 'dart:io';
-
 import 'package:dilidili/cache/shared_preferences_instance.dart';
 import 'package:dilidili/http/dio_instance.dart';
 import 'package:dilidili/http/http_methods.dart';
+import 'package:dilidili/http/static/api_string.dart';
 import 'package:dilidili/model/nav_user_info.dart';
 import 'package:dilidili/model/rcmd_video.dart';
 import 'package:dilidili/model/root_data.dart';
+import 'package:dilidili/model/video/video_basic_info.dart';
 import 'package:dilidili/model/video_play_url.dart';
 import 'package:dilidili/utils/header_utils.dart';
 import 'package:dilidili/utils/log_utils.dart';
@@ -20,6 +21,8 @@ class VideoPageViewModel extends ChangeNotifier {
   VideoPlayUrl? _videoPlayUrl;
   VideoController? _main_controller;
   UserCardInfo? _upInfo;
+  VideoOnlinePeople? _onlinePeople;
+
   Player player = Player(
       configuration: const PlayerConfiguration(
     bufferSize: 5 * 1024 * 1024,
@@ -29,6 +32,12 @@ class VideoPageViewModel extends ChangeNotifier {
   VideoItem? get video => _video;
   VideoPlayUrl? get videoPlayUrl => _videoPlayUrl;
   VideoController? get main_controller => _main_controller;
+  VideoOnlinePeople? get onlinePeople => _onlinePeople;
+
+  set onlinePeople(VideoOnlinePeople? count) {
+    _onlinePeople = count;
+    notifyListeners();
+  }
 
   set upInfo(UserCardInfo? new_upInfo) {
     _upInfo = new_upInfo;
@@ -128,5 +137,39 @@ class VideoPageViewModel extends ChangeNotifier {
         (dynamic data) => UserCardInfo.fromJson(data),
       ).data;
     }
+  }
+
+  Future fetchOnlinePeople(int cid, String bvid) async {
+    Response res = await DioInstance.instance().get(
+      path: ApiString.baseUrl + ApiString.video_online_people,
+      param: {'bvid': bvid, 'cid': cid},
+      options: Options(
+        method: HttpMethods.get,
+        headers: {
+          'user-agent': HeaderUtil.randomHeader(),
+        },
+      ),
+    );
+    onlinePeople = Rootdata.fromJson(
+      res.data,
+      (dynamic data) => VideoOnlinePeople.fromJson(data),
+    ).data;
+  }
+
+  Future fetchBasicVideoInfo(int cid, String bvid) async {
+    final prefs = await SharedPreferencesInstance.instance();
+    print("cid${cid}----bvid${bvid}");
+    Response res = await DioInstance.instance().get(
+      path: ApiString.baseUrl + ApiString.video_desc_info,
+      param: {'bvid': bvid, 'cid': cid},
+      options: Options(
+        method: HttpMethods.get,
+        headers: {
+          'user-agent': HeaderUtil.randomHeader(),
+          'cookie': 'SESSDATA=${await prefs.getString('SESSDATA')};',
+        },
+      ),
+    );
+    Logutils.println("视频简介${res.data}");
   }
 }

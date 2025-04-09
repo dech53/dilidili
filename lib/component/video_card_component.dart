@@ -83,32 +83,32 @@ class VideoCardComponent extends StatelessWidget {
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.play_circle_outline_rounded,
-                          size: 13.r,
+                          size: 13,
                         ),
                         1.horizontalSpace,
                         Text(
                           NumUtils.int2Num(video.stat.view),
                           style:
-                              TextStyle(fontSize: 9.sp, color: Colors.black),
+                              const TextStyle(fontSize: 9, color: Colors.black),
                         ),
                         8.horizontalSpace,
-                        Icon(
+                        const Icon(
                           Icons.subtitles_outlined,
-                          size: 13.r,
+                          size: 13,
                         ),
                         1.horizontalSpace,
                         Text(
                           NumUtils.int2Num(video.stat.danmaku),
                           style:
-                              TextStyle(fontSize: 9.sp, color: Colors.black),
+                              const TextStyle(fontSize: 9, color: Colors.black),
                         ),
                       ],
                     ),
                     Text(
                       NumUtils.int2Date(video.pubdate),
-                      style: TextStyle(fontSize: 9.sp, color: Colors.black),
+                      style: const TextStyle(fontSize: 9, color: Colors.black),
                     ),
                   ],
                 ),
@@ -117,9 +117,36 @@ class VideoCardComponent extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text(
-                      video.owner.name,
-                      style: TextStyle(fontSize: 10.sp, color: Colors.black),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        if (video.rcmd_reason != null &&
+                            video.rcmd_reason!.content != null)
+                          Row(
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                    color: Colors.grey.shade300,
+                                    borderRadius: BorderRadius.circular(4)),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(1.5),
+                                  child: Text(
+                                    video.rcmd_reason!.content!,
+                                    style: TextStyle(
+                                        fontSize: 10.sp, color: Colors.black),
+                                  ),
+                                ),
+                              ),
+                              3.horizontalSpace,
+                            ],
+                          ),
+                        Text(
+                          video.owner.name,
+                          style:
+                              TextStyle(fontSize: 10.sp, color: Colors.black),
+                        ),
+                      ],
                     ),
                     GestureDetector(
                       onTap: () {
