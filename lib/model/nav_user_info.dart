@@ -22,12 +22,12 @@ class WbiImg {
 
 @JsonSerializable(fieldRename: FieldRename.snake)
 class UserCardInfo {
-  final Card card;
-  final bool following;
-  final int archiveCount;
-  final int articleCount;
-  final int follower;
-  final int likeNum;
+  Card card;
+  bool following;
+  int archiveCount;
+  int articleCount;
+  int follower;
+  int likeNum;
 
   UserCardInfo({
     required this.card,
@@ -44,38 +44,38 @@ class UserCardInfo {
 
 @JsonSerializable(fieldRename: FieldRename.snake)
 class Card {
-  final String mid;
-  final bool approve;
-  final String name;
-  final String sex;
-  final String face;
+  String mid;
+  bool approve;
+  String name;
+  String sex;
+  String face;
   @JsonKey(name: 'face_nft')
-  final int faceNft;
+  int faceNft;
   @JsonKey(name: 'face_nft_type')
-  final int faceNftType;
+  int faceNftType;
   @JsonKey(name: 'DisplayRank')
-  final String displayRank;
-  final int regtime;
-  final int spacesta;
-  final String birthday;
-  final String place;
-  final String description;
-  final int article;
-  final List<dynamic> attentions;
-  final int fans;
-  final int friend;
-  final int attention;
-  final String sign;
-  final LevelInfo levelInfo;
-  final Pendant? pendant;
-  final Nameplate? nameplate;
+  String displayRank;
+  int regtime;
+  int spacesta;
+  String birthday;
+  String place;
+  String description;
+  int article;
+  List<dynamic> attentions;
+  int fans;
+  int friend;
+  int attention;
+  String sign;
+  LevelInfo levelInfo;
+  Pendant? pendant;
+  Nameplate? nameplate;
   @JsonKey(name: 'Official')
-  final Official? official;
-  final OfficialVerify? officialVerify;
-  final Vip vip;
+  Official? official;
+  OfficialVerify? officialVerify;
+  Vip vip;
   @JsonKey(name: 'is_senior_member')
-  final int isSeniorMember;
-  final dynamic nameRender; // 根据实际类型调整
+  int isSeniorMember;
+  dynamic nameRender; // 根据实际类型调整
 
   Card({
     required this.mid,
@@ -113,10 +113,10 @@ class Card {
 
 @JsonSerializable(fieldRename: FieldRename.snake)
 class LevelInfo {
-  final int currentLevel;
-  final int currentMin;
-  final int currentExp;
-  final int nextExp;
+  int currentLevel;
+  int currentMin;
+  int currentExp;
+  int nextExp;
 
   LevelInfo({
     required this.currentLevel,
@@ -131,13 +131,13 @@ class LevelInfo {
 
 @JsonSerializable(fieldRename: FieldRename.snake)
 class Pendant {
-  final int pid;
-  final String name;
-  final String image;
-  final int expire;
-  final String imageEnhance;
-  final String imageEnhanceFrame;
-  final int nPid;
+  int pid;
+  String name;
+  String image;
+  int expire;
+  String imageEnhance;
+  String imageEnhanceFrame;
+  int nPid;
 
   Pendant({
     required this.pid,
@@ -155,12 +155,12 @@ class Pendant {
 
 @JsonSerializable(fieldRename: FieldRename.snake)
 class Nameplate {
-  final int nid;
-  final String name;
-  final String image;
-  final String imageSmall;
-  final String level;
-  final String condition;
+  int nid;
+  String name;
+  String image;
+  String imageSmall;
+  String level;
+  String condition;
 
   Nameplate({
     required this.nid,
@@ -177,10 +177,10 @@ class Nameplate {
 
 @JsonSerializable(fieldRename: FieldRename.snake)
 class Official {
-  final int role;
-  final String title;
-  final String desc;
-  final int type;
+  int role;
+  String title;
+  String desc;
+  int type;
 
   Official({
     required this.role,
@@ -195,8 +195,8 @@ class Official {
 
 @JsonSerializable(fieldRename: FieldRename.snake)
 class OfficialVerify {
-  final int type;
-  final String desc;
+  int type;
+  String desc;
 
   OfficialVerify({
     required this.type,
@@ -209,34 +209,34 @@ class OfficialVerify {
 
 @JsonSerializable(fieldRename: FieldRename.snake)
 class Vip {
-  final int type;
-  final int status;
+  int type;
+  int status;
   @JsonKey(name: 'due_date')
-  final int dueDate;
+  int dueDate;
   @JsonKey(name: 'vip_pay_type')
-  final int vipPayType;
+  int vipPayType;
   @JsonKey(name: 'theme_type')
-  final int themeType;
-  final VipLabel label;
+  int themeType;
+  VipLabel label;
   @JsonKey(name: 'avatar_subscript')
-  final int avatarSubscript;
+  int avatarSubscript;
   @JsonKey(name: 'nickname_color')
-  final String nicknameColor;
-  final int role;
+  String nicknameColor;
+  int role;
   @JsonKey(name: 'avatar_subscript_url')
-  final String avatarSubscriptUrl;
+  String avatarSubscriptUrl;
   @JsonKey(name: 'tv_vip_status')
-  final int tvVipStatus;
+  int tvVipStatus;
   @JsonKey(name: 'tv_vip_pay_type')
-  final int tvVipPayType;
+  int tvVipPayType;
   @JsonKey(name: 'tv_due_date')
-  final int tvDueDate;
+  int tvDueDate;
   @JsonKey(name: 'avatar_icon')
-  final AvatarIcon avatarIcon;
+  AvatarIcon avatarIcon;
   @JsonKey(name: 'vipType')
-  final int vipType;
+  int vipType;
   @JsonKey(name: 'vipStatus')
-  final int vipStatus;
+  int vipStatus;
 
   Vip({
     required this.type,
@@ -263,8 +263,8 @@ class Vip {
 
 @JsonSerializable(fieldRename: FieldRename.snake)
 class Space {
-  final String sImg;
-  final String lImg;
+  String sImg;
+  String lImg;
 
   Space({
     required this.sImg,
@@ -276,18 +276,18 @@ class Space {
 
 @JsonSerializable(fieldRename: FieldRename.snake)
 class VipLabel {
-  final String path;
-  final String text;
-  final String labelTheme;
-  final String textColor;
-  final int bgStyle;
-  final String bgColor;
-  final String borderColor;
-  final bool useImgLabel;
-  final String imgLabelUriHans;
-  final String imgLabelUriHant;
-  final String imgLabelUriHansStatic;
-  final String imgLabelUriHantStatic;
+  String path;
+  String text;
+  String labelTheme;
+  String textColor;
+  int bgStyle;
+  String bgColor;
+  String borderColor;
+  bool useImgLabel;
+  String imgLabelUriHans;
+  String imgLabelUriHant;
+  String imgLabelUriHansStatic;
+  String imgLabelUriHantStatic;
 
   VipLabel({
     required this.path,
@@ -311,8 +311,8 @@ class VipLabel {
 
 @JsonSerializable(fieldRename: FieldRename.snake)
 class AvatarIcon {
-  final int? iconType;
-  final Map<String, dynamic> iconResource;
+  int? iconType;
+  Map<String, dynamic> iconResource;
 
   AvatarIcon({
     this.iconType,

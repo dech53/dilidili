@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:dilidili/model/nav_user_info.dart';
-import 'package:dilidili/model/rcmd_video.dart';
+import 'package:dilidili/model/video/related_video.dart';
+import 'package:dilidili/model/video/video_basic_info.dart';
 import 'package:dilidili/model/video_play_url.dart';
 import 'package:dilidili/pages/video/detail/video_page_vm.dart';
 import 'package:dilidili/pages/video/panel/video_info_panel.dart';
@@ -10,17 +11,24 @@ import 'package:media_kit_video/media_kit_video.dart';
 import 'package:provider/provider.dart';
 
 class VideoPage extends StatefulWidget {
-  final VideoItem video;
-
-  const VideoPage({super.key, required this.video});
+  final String bvid;
+  final int cid;
+  final int mid;
+  const VideoPage(
+      {super.key, required this.bvid, required this.cid, required this.mid});
 
   @override
   State<VideoPage> createState() => _VideoPageState();
 }
 
-class _VideoPageState extends State<VideoPage> {
+class _VideoPageState extends State<VideoPage>
+    with SingleTickerProviderStateMixin {
   final VideoPageViewModel _viewmodel = VideoPageViewModel();
   Timer? _peopleCountTimer;
+  late PageController _pageController;
+  late TabController _tabController;
+
+  List tabs = ["简介", "评论"];
   @override
   void dispose() {
     super.dispose();
@@ -33,15 +41,16 @@ class _VideoPageState extends State<VideoPage> {
   @override
   void initState() {
     super.initState();
-    _viewmodel.video = widget.video;
-    _viewmodel.fetchVideoPlayurl(widget.video.cid, widget.video.bvid);
-    _viewmodel.fetchUpInfo();
-    _viewmodel.fetchOnlinePeople(widget.video.cid, widget.video.bvid);
-    _viewmodel.fetchBasicVideoInfo(widget.video.cid, widget.video.bvid);
+    _tabController = TabController(length: tabs.length, vsync: this);
+    _pageController = PageController();
+    _viewmodel.fetchVideoPlayurl(widget.cid, widget.bvid);
+    _viewmodel.fetchUpInfo(widget.mid);
+    _viewmodel.fetchOnlinePeople(widget.cid, widget.bvid);
+    _viewmodel.fetchBasicVideoInfo(widget.cid, widget.bvid);
+    _viewmodel.fetchRelatedVideo(widget.bvid);
     _peopleCountTimer = Timer.periodic(
       const Duration(seconds: 30),
-      (timer) =>
-          _viewmodel.fetchOnlinePeople(widget.video.cid, widget.video.bvid),
+      (timer) => _viewmodel.fetchOnlinePeople(widget.cid, widget.bvid),
     );
   }
 
@@ -52,7 +61,7 @@ class _VideoPageState extends State<VideoPage> {
       child: Scaffold(
         extendBody: true,
         appBar: PreferredSize(
-          preferredSize: Size.fromHeight(0),
+          preferredSize: const Size.fromHeight(0),
           child: AppBar(
             backgroundColor: Colors.black,
             elevation: 0,
@@ -94,40 +103,99 @@ class _VideoPageState extends State<VideoPage> {
             },
             selector: (_, viewModel) => viewModel.main_controller),
         Expanded(
-          child: Padding(
-              padding: EdgeInsets.all(7.w),
-              child: Expanded(
-                  child: PageView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Selector<
-                      VideoPageViewModel,
-                      ({
-                        UserCardInfo? user,
-                        VideoItem? video,
-                        VideoOnlinePeople? onlinePeople
-                      })>(
-                    builder: (context, data, child) {
-                      return (data.user != null &&
-                              data.video != null &&
-                              data.onlinePeople != null)
-                          ? VideoInfoPanel(
-                              user: data.user!,
-                              video: data.video!,
-                              count: data.onlinePeople!,
-                            )
-                          : const Text("加载中");
-                    },
-                    selector: (_, viewModel) => (
-                      user: viewModel.upInfo,
-                      video: viewModel.video,
-                      onlinePeople: viewModel.onlinePeople
+                  SizedBox(
+                    width: ScreenUtil().screenWidth / 2,
+                    child: TabBar(
+                      dividerHeight: 0.2,
+                      splashFactory: NoSplash.splashFactory,
+                      padding: EdgeInsets.zero,
+                      isScrollable: true,
+                      labelStyle: const TextStyle(fontSize: 13),
+                      labelPadding:
+                          const EdgeInsets.symmetric(horizontal: 25.0),
+                      controller: _tabController,
+                      dividerColor: Colors.transparent,
+                      tabs: tabs
+                          .map((e) => Tab(
+                                text: e,
+                              ))
+                          .toList(),
+                      onTap: (index) {
+                        _pageController.animateToPage(
+                          index,
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.ease,
+                        );
+                      },
                     ),
                   ),
-                  const Center(
-                    child: Text("2"),
-                  )
                 ],
-              ))),
+              ),
+              Expanded(
+                child: PageView(
+                  controller: _pageController,
+                  onPageChanged: (value) {
+                    setState(() {
+                      _tabController.animateTo(
+                        value,
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.ease,
+                      );
+                    });
+                  },
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.all(7.w),
+                      child: Selector<
+                          VideoPageViewModel,
+                          ({
+                            UserCardInfo? user,
+                            VideoOnlinePeople? onlinePeople,
+                            VideoDetailData? videoDetailData,
+                            List<RelatedVideoItem>? relatedVideo,
+                          })>(
+                        builder: (context, data, child) {
+                          return (data.user != null &&
+                                  data.onlinePeople != null &&
+                                  data.videoDetailData != null &&
+                                  data.relatedVideo != null)
+                              ? VideoInfoPanel(
+                                  user: data.user!,
+                                  count: data.onlinePeople!,
+                                  videoDetailData: data.videoDetailData!,
+                                  relatedVideo: data.relatedVideo!,
+                                  itemTap: (bvid, cid, mid) {
+                                    _viewmodel.fetchVideoPlayurl(cid, bvid);
+                                    _viewmodel.fetchUpInfo(mid);
+                                    _viewmodel.fetchOnlinePeople(cid, bvid);
+                                    _viewmodel.fetchBasicVideoInfo(cid, bvid);
+                                    _viewmodel.fetchRelatedVideo(bvid);
+                                  },
+                                )
+                              : const Text("加载中");
+                        },
+                        selector: (_, viewModel) => (
+                          user: viewModel.upInfo,
+                          onlinePeople: viewModel.onlinePeople,
+                          videoDetailData: viewModel.videoData,
+                          relatedVideo: viewModel.relatedVideo,
+                        ),
+                      ),
+                    ),
+                    const Center(
+                      child: Text("2"),
+                    )
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ],
     );
