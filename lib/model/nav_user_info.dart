@@ -22,20 +22,20 @@ class WbiImg {
 
 @JsonSerializable(fieldRename: FieldRename.snake)
 class UserCardInfo {
-  Card card;
-  bool following;
-  int archiveCount;
-  int articleCount;
-  int follower;
-  int likeNum;
+  Card? card;
+  bool? following;
+  int? archiveCount;
+  int? articleCount;
+  int? follower;
+  int? likeNum;
 
   UserCardInfo({
-    required this.card,
-    required this.following,
-    required this.archiveCount,
-    required this.articleCount,
-    required this.follower,
-    required this.likeNum,
+    this.card,
+    this.following,
+    this.archiveCount,
+    this.articleCount,
+    this.follower,
+    this.likeNum,
   });
   factory UserCardInfo.fromJson(Map<String, dynamic> json) =>
       _$UserCardInfoFromJson(json);

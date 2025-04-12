@@ -75,7 +75,7 @@ class _RootPageState extends State<RootPage> {
         (index) {
           return SalomonBottomBarItem(
             selectedColor: Theme.of(context).colorScheme.onSurface,
-            unselectedColor: Theme.of(context).colorScheme.inversePrimary,
+            unselectedColor: Theme.of(context).colorScheme.surfaceContainerHighest,
             icon: Icon(rootApp[index]
                 [(_index == index) ? 'SelectedIcon' : 'unSelectedIcon']),
             title: Text(rootApp[index]['text']),

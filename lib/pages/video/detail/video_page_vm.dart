@@ -4,7 +4,6 @@ import 'package:dilidili/http/dio_instance.dart';
 import 'package:dilidili/http/http_methods.dart';
 import 'package:dilidili/http/static/api_string.dart';
 import 'package:dilidili/model/nav_user_info.dart';
-import 'package:dilidili/model/rcmd_video.dart';
 import 'package:dilidili/model/root_data.dart';
 import 'package:dilidili/model/video/related_video.dart';
 import 'package:dilidili/model/video/video_basic_info.dart';
@@ -66,7 +65,6 @@ class VideoPageViewModel extends ChangeNotifier {
   }
 
   Future fetchVideoPlayurl(int cid, String bvid) async {
-    final prefs = await SharedPreferencesInstance.instance();
     Response response = await DioInstance.instance().get(
       path: "https://api.bilibili.com/x/player/wbi/playurl",
       param: await WbiUtils.getWbi(
@@ -79,13 +77,7 @@ class VideoPageViewModel extends ChangeNotifier {
           'fourk': 1,
         },
       ),
-      options: Options(
-        method: HttpMethods.get,
-        headers: {
-          'user-agent': HeaderUtil.randomHeader(),
-          'cookie': 'SESSDATA=${await prefs.getString('SESSDATA')};',
-        },
-      ),
+      
     );
     VideoPlayUrl res = Rootdata.fromJson(
       response.data,
@@ -122,20 +114,13 @@ class VideoPageViewModel extends ChangeNotifier {
   }
 
   Future fetchUpInfo(int mid) async {
-    final prefs = await SharedPreferencesInstance.instance();
     Response response = await DioInstance.instance().get(
       path: "https://api.bilibili.com/x/web-interface/card",
       param: {
         'mid': mid,
         'photo': false,
       },
-      options: Options(
-        method: HttpMethods.get,
-        headers: {
-          'user-agent': HeaderUtil.randomHeader(),
-          'cookie': 'SESSDATA=${await prefs.getString('SESSDATA')};',
-        },
-      ),
+      
     );
     upInfo = Rootdata.fromJson(
       response.data,
@@ -147,12 +132,7 @@ class VideoPageViewModel extends ChangeNotifier {
     Response res = await DioInstance.instance().get(
       path: ApiString.baseUrl + ApiString.video_online_people,
       param: {'bvid': bvid, 'cid': cid},
-      options: Options(
-        method: HttpMethods.get,
-        headers: {
-          'user-agent': HeaderUtil.randomHeader(),
-        },
-      ),
+      
     );
     onlinePeople = Rootdata.fromJson(
       res.data,
@@ -161,17 +141,10 @@ class VideoPageViewModel extends ChangeNotifier {
   }
 
   Future fetchBasicVideoInfo(int cid, String bvid) async {
-    final prefs = await SharedPreferencesInstance.instance();
     Response res = await DioInstance.instance().get(
       path: ApiString.baseUrl + ApiString.video_basic_info,
       param: {'bvid': bvid, 'cid': cid},
-      options: Options(
-        method: HttpMethods.get,
-        headers: {
-          'user-agent': HeaderUtil.randomHeader(),
-          'cookie': 'SESSDATA=${await prefs.getString('SESSDATA')};',
-        },
-      ),
+      
     );
     videoData = Rootdata.fromJson(
         res.data, (dynamic data) => VideoDetailData.fromJson(data)).data;
@@ -183,12 +156,7 @@ class VideoPageViewModel extends ChangeNotifier {
       param: {
         'bvid': bvid,
       },
-      options: Options(
-        method: HttpMethods.get,
-        headers: {
-          'user-agent': HeaderUtil.randomHeader(),
-        },
-      ),
+      
     );
     relatedVideo = (res.data['data'] as List<dynamic>)
         .map((e) => RelatedVideoItem.fromJson(e as Map<String, dynamic>))

@@ -57,6 +57,10 @@ dependencies:
   media_kit_video: ^1.2.5 # For video rendering.
   media_kit_libs_video: ^1.0.5 # Native video dependencies.
   readmore: ^3.0.0
+  flutter_svg: ^2.0.17
+  get: ^4.7.2
+  lottie: ^3.3.1
+  flutter_smart_dialog: ^4.9.8+7
 
 dev_dependencies:
   flutter_test:
@@ -86,9 +90,13 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
-  #   - images/a_dot_ham.jpeg
+  assets:
+    - assets/
+    - assets/images/
+    - assets/images/lv/
+    - assets/images/logo/
+    - assets/images/live/
+    - assets/images/video/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

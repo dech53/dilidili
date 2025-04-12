@@ -1,13 +1,19 @@
+import 'package:dilidili/http/dio_instance.dart';
+import 'package:dilidili/router/app_pages.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:get/get.dart';
 import 'package:media_kit/media_kit.dart';
 import 'app.dart';
 
-main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   MediaKit.ensureInitialized();
+  await DioInstance.initDio();
   runApp(
-    const ProviderScope(
-      child: MyApp(),
+    GetMaterialApp(
+      getPages: Routes.getPages,
+      debugShowCheckedModeBanner: false,
+      home: const MyApp(),
     ),
   );
 }

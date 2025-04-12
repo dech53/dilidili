@@ -4,9 +4,9 @@ import 'package:dilidili/pages/video/detail/video_page.dart';
 import 'package:dilidili/utils/string_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
-//TODO 添加viewmodel
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -85,7 +85,8 @@ class _HomePageState extends State<HomePage> {
                           alignment: Alignment.centerLeft,
                           height: 40.h,
                           decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.secondary,
+                            color:
+                                Theme.of(context).colorScheme.surfaceContainer,
                             borderRadius: BorderRadius.circular(12.r),
                           ),
                           child: Row(
@@ -99,9 +100,8 @@ class _HomePageState extends State<HomePage> {
                               Text(
                                 "搜索...",
                                 style: TextStyle(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .inversePrimary,
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
                                 ),
                               ),
                             ],
@@ -123,6 +123,7 @@ class _HomePageState extends State<HomePage> {
                     ],
                   ),
                 ),
+                //Expanded + tabbar
                 //视频列表
                 15.verticalSpace,
                 SizedBox(
@@ -149,15 +150,8 @@ class _HomePageState extends State<HomePage> {
                             return VideoCardComponent(
                               video: videModel.videoItems![index],
                               itemTap: (video) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => VideoPage(
-                                      bvid: video.bvid,
-                                      cid: video.cid,
-                                      mid: video.owner.mid,
-                                    ),
-                                  ),
+                                Get.toNamed(
+                                  '/video?bvid=${video.bvid}&cid=${video.cid}&mid=${video.owner.mid}',
                                 );
                               },
                             );

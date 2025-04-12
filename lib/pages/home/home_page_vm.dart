@@ -28,16 +28,11 @@ class HomePageViewModel extends ChangeNotifier {
   Future fetchVideos({bool refresh = false}) async {
     final prefs = await SharedPreferencesInstance.instance();
     Response response = await DioInstance.instance().get(
-        path: ApiString.baseUrl + ApiString.getRcmdVideo,
-        param: await WbiUtils.getWbi(
-          {
-            "fresh_idx": _currentPage,
-          },
-        ),
-        options: Options(method: HttpMethods.get, headers: {
-          'user-agent': HeaderUtil.randomHeader(),
-          'cookie': 'SESSDATA=${prefs.getString('SESSDATA')};',
-        }));
+      path: ApiString.baseUrl + ApiString.getRcmdVideo,
+      param: {
+        "fresh_idx": _currentPage,
+      },
+    );
     RcmdVideo parsedData = Rootdata.fromJson(
       response.data,
       (dynamic data) => RcmdVideo.fromJson(data),

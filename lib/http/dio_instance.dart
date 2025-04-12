@@ -1,6 +1,8 @@
 import 'package:dilidili/http/http_methods.dart';
 import 'package:dilidili/http/print_log_interceptor.dart';
 import 'package:dilidili/http/response_interceptor.dart';
+import 'package:dilidili/http/static/api_string.dart';
+import 'package:dilidili/utils/file_utils.dart';
 import 'package:dilidili/utils/header_utils.dart';
 import 'package:dio/dio.dart';
 import 'package:cookie_jar/cookie_jar.dart';
@@ -14,16 +16,19 @@ class DioInstance {
     return _instance ??= DioInstance._();
   }
 
-  final Dio _dio = Dio();
-  final _defaultTimeout = const Duration(seconds: 30);
-  void initDio({
+  static late CookieManager cookieManager;
+
+  static final Dio _dio = Dio();
+  static final _defaultTimeout = const Duration(seconds: 30);
+  static initDio({
     String? httpMethod = HttpMethods.get,
     Duration? connectTimeout,
     Duration? receiveTimeout,
     Duration? sendTimeout,
     ResponseType? responseType = ResponseType.json,
     String? contentType,
-  }) {
+  }) async {
+    final String cookiePath = await FileUtils.getCookiePath();
     _dio.options = BaseOptions(
       method: httpMethod,
       connectTimeout: connectTimeout ?? _defaultTimeout,
@@ -32,17 +37,21 @@ class DioInstance {
       responseType: responseType,
       contentType: contentType,
     );
-    _dio.interceptors.add(ResponseInterceptor());
-    _dio.interceptors.add(PrintLogInterceptor());
-    _dio.interceptors.add(
-      CookieManager(
-        PersistCookieJar(
-          persistSession: true,
-          storage:
-              FileStorage("${getApplicationDocumentsDirectory()}/.cookies/"),
-        ),
-      ),
+    final PersistCookieJar cookieJar = PersistCookieJar(
+      ignoreExpires: true,
+      storage: FileStorage(cookiePath),
     );
+    cookieManager = CookieManager(cookieJar);
+    _dio.interceptors.add(cookieManager);
+    final List<Cookie> cookie = await cookieManager.cookieJar
+        .loadForRequest(Uri.parse(ApiString.baseUrl));
+    final String cookieString = cookie
+        .map((Cookie cookie) => '${cookie.name}=${cookie.value}')
+        .join('; ');
+    _dio.options.headers['cookie'] = cookieString;
+    _dio.options.headers['user-agent'] = HeaderUtil.randomHeader();
+    // _dio.interceptors.add(ResponseInterceptor());
+    // _dio.interceptors.add(PrintLogInterceptor());
   }
 
   //get请求

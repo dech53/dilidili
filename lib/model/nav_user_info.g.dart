@@ -28,12 +28,14 @@ Map<String, dynamic> _$WbiImgToJson(WbiImg instance) => <String, dynamic>{
     };
 
 UserCardInfo _$UserCardInfoFromJson(Map<String, dynamic> json) => UserCardInfo(
-      card: Card.fromJson(json['card'] as Map<String, dynamic>),
-      following: json['following'] as bool,
-      archiveCount: (json['archive_count'] as num).toInt(),
-      articleCount: (json['article_count'] as num).toInt(),
-      follower: (json['follower'] as num).toInt(),
-      likeNum: (json['like_num'] as num).toInt(),
+      card: json['card'] == null
+          ? null
+          : Card.fromJson(json['card'] as Map<String, dynamic>),
+      following: json['following'] as bool?,
+      archiveCount: (json['archive_count'] as num?)?.toInt(),
+      articleCount: (json['article_count'] as num?)?.toInt(),
+      follower: (json['follower'] as num?)?.toInt(),
+      likeNum: (json['like_num'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$UserCardInfoToJson(UserCardInfo instance) =>

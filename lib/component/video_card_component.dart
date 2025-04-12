@@ -63,7 +63,7 @@ class VideoCardComponent extends StatelessWidget {
             ],
           ),
           Padding(
-            padding: EdgeInsets.all(1.r),
+            padding: EdgeInsets.all(0.3),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,

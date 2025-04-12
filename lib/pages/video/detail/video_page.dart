@@ -1,37 +1,37 @@
 import 'dart:async';
-import 'package:dilidili/model/nav_user_info.dart';
-import 'package:dilidili/model/video/related_video.dart';
-import 'package:dilidili/model/video/video_basic_info.dart';
-import 'package:dilidili/model/video_play_url.dart';
 import 'package:dilidili/pages/video/detail/video_page_vm.dart';
-import 'package:dilidili/pages/video/panel/video_info_panel.dart';
+import 'package:dilidili/pages/video/introduction/view.dart';
+import 'package:dilidili/pages/video/related/view.dart';
+import 'package:dilidili/utils/log_utils.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:provider/provider.dart';
 
 class VideoPage extends StatefulWidget {
-  final String bvid;
-  final int cid;
-  final int mid;
-  const VideoPage(
-      {super.key, required this.bvid, required this.cid, required this.mid});
-
+  const VideoPage({super.key});
   @override
   State<VideoPage> createState() => _VideoPageState();
 }
 
 class _VideoPageState extends State<VideoPage>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
+  late String bvid;
+  late int cid;
+  late int mid;
   final VideoPageViewModel _viewmodel = VideoPageViewModel();
   Timer? _peopleCountTimer;
   late PageController _pageController;
   late TabController _tabController;
+  final ScrollController _scrollController = ScrollController();
 
   List tabs = ["简介", "评论"];
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+
     _viewmodel.player.dispose();
     _viewmodel.main_controller = null;
     _peopleCountTimer?.cancel();
@@ -39,18 +39,38 @@ class _VideoPageState extends State<VideoPage>
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive) {
+      Logutils.println("应用暂停");
+      _peopleCountTimer?.cancel();
+    } else if (state == AppLifecycleState.resumed) {
+      Logutils.println("应用暂停");
+      _peopleCountTimer = Timer.periodic(
+        const Duration(seconds: 30),
+        (timer) => _viewmodel.fetchOnlinePeople(cid, bvid),
+      );
+    }
+  }
+
+  @override
   void initState() {
+    WidgetsBinding.instance.addObserver(this);
     super.initState();
+    bvid = Get.parameters['bvid']!;
+    cid = int.parse(Get.parameters['cid']!);
+    mid = int.parse(Get.parameters['mid']!);
     _tabController = TabController(length: tabs.length, vsync: this);
     _pageController = PageController();
-    _viewmodel.fetchVideoPlayurl(widget.cid, widget.bvid);
-    _viewmodel.fetchUpInfo(widget.mid);
-    _viewmodel.fetchOnlinePeople(widget.cid, widget.bvid);
-    _viewmodel.fetchBasicVideoInfo(widget.cid, widget.bvid);
-    _viewmodel.fetchRelatedVideo(widget.bvid);
+    _viewmodel.fetchVideoPlayurl(cid, bvid);
+    _viewmodel.fetchUpInfo(mid);
+    _viewmodel.fetchOnlinePeople(cid, bvid);
+    _viewmodel.fetchBasicVideoInfo(cid, bvid);
+    _viewmodel.fetchRelatedVideo(bvid);
     _peopleCountTimer = Timer.periodic(
       const Duration(seconds: 30),
-      (timer) => _viewmodel.fetchOnlinePeople(widget.cid, widget.bvid),
+      (timer) => _viewmodel.fetchOnlinePeople(cid, bvid),
     );
   }
 
@@ -104,93 +124,97 @@ class _VideoPageState extends State<VideoPage>
             selector: (_, viewModel) => viewModel.main_controller),
         Expanded(
           child: Column(
+            mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  SizedBox(
-                    width: ScreenUtil().screenWidth / 2,
-                    child: TabBar(
-                      dividerHeight: 0.2,
-                      splashFactory: NoSplash.splashFactory,
-                      padding: EdgeInsets.zero,
-                      isScrollable: true,
-                      labelStyle: const TextStyle(fontSize: 13),
-                      labelPadding:
-                          const EdgeInsets.symmetric(horizontal: 25.0),
-                      controller: _tabController,
-                      dividerColor: Colors.transparent,
-                      tabs: tabs
-                          .map((e) => Tab(
-                                text: e,
-                              ))
-                          .toList(),
-                      onTap: (index) {
-                        _pageController.animateToPage(
-                          index,
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.ease,
+              Container(
+                width: double.infinity,
+                height: 45,
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(
+                      width: 1,
+                      color: Theme.of(context).dividerColor.withOpacity(0.1),
+                    ),
+                  ),
+                ),
+                child: Material(
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TabBar(
+                          controller: _tabController,
+                          padding: EdgeInsets.zero,
+                          labelStyle: const TextStyle(fontSize: 13),
+                          labelPadding:
+                              const EdgeInsets.symmetric(horizontal: 10.0),
+                          dividerColor: Colors.transparent,
+                          tabs: tabs
+                              .map((e) => Tab(
+                                    text: e,
+                                  ))
+                              .toList(),
+                          onTap: (index) {},
+                        ),
+                      ),
+                      Flexible(
+                        flex: 1,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            const Icon(
+                              Icons.drag_handle_rounded,
+                              size: 20,
+                              color: Colors.grey,
+                            ),
+                            const SizedBox(width: 8),
+                            SizedBox(
+                              height: 32,
+                              child: TextButton(
+                                style: ButtonStyle(
+                                  padding:
+                                      WidgetStateProperty.all(EdgeInsets.zero),
+                                ),
+                                onPressed: () {},
+                                child: const Text('发弹幕',
+                                    style: TextStyle(fontSize: 12)),
+                              ),
+                            ),
+                            SizedBox(
+                              width: 38,
+                              height: 38,
+                              child: IconButton(
+                                icon: SvgPicture.asset(
+                                  'assets/images/video/danmu_close.svg',
+                                  colorFilter: const ColorFilter.mode(
+                                      Colors.grey, BlendMode.srcIn),
+                                ),
+                                onPressed: () {},
+                              ),
+                            ),
+                            const SizedBox(width: 18),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+              Expanded(
+                child: TabBarView(
+                  controller: _tabController,
+                  children: <Widget>[
+                    Builder(
+                      builder: (BuildContext context) {
+                        return CustomScrollView(
+                          slivers: <Widget>[
+                            VideoIntroPanel(bvid: bvid),
+                            const RelatedVideoPanel(),
+                          ],
                         );
                       },
                     ),
-                  ),
-                ],
-              ),
-              Expanded(
-                child: PageView(
-                  controller: _pageController,
-                  onPageChanged: (value) {
-                    setState(() {
-                      _tabController.animateTo(
-                        value,
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.ease,
-                      );
-                    });
-                  },
-                  children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.all(7.w),
-                      child: Selector<
-                          VideoPageViewModel,
-                          ({
-                            UserCardInfo? user,
-                            VideoOnlinePeople? onlinePeople,
-                            VideoDetailData? videoDetailData,
-                            List<RelatedVideoItem>? relatedVideo,
-                          })>(
-                        builder: (context, data, child) {
-                          return (data.user != null &&
-                                  data.onlinePeople != null &&
-                                  data.videoDetailData != null &&
-                                  data.relatedVideo != null)
-                              ? VideoInfoPanel(
-                                  user: data.user!,
-                                  count: data.onlinePeople!,
-                                  videoDetailData: data.videoDetailData!,
-                                  relatedVideo: data.relatedVideo!,
-                                  itemTap: (bvid, cid, mid) {
-                                    _viewmodel.fetchVideoPlayurl(cid, bvid);
-                                    _viewmodel.fetchUpInfo(mid);
-                                    _viewmodel.fetchOnlinePeople(cid, bvid);
-                                    _viewmodel.fetchBasicVideoInfo(cid, bvid);
-                                    _viewmodel.fetchRelatedVideo(bvid);
-                                  },
-                                )
-                              : const Text("加载中");
-                        },
-                        selector: (_, viewModel) => (
-                          user: viewModel.upInfo,
-                          onlinePeople: viewModel.onlinePeople,
-                          videoDetailData: viewModel.videoData,
-                          relatedVideo: viewModel.relatedVideo,
-                        ),
-                      ),
-                    ),
-                    const Center(
-                      child: Text("2"),
-                    )
+                    const Center(child: Text('评论功能待实现')),
                   ],
                 ),
               ),

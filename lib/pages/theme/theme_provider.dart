@@ -1,21 +1,15 @@
-import 'package:dilidili/pages/theme/dark_theme.dart';
-import 'package:dilidili/pages/theme/light_theme.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:get/get.dart';
 
-class ThemeNotifier extends StateNotifier<ThemeData> {
-  ThemeNotifier() : super(lightMode);
+class ThemeController extends GetxController {
+  final Rx<ThemeData> _currentTheme = ThemeData.light().obs;
 
-  ThemeData get lightTheme => lightMode;
-  ThemeData get darkTheme => darkMode;
-
-  bool get isDarkMode => state == darkMode;
+  ThemeData get currentTheme => _currentTheme.value;
 
   void toggleTheme() {
-    state = isDarkMode ? lightMode : darkMode;
+    _currentTheme.value = _currentTheme.value == ThemeData.light()
+        ? ThemeData.dark()
+        : ThemeData.light();
+    update();
   }
 }
-
-final themeProvider = StateNotifierProvider<ThemeNotifier, ThemeData>((ref) {
-  return ThemeNotifier();
-});
