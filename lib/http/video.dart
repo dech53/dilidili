@@ -1,6 +1,7 @@
 import 'package:dilidili/http/dio_instance.dart';
 import 'package:dilidili/http/static/api_string.dart';
 import 'package:dilidili/model/nav_user_info.dart';
+import 'package:dilidili/model/rcmd_video.dart';
 import 'package:dilidili/model/root_data.dart';
 import 'package:dilidili/model/video/related_video.dart';
 import 'package:dilidili/model/video/video_basic_info.dart';
@@ -60,6 +61,40 @@ class VideoHttp {
         'data': null,
         'code': res.data['code'],
         'msg': res.data['message'],
+      };
+    }
+  }
+
+  static Future rcmdVideoList({required int ps, required int freshIdx}) async {
+    try {
+      var res = await DioInstance.instance().get(
+        path: ApiString.baseUrl + ApiString.getRcmdVideo,
+        param: {
+          'ps': ps,
+          'fresh_idx': freshIdx,
+          'brush': freshIdx,
+          'fresh_type': 4
+        },
+      );
+      if (res.data['code'] == 0) {
+        List<VideoItem> list = [];
+        list.addAll(
+          Rootdata.fromJson(
+              res.data, (dynamic data) => RcmdVideo.fromJson(data)).data.item,
+        );
+        return {'status': true, 'data': list};
+      } else {
+        return {
+          'status': false,
+          'data': [],
+          'msg': res.data['message'],
+        };
+      }
+    } catch (e) {
+      return {
+        'status': false,
+        'data': [],
+        'msg': e.toString(),
       };
     }
   }
