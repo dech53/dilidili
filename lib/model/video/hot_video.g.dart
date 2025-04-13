@@ -1,13 +1,26 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'related_video.dart';
+part of 'hot_video.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-RelatedVideoItem _$RelatedVideoItemFromJson(Map<String, dynamic> json) =>
-    RelatedVideoItem(
+HotVideoItemList _$HotVideoItemListFromJson(Map<String, dynamic> json) =>
+    HotVideoItemList(
+      list: (json['list'] as List<dynamic>?)
+          ?.map((e) => HotVideoItem.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      noMore: json['no_more'] as bool?,
+    );
+
+Map<String, dynamic> _$HotVideoItemListToJson(HotVideoItemList instance) =>
+    <String, dynamic>{
+      'list': instance.list,
+      'no_more': instance.noMore,
+    };
+
+HotVideoItem _$HotVideoItemFromJson(Map<String, dynamic> json) => HotVideoItem(
       aid: (json['aid'] as num?)?.toInt(),
       videos: (json['videos'] as num?)?.toInt(),
       tid: (json['tid'] as num?)?.toInt(),
@@ -20,6 +33,7 @@ RelatedVideoItem _$RelatedVideoItemFromJson(Map<String, dynamic> json) =>
       desc: json['desc'] as String?,
       state: (json['state'] as num?)?.toInt(),
       duration: (json['duration'] as num?)?.toInt(),
+      missionId: (json['mission_id'] as num?)?.toInt(),
       rights: (json['rights'] as Map<String, dynamic>?)?.map(
         (k, e) => MapEntry(k, (e as num).toInt()),
       ),
@@ -29,7 +43,7 @@ RelatedVideoItem _$RelatedVideoItemFromJson(Map<String, dynamic> json) =>
       stat: json['stat'] == null
           ? null
           : Stat.fromJson(json['stat'] as Map<String, dynamic>),
-      relatedVideoItemDynamic: json['dynamic'] as String?,
+      listDynamic: json['dynamic'] as String?,
       cid: (json['cid'] as num?)?.toInt(),
       dimension: json['dimension'] == null
           ? null
@@ -47,14 +61,15 @@ RelatedVideoItem _$RelatedVideoItemFromJson(Map<String, dynamic> json) =>
       seasonType: (json['season_type'] as num?)?.toInt(),
       isOgv: json['is_ogv'] as bool?,
       ogvInfo: json['ogv_info'],
-      rcmdReason: json['rcmd_reason'] as String?,
       enableVt: (json['enable_vt'] as num?)?.toInt(),
-      aiRcmd: json['ai_rcmd'] == null
+      aiRcmd: json['ai_rcmd'],
+      rcmdReason: json['rcmd_reason'] == null
           ? null
-          : AiRcmd.fromJson(json['ai_rcmd'] as Map<String, dynamic>),
+          : RcmdReason.fromJson(json['rcmd_reason'] as Map<String, dynamic>),
+      upFromV2: (json['up_from_v2'] as num?)?.toInt(),
     );
 
-Map<String, dynamic> _$RelatedVideoItemToJson(RelatedVideoItem instance) =>
+Map<String, dynamic> _$HotVideoItemToJson(HotVideoItem instance) =>
     <String, dynamic>{
       'aid': instance.aid,
       'videos': instance.videos,
@@ -68,10 +83,11 @@ Map<String, dynamic> _$RelatedVideoItemToJson(RelatedVideoItem instance) =>
       'desc': instance.desc,
       'state': instance.state,
       'duration': instance.duration,
+      'mission_id': instance.missionId,
       'rights': instance.rights,
       'owner': instance.owner,
       'stat': instance.stat,
-      'dynamic': instance.relatedVideoItemDynamic,
+      'dynamic': instance.listDynamic,
       'cid': instance.cid,
       'dimension': instance.dimension,
       'season_id': instance.seasonId,
@@ -87,23 +103,10 @@ Map<String, dynamic> _$RelatedVideoItemToJson(RelatedVideoItem instance) =>
       'season_type': instance.seasonType,
       'is_ogv': instance.isOgv,
       'ogv_info': instance.ogvInfo,
-      'rcmd_reason': instance.rcmdReason,
       'enable_vt': instance.enableVt,
       'ai_rcmd': instance.aiRcmd,
-    };
-
-AiRcmd _$AiRcmdFromJson(Map<String, dynamic> json) => AiRcmd(
-      id: (json['id'] as num?)?.toInt(),
-      goto: json['goto'] as String?,
-      trackid: json['trackid'] as String?,
-      uniqId: json['uniq_id'] as String?,
-    );
-
-Map<String, dynamic> _$AiRcmdToJson(AiRcmd instance) => <String, dynamic>{
-      'id': instance.id,
-      'goto': instance.goto,
-      'trackid': instance.trackid,
-      'uniq_id': instance.uniqId,
+      'rcmd_reason': instance.rcmdReason,
+      'up_from_v2': instance.upFromV2,
     };
 
 Dimension _$DimensionFromJson(Map<String, dynamic> json) => Dimension(
@@ -128,4 +131,51 @@ Map<String, dynamic> _$OwnerToJson(Owner instance) => <String, dynamic>{
       'mid': instance.mid,
       'name': instance.name,
       'face': instance.face,
+    };
+
+RcmdReason _$RcmdReasonFromJson(Map<String, dynamic> json) => RcmdReason(
+      content: json['content'] as String?,
+      cornerMark: (json['corner_mark'] as num?)?.toInt(),
+    );
+
+Map<String, dynamic> _$RcmdReasonToJson(RcmdReason instance) =>
+    <String, dynamic>{
+      'content': instance.content,
+      'corner_mark': instance.cornerMark,
+    };
+
+Stat _$StatFromJson(Map<String, dynamic> json) => Stat(
+      aid: (json['aid'] as num?)?.toInt(),
+      view: (json['view'] as num?)?.toInt(),
+      danmaku: (json['danmaku'] as num?)?.toInt(),
+      reply: (json['reply'] as num?)?.toInt(),
+      favorite: (json['favorite'] as num?)?.toInt(),
+      coin: (json['coin'] as num?)?.toInt(),
+      share: (json['share'] as num?)?.toInt(),
+      nowRank: (json['now_rank'] as num?)?.toInt(),
+      hisRank: (json['all_rank'] as num?)?.toInt(),
+      like: (json['like'] as num?)?.toInt(),
+      dislike: (json['dislike'] as num?)?.toInt(),
+      vt: (json['vt'] as num?)?.toInt(),
+      vv: (json['vv'] as num?)?.toInt(),
+      favG: (json['fav_g'] as num?)?.toInt(),
+      likeG: (json['like_g'] as num?)?.toInt(),
+    );
+
+Map<String, dynamic> _$StatToJson(Stat instance) => <String, dynamic>{
+      'aid': instance.aid,
+      'view': instance.view,
+      'danmaku': instance.danmaku,
+      'reply': instance.reply,
+      'favorite': instance.favorite,
+      'coin': instance.coin,
+      'share': instance.share,
+      'now_rank': instance.nowRank,
+      'all_rank': instance.hisRank,
+      'like': instance.like,
+      'dislike': instance.dislike,
+      'vt': instance.vt,
+      'vv': instance.vv,
+      'fav_g': instance.favG,
+      'like_g': instance.likeG,
     };

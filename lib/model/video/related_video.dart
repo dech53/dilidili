@@ -1,3 +1,4 @@
+import 'package:dilidili/model/video/hot_video.dart';
 import 'package:json_annotation/json_annotation.dart';
 part 'related_video.g.dart';
 @JsonSerializable()
@@ -31,7 +32,7 @@ class RelatedVideoItem {
     @JsonKey(name: "owner")
     Owner? owner;
     @JsonKey(name: "stat")
-    Map<String, int>? stat;
+    Stat? stat;
     @JsonKey(name: "dynamic")
     String? relatedVideoItemDynamic;
     @JsonKey(name: "cid")

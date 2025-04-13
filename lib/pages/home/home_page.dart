@@ -128,9 +128,9 @@ class _HomePageState extends State<HomePage>
           ),
           //Expanded + tabbar
           //视频列表
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15),
-            child: const CustomTabs(),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 15),
+            child: CustomTabs(),
           ),
           Expanded(
             child: TabBarView(

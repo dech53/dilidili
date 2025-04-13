@@ -12,4 +12,7 @@ class ApiString {
   static const String video_online_people = "x/player/online/total";
   static const String video_basic_info = "x/web-interface/view";
   static const String video_desc_info ="x/web-interface/archive/desc";
+  static const String hotList = '/x/web-interface/popular';
+  static const String hasFollow = '/x/relation';
+  static const String relationMod = '/x/relation/modify';
 }

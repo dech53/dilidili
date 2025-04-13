@@ -3,6 +3,7 @@ import 'package:dilidili/http/static/api_string.dart';
 import 'package:dilidili/model/nav_user_info.dart';
 import 'package:dilidili/model/rcmd_video.dart';
 import 'package:dilidili/model/root_data.dart';
+import 'package:dilidili/model/video/hot_video.dart';
 import 'package:dilidili/model/video/related_video.dart';
 import 'package:dilidili/model/video/video_basic_info.dart';
 
@@ -96,6 +97,81 @@ class VideoHttp {
         'data': [],
         'msg': e.toString(),
       };
+    }
+  }
+
+  static Future hotVideoList({required int pn, required int ps}) async {
+    try {
+      var res = await DioInstance.instance().get(
+        path: ApiString.baseUrl + ApiString.hotList,
+        param: {
+          'pn': pn,
+          'ps': ps,
+        },
+      );
+      if (res.data['code'] == 0) {
+        List<HotVideoItem> list = [];
+        list.addAll(
+          Rootdata.fromJson(
+            res.data,
+            (dynamic data) => HotVideoItemList.fromJson(data),
+          ).data.list!,
+        );
+        return {'status': true, 'data': list};
+      } else {
+        return {'status': false, 'data': [], 'msg': res.data['message']};
+      }
+    } catch (err) {
+      return {'status': false, 'data': [], 'msg': err};
+    }
+  }
+
+  static Future onlineTotal({int? aid, String? bvid, int? cid}) async {
+    var res = await DioInstance.instance().get(
+      path: ApiString.baseUrl + ApiString.video_online_people,
+      param: {
+        'aid': aid,
+        'bvid': bvid,
+        'cid': cid,
+      },
+    );
+    if (res.data['code'] == 0) {
+      return {'status': true, 'data': res.data['data']};
+    } else {
+      return {'status': false, 'data': null, 'msg': res.data['message']};
+    }
+  }
+
+  static Future hasFollow(int mid) async {
+    var res = await DioInstance.instance().get(
+      path: ApiString.baseUrl + ApiString.hasFollow,
+      param: {
+        'fid': mid,
+      },
+    );
+    if (res.data['code'] == 0) {
+      return {'status': true, 'data': res.data['data']};
+    } else {
+      return {'status': false, 'msg': res.data['message']};
+    }
+  }
+
+  // 操作用户关系
+  static Future relationMod(
+      {required int mid, required int act, required int reSrc}) async {
+    var res = await DioInstance.instance().post(
+      path: ApiString.baseUrl + ApiString.relationMod,
+      param: {
+        'fid': mid,
+        'act': act,
+        're_src': reSrc,
+        'csrf': await DioInstance.instance().getCsrf(),
+      },
+    );
+    if (res.data['code'] == 0) {
+      return {'status': true, 'data': res.data['data'], 'msg': '成功'};
+    } else {
+      return {'status': false, 'data': [], 'msg': res.data['message']};
     }
   }
 }

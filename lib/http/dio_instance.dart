@@ -54,6 +54,17 @@ class DioInstance {
     // _dio.interceptors.add(PrintLogInterceptor());
   }
 
+  // 从cookie中获取 csrf token
+   Future<String> getCsrf() async {
+    List<Cookie> cookies = await cookieManager.cookieJar
+        .loadForRequest(Uri.parse(ApiString.baseUrl));
+    String token = '';
+    if (cookies.where((e) => e.name == 'bili_jct').isNotEmpty) {
+      token = cookies.firstWhere((e) => e.name == 'bili_jct').value;
+    }
+    return token;
+  }
+
   //get请求
   Future<Response> get({
     required String path,

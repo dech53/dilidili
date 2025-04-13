@@ -7,7 +7,7 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
   late RxList tabs = [].obs;
   late List tabsCtrList;
   late List<Widget> tabsPageList;
-  RxInt initialIndex = 0.obs;
+  RxInt initialIndex = 1.obs;
 
   void onRefresh() {
     int index = tabController.index;

@@ -27,8 +27,8 @@ class _RcmdPageState extends State<RcmdPage>
       () {
         if (scrollController.position.pixels >=
             scrollController.position.maxScrollExtent - 200) {
-            _rcmdController.isLoadingMore = true;
-            _rcmdController.onLoad();
+          _rcmdController.isLoadingMore = true;
+          _rcmdController.onLoad();
         }
       },
     );
@@ -79,7 +79,9 @@ class _RcmdPageState extends State<RcmdPage>
                             } else {
                               // 显示视频列表
                               return contentGrid(
-                                  _rcmdController, _rcmdController.videoList);
+                                _rcmdController,
+                                _rcmdController.videoList,
+                              );
                             }
                           },
                         );

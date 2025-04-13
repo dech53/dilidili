@@ -61,6 +61,7 @@ dependencies:
   get: ^4.7.2
   lottie: ^3.3.1
   flutter_smart_dialog: ^4.9.8+7
+  expandable: ^5.0.1
 
 dev_dependencies:
   flutter_test:

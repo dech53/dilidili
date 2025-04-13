@@ -55,6 +55,16 @@ class RcmdController extends GetxController {
     return res;
   }
 
+  void animateToTop() async {
+    if (scrollController.offset >=
+        MediaQuery.of(Get.context!).size.height * 5) {
+      scrollController.jumpTo(0);
+    } else {
+      await scrollController.animateTo(0,
+          duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
+    }
+  }
+
   // 下拉刷新
   Future onRefresh() async {
     isLoadingMore = true;

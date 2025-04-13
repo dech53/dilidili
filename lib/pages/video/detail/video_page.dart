@@ -16,7 +16,7 @@ class VideoPage extends StatefulWidget {
 }
 
 class _VideoPageState extends State<VideoPage>
-    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
+    with SingleTickerProviderStateMixin {
   late String bvid;
   late int cid;
   late int mid;
@@ -29,7 +29,6 @@ class _VideoPageState extends State<VideoPage>
   List tabs = ["简介", "评论"];
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
 
     _viewmodel.player.dispose();
@@ -39,24 +38,7 @@ class _VideoPageState extends State<VideoPage>
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    super.didChangeAppLifecycleState(state);
-    if (state == AppLifecycleState.paused ||
-        state == AppLifecycleState.inactive) {
-      Logutils.println("应用暂停");
-      _peopleCountTimer?.cancel();
-    } else if (state == AppLifecycleState.resumed) {
-      Logutils.println("应用暂停");
-      _peopleCountTimer = Timer.periodic(
-        const Duration(seconds: 30),
-        (timer) => _viewmodel.fetchOnlinePeople(cid, bvid),
-      );
-    }
-  }
-
-  @override
   void initState() {
-    WidgetsBinding.instance.addObserver(this);
     super.initState();
     bvid = Get.parameters['bvid']!;
     cid = int.parse(Get.parameters['cid']!);
@@ -65,13 +47,8 @@ class _VideoPageState extends State<VideoPage>
     _pageController = PageController();
     _viewmodel.fetchVideoPlayurl(cid, bvid);
     _viewmodel.fetchUpInfo(mid);
-    _viewmodel.fetchOnlinePeople(cid, bvid);
     _viewmodel.fetchBasicVideoInfo(cid, bvid);
     _viewmodel.fetchRelatedVideo(bvid);
-    _peopleCountTimer = Timer.periodic(
-      const Duration(seconds: 30),
-      (timer) => _viewmodel.fetchOnlinePeople(cid, bvid),
-    );
   }
 
   @override

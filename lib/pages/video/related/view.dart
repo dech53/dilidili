@@ -1,6 +1,6 @@
 import 'package:dilidili/common/skeleton/video_card_h.dart';
 import 'package:dilidili/common/widgets/http_error.dart';
-import 'package:dilidili/common/widgets/video_card_related.dart';
+import 'package:dilidili/common/widgets/video_card_h.dart';
 import 'package:dilidili/pages/video/related/controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -53,9 +53,7 @@ class _RelatedVideoPanelState extends State<RelatedVideoPanel>
                 delegate: SliverChildBuilderDelegate(
                   (_, i) {
                     return Material(
-                      child: VideoCardRelated(
-                        relatedVideoItem: relatedVideoList[i],
-                      ),
+                      child: VideoCardH(videoItem: relatedVideoList[i],enableTap: false,),
                     );
                   },
                   childCount: relatedVideoList.length,
