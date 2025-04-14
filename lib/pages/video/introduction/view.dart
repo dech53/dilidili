@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dilidili/common/widgets/action_item.dart';
 import 'package:dilidili/common/widgets/http_error.dart';
 import 'package:dilidili/model/nav_user_info.dart';
 import 'package:dilidili/model/video/video_basic_info.dart';
@@ -12,6 +13,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class VideoIntroPanel extends StatefulWidget {
   final String bvid;
@@ -288,7 +290,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                 ),
                 1.horizontalSpace,
                 Text(
-                  NumUtils.int2Num(widget.videoDetail!.stat!.view),
+                  NumUtils.int2Num(widget.videoDetail!.stat!.view!),
                   style: const TextStyle(fontSize: 12, color: Colors.grey),
                 ),
                 8.horizontalSpace,
@@ -299,7 +301,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                 ),
                 1.horizontalSpace,
                 Text(
-                  NumUtils.int2Num(widget.videoDetail!.stat!.danmaku),
+                  NumUtils.int2Num(widget.videoDetail!.stat!.danmaku!),
                   style: const TextStyle(fontSize: 12, color: Colors.grey),
                 ),
                 10.horizontalSpace,
@@ -321,23 +323,22 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
               ],
             ),
             //简介
-            if (widget.videoDetail?.desc != null)
-              ExpandablePanel(
-                controller: _expandableController,
-                collapsed: const SizedBox(height: 0),
-                expanded: IntroDetail(
-                  videoDetail: widget.videoDetail,
-                ),
-                theme: const ExpandableThemeData(
-                  animationDuration: Duration(milliseconds: 300),
-                  scrollAnimationDuration: Duration(milliseconds: 300),
-                  crossFadePoint: 0,
-                  fadeCurve: Curves.ease,
-                  sizeCurve: Curves.linear,
-                ),
+            ExpandablePanel(
+              controller: _expandableController,
+              collapsed: const SizedBox(height: 0),
+              expanded: IntroDetail(
+                videoDetail: widget.videoDetail,
               ),
+              theme: const ExpandableThemeData(
+                animationDuration: Duration(milliseconds: 300),
+                scrollAnimationDuration: Duration(milliseconds: 300),
+                crossFadePoint: 0,
+                fadeCurve: Curves.ease,
+                sizeCurve: Curves.linear,
+              ),
+            ),
             //点赞、投币、收藏、转发
-
+            Material(child: actionGrid(context, videoIntroController)),
             //分割线
             Divider(
               color: Colors.grey.shade300,
@@ -348,6 +349,68 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
           ],
         ),
       ),
+    );
+  }
+
+  Widget actionGrid(BuildContext context, videoIntroController) {
+    Map<String, Widget> menuListWidgets = {
+      'like': Obx(
+        () => ActionItem(
+          icon: const Icon(FontAwesomeIcons.thumbsUp),
+          selectIcon: const Icon(FontAwesomeIcons.solidThumbsUp),
+          onTap: videoIntroController.actionLikeVideo,
+          selectStatus: videoIntroController.hasLike.value,
+          text: widget.videoDetail!.stat!.like!.toString(),
+        ),
+      ),
+      'dislike': Obx(
+        () => ActionItem(
+          icon: const Icon(FontAwesomeIcons.thumbsDown),
+          selectIcon: const Icon(FontAwesomeIcons.solidThumbsDown),
+          onTap: () {},
+          selectStatus: videoIntroController.hasDisLike.value,
+          text: '不喜欢',
+        ),
+      ),
+      'coin': Obx(
+        () => ActionItem(
+          icon: const Icon(FontAwesomeIcons.b),
+          selectIcon: const Icon(FontAwesomeIcons.b),
+          onTap: videoIntroController.actionCoinVideo,
+          selectStatus: videoIntroController.hasCoin.value,
+          text: widget.videoDetail!.stat!.coin!.toString(),
+        ),
+      ),
+      'collect': Obx(
+        () => ActionItem(
+          icon: const Icon(FontAwesomeIcons.star),
+          selectIcon: const Icon(FontAwesomeIcons.solidStar),
+          onTap: videoIntroController.actionFavVideo,
+          onLongPress: () {},
+          selectStatus: videoIntroController.hasFav.value,
+          text: widget.videoDetail!.stat!.favorite!.toString(),
+        ),
+      ),
+      'share': ActionItem(
+        icon: const Icon(FontAwesomeIcons.shareFromSquare),
+        onTap: () => videoIntroController.actionShareVideo(),
+        selectStatus: false,
+        text: widget.videoDetail!.stat!.share!.toString(),
+      ),
+    };
+    final List<Widget> list = [];
+    list.addAll(menuListWidgets.values);
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        return Container(
+          margin: const EdgeInsets.only(top: 6, bottom: 4),
+          height: constraints.maxWidth / 5,
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            children: list,
+          ),
+        );
+      },
     );
   }
 }

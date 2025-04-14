@@ -49,7 +49,9 @@ class IntroDetail extends StatelessWidget {
               )
             ],
           ),
+          if(videoDetail?.desc != "")
           const SizedBox(height: 4),
+          if(videoDetail?.desc != "")
           SelectableRegion(
             focusNode: FocusNode(),
             selectionControls: MaterialTextSelectionControls(),

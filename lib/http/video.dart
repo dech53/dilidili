@@ -3,9 +3,11 @@ import 'package:dilidili/http/static/api_string.dart';
 import 'package:dilidili/model/nav_user_info.dart';
 import 'package:dilidili/model/rcmd_video.dart';
 import 'package:dilidili/model/root_data.dart';
+import 'package:dilidili/model/user/fav_folder.dart';
 import 'package:dilidili/model/video/hot_video.dart';
 import 'package:dilidili/model/video/related_video.dart';
 import 'package:dilidili/model/video/video_basic_info.dart';
+import 'package:dilidili/utils/log_utils.dart';
 
 class VideoHttp {
   static Future relatedVideoList({required String bvid}) async {
@@ -170,6 +172,122 @@ class VideoHttp {
     );
     if (res.data['code'] == 0) {
       return {'status': true, 'data': res.data['data'], 'msg': '成功'};
+    } else {
+      return {'status': false, 'data': [], 'msg': res.data['message']};
+    }
+  }
+
+  // 获取点赞状态
+  static Future hasLikeVideo({required String bvid}) async {
+    var res = await DioInstance.instance().get(
+      path: ApiString.baseUrl + ApiString.hasLikeVideo,
+      param: {
+        'bvid': bvid,
+      },
+    );
+    if (res.data['code'] == 0) {
+      return {'status': true, 'data': res.data['data']};
+    } else {
+      return {'status': false, 'data': []};
+    }
+  }
+
+  // 获取投币状态
+  static Future hasCoinVideo({required String bvid}) async {
+    var res = await DioInstance.instance().get(
+      path: ApiString.baseUrl + ApiString.hasCoinVideo,
+      param: {
+        'bvid': bvid,
+      },
+    );
+    print('res: $res');
+    if (res.data['code'] == 0) {
+      return {'status': true, 'data': res.data['data']};
+    } else {
+      return {'status': false, 'data': []};
+    }
+  }
+
+  // 获取收藏状态
+  static Future hasFavVideo({required int aid}) async {
+    var res = await DioInstance.instance().get(
+      path: ApiString.baseUrl + ApiString.hasFavVideo,
+      param: {
+        'aid': aid,
+      },
+    );
+    if (res.data['code'] == 0) {
+      return {'status': true, 'data': res.data['data']};
+    } else {
+      return {'status': false, 'data': []};
+    }
+  }
+
+  // （取消）点赞
+  static Future likeVideo({required String bvid, required bool type}) async {
+    var res = await DioInstance.instance().post(
+      path: ApiString.baseUrl + ApiString.likeVideo,
+      param: {
+        'bvid': bvid,
+        'like': type ? 1 : 2,
+        'csrf': await DioInstance.instance().getCsrf(),
+      },
+    );
+    if (res.data['code'] == 0) {
+      return {'status': true, 'data': res.data['code']};
+    } else {
+      return {'status': false, 'data': [], 'msg': res.data['message']};
+    }
+  }
+
+  static Future coinVideo({required String bvid, required int multiply}) async {
+    var res = await DioInstance.instance().post(
+      path: ApiString.baseUrl + ApiString.coinVideo,
+      param: {
+        'bvid': bvid,
+        'multiply': multiply,
+        'select_like': 0,
+        'csrf': await DioInstance.instance().getCsrf(),
+      },
+    );
+    if (res.data['code'] == 0) {
+      return {'status': true, 'data': res.data['data']};
+    } else {
+      return {'status': false, 'data': [], 'msg': res.data['message']};
+    }
+  }
+
+  static Future videoInFolder({required int mid, required int rid}) async {
+    var res = await DioInstance.instance().get(
+      path: ApiString.baseUrl + ApiString.videoInFolder,
+      param: {
+        'up_mid': mid,
+        'rid': rid,
+      },
+    );
+    if (res.data['code'] == 0) {
+      FavFolderData data = FavFolderData.fromJson(res.data['data']);
+      return {'status': true, 'data': data};
+    } else {
+      return {'status': false, 'data': []};
+    }
+  }
+
+  // （取消）收藏
+  static Future favVideo(
+      {required int aid, String? addIds, String? delIds}) async {
+    var res = await DioInstance.instance().post(
+      path: ApiString.baseUrl + ApiString.favVideo,
+      param: {
+        'rid': aid,
+        'type': 2,
+        'add_media_ids': addIds ?? '',
+        'del_media_ids': delIds ?? '',
+        'csrf': await DioInstance.instance().getCsrf(),
+      },
+    );
+    if (res.data['code'] == 0) {
+      return {'status': true, 'data': res.data['data']};
     } else {
       return {'status': false, 'data': [], 'msg': res.data['message']};
     }

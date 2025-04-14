@@ -1,13 +1,10 @@
 import 'package:dilidili/http/http_methods.dart';
-import 'package:dilidili/http/print_log_interceptor.dart';
-import 'package:dilidili/http/response_interceptor.dart';
 import 'package:dilidili/http/static/api_string.dart';
 import 'package:dilidili/utils/file_utils.dart';
 import 'package:dilidili/utils/header_utils.dart';
 import 'package:dio/dio.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
-import 'package:path_provider/path_provider.dart';
 
 class DioInstance {
   static DioInstance? _instance;
@@ -55,7 +52,7 @@ class DioInstance {
   }
 
   // 从cookie中获取 csrf token
-   Future<String> getCsrf() async {
+  Future<String> getCsrf() async {
     List<Cookie> cookies = await cookieManager.cookieJar
         .loadForRequest(Uri.parse(ApiString.baseUrl));
     String token = '';

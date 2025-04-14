@@ -327,3 +327,15 @@ Map<String, dynamic> _$ArgueInfoToJson(ArgueInfo instance) => <String, dynamic>{
       'argue_msg': instance.argue_msg,
       'argue_type': instance.argue_type,
     };
+
+Owner _$OwnerFromJson(Map<String, dynamic> json) => Owner(
+      mid: (json['mid'] as num).toInt(),
+      name: json['name'] as String,
+      face: json['face'] as String,
+    );
+
+Map<String, dynamic> _$OwnerToJson(Owner instance) => <String, dynamic>{
+      'mid': instance.mid,
+      'name': instance.name,
+      'face': instance.face,
+    };

@@ -29,11 +29,6 @@ class _RootPageState extends State<RootPage> {
       "text": "排行榜",
     },
     {
-      "SelectedIcon": Icons.add,
-      "unSelectedIcon": Icons.add,
-      "text": "发布页",
-    },
-    {
       "SelectedIcon": Icons.motion_photos_on,
       "unSelectedIcon": Icons.motion_photos_on_outlined,
       "text": "动态",
@@ -57,7 +52,7 @@ class _RootPageState extends State<RootPage> {
       bottomNavigationBar: _getBottomNavigator(context),
       body: LazyLoadIndexedStack(
         index: _index,
-        children: const [HomePage(), TrendPage(),IssuePage(), MomentsPage(), UserPage()],
+        children: const [HomePage(), TrendPage(), MomentsPage(), UserPage()],
       ),
     );
   }

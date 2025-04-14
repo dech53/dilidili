@@ -20,7 +20,6 @@ class VideoCardComponent extends StatelessWidget {
   }
 
   Widget _getVideoCardUI() {
-    int? memCacheWidth, memCacheHeight;
     return GestureDetector(
       onTap: () {
         itemTap?.call(video);
@@ -34,6 +33,7 @@ class VideoCardComponent extends StatelessWidget {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(5.r),
                   child: CachedNetworkImage(
+                    cacheKey: "${video.pic}",
                     filterQuality: FilterQuality.low,
                     fit: BoxFit.cover,
                     imageUrl: video.pic.replaceFirst("http://", "https://"),

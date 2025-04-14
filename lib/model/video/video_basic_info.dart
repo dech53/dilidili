@@ -1,4 +1,4 @@
-import 'package:dilidili/model/rcmd_video.dart';
+import 'package:dilidili/model/video/hot_video.dart';
 import 'package:json_annotation/json_annotation.dart';
 part 'video_basic_info.g.dart';
 
@@ -329,4 +329,17 @@ class ArgueInfo {
   factory ArgueInfo.fromJson(Map<String, dynamic> json) =>
       _$ArgueInfoFromJson(json);
   Map<String, dynamic> toJson() => _$ArgueInfoToJson(this);
+}
+@JsonSerializable()
+class Owner {
+  int mid;
+  String name;
+  String face;
+
+  Owner({
+    required this.mid,
+    required this.name,
+    required this.face,
+  });
+  factory Owner.fromJson(Map<String, dynamic> json) => _$OwnerFromJson(json);
 }
