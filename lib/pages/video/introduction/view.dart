@@ -125,6 +125,11 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
     _expandableController = ExpandableController(initialExpanded: false);
   }
 
+// 用户主页
+  onPushMember() {
+    Get.toNamed('/member?mid=${videoIntroController.mid}');
+  }
+
   @override
   void dispose() {
     _expandableController.dispose();
@@ -148,12 +153,10 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            GestureDetector(
-              //点击用户头像
-              onTap: () {},
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+              child: GestureDetector(
+                onTap: onPushMember,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -161,7 +164,8 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                       children: [
                         CircleAvatar(
                           backgroundImage: CachedNetworkImageProvider(
-                              widget.videoDetail!.owner!.face),
+                            widget.videoDetail!.owner!.face,
+                          ),
                         ),
                         10.horizontalSpace,
                         Column(
@@ -360,7 +364,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
           selectIcon: const Icon(FontAwesomeIcons.solidThumbsUp),
           onTap: videoIntroController.actionLikeVideo,
           selectStatus: videoIntroController.hasLike.value,
-          text: widget.videoDetail!.stat!.like!.toString(),
+          text: NumUtils.int2Num(widget.videoDetail!.stat!.like!),
         ),
       ),
       'dislike': Obx(
@@ -378,7 +382,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
           selectIcon: const Icon(FontAwesomeIcons.b),
           onTap: videoIntroController.actionCoinVideo,
           selectStatus: videoIntroController.hasCoin.value,
-          text: widget.videoDetail!.stat!.coin!.toString(),
+          text: NumUtils.int2Num(widget.videoDetail!.stat!.coin!),
         ),
       ),
       'collect': Obx(
@@ -388,14 +392,14 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
           onTap: videoIntroController.actionFavVideo,
           onLongPress: () {},
           selectStatus: videoIntroController.hasFav.value,
-          text: widget.videoDetail!.stat!.favorite!.toString(),
+          text: NumUtils.int2Num(widget.videoDetail!.stat!.favorite!),
         ),
       ),
       'share': ActionItem(
         icon: const Icon(FontAwesomeIcons.shareFromSquare),
         onTap: () => videoIntroController.actionShareVideo(),
         selectStatus: false,
-        text: widget.videoDetail!.stat!.share!.toString(),
+        text: NumUtils.int2Num(widget.videoDetail!.stat!.share!),
       ),
     };
     final List<Widget> list = [];

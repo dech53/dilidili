@@ -55,7 +55,9 @@ class _LivePageState extends State<LivePage>
         borderRadius: BorderRadius.all(StyleString.imgRadius),
       ),
       child: RefreshIndicator(
-        onRefresh: () async {},
+        onRefresh: () async {
+          return await _liveController.onRefresh();
+        },
         child: CustomScrollView(
           controller: _liveController.scrollController,
           slivers: [
@@ -76,26 +78,33 @@ class _LivePageState extends State<LivePage>
                           builder: (context, boxConstraints) {
                         return Obx(
                           () => contentGrid(
-                              _liveController, _liveController.liveRcmdList),
+                            _liveController,
+                            _liveController.liveRcmdList,
+                          ),
                         );
                       });
                     } else {
                       return HttpError(
                         errMsg: data['msg'],
                         fn: () {
-                          setState(() {
-                            _futureBuilderFuture =
-                                _liveController.queryLiveList('init');
-                          });
+                          setState(
+                            () {
+                              _futureBuilderFuture =
+                                  _liveController.queryLiveList('init');
+                            },
+                          );
                         },
                       );
                     }
                   } else {
-                    return contentGrid(_liveController, []);
+                    return contentGrid(
+                      _liveController,
+                      [],
+                    );
                   }
                 },
               ),
-            )
+            ),
           ],
         ),
       ),

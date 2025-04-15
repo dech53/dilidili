@@ -29,18 +29,18 @@ class LiveCardV extends StatelessWidget {
               child: LayoutBuilder(builder: (context, boxConstraints) {
                 return Stack(
                   children: [
-                    AspectRatio(
-                      aspectRatio: 16 / 9,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(5.r),
-                        child: CachedNetworkImage(
-                          fit: BoxFit.cover,
-                          imageUrl: liveItem.cover!
-                              .replaceFirst("http://", "https://"),
-                          httpHeaders: const {},
+                    if (liveItem.cover != "" && liveItem.cover != null)
+                      AspectRatio(
+                        aspectRatio: 16 / 9,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(5.r),
+                          child: CachedNetworkImage(
+                            fit: BoxFit.cover,
+                            imageUrl: liveItem.cover!
+                                .replaceFirst("http://", "https://"),
+                          ),
                         ),
                       ),
-                    ),
                     if (crossAxisCount != 1)
                       Positioned(
                         left: 0,
