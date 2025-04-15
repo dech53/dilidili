@@ -7,7 +7,6 @@ import 'package:dilidili/model/user/fav_folder.dart';
 import 'package:dilidili/model/video/hot_video.dart';
 import 'package:dilidili/model/video/related_video.dart';
 import 'package:dilidili/model/video/video_basic_info.dart';
-import 'package:dilidili/utils/log_utils.dart';
 
 class VideoHttp {
   static Future relatedVideoList({required String bvid}) async {

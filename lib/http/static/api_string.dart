@@ -14,7 +14,6 @@ class ApiString {
   static const String video_basic_info = "/x/web-interface/view";
   static const String video_desc_info = "/x/web-interface/archive/desc";
   static const String hotList = '/x/web-interface/popular';
-  static const String hasFollow = '/x/relation';
   static const String relationMod = '/x/relation/modify';
   static const String hasLikeVideo = '/x/web-interface/archive/has/like';
   static const String hasCoinVideo = '/x/web-interface/archive/coins';
@@ -27,5 +26,23 @@ class ApiString {
   // 我的关注 - 正在直播
   static const String getFollowingLive = '/xlive/web-ucenter/user/following';
   // 直播推荐
-  static const String getliveRecommend = '/xlive/web-interface/v1/webMain/getMoreRecList';
+  static const String getliveRecommend =
+      '/xlive/web-interface/v1/webMain/getMoreRecList';
+  //用户信息
+  static const String memberInfo = '/x/space/wbi/acc/info';
+  //用户关注数和粉丝数
+  static const String userStat = '/x/relation/stat';
+  //用户获赞数、播放数
+  static const String getMemberViewApi = '/x/space/upstat';
+  // 查询用户与自己关系_仅查关注
+  static const String hasFollow = '/x/relation';
+  //查询用户公开收藏夹
+  //传入up_mid,用户id
+  static const String getUserFolder = '/x/v3/fav/folder/created/list-all';
+  //查询收藏夹元数据,收藏夹封面图
+  //传入media_id,收藏夹id
+  static const String getFolerDetail = '/x/v3/fav/folder/info';
+  //获取收藏夹内容明细
+  //传入media_id、ps(页数)
+  static const String getFolerContent = '/x/v3/fav/resource/list';
 }
