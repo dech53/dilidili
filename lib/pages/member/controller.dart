@@ -4,12 +4,19 @@ import 'package:dilidili/http/user.dart';
 import 'package:dilidili/http/video.dart';
 import 'package:dilidili/model/member/folder_info.dart';
 import 'package:dilidili/model/member/member_info.dart';
+import 'package:dilidili/model/member_tab_type.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 
-class MemberController extends GetxController {
+class MemberController extends GetxController with GetTickerProviderStateMixin {
   late int mid;
+
   Rx<MemberInfo> memberInfo = MemberInfo().obs;
-  RxList<FolderItem> folders = <FolderItem>[].obs;
+  late RxList tabs = [].obs;
+  late List tabsCtrList;
+  late List<Widget> tabsPageList;
+
   late Map userStat;
   late int ownerMid;
   late SharedPreferencesInstance prefs;
@@ -19,6 +26,9 @@ class MemberController extends GetxController {
   @override
   void onInit() async {
     super.onInit();
+    tabs.value = memberTabs;
+    tabsCtrList = memberTabs.map((e) => e['ctr']).toList();
+    tabsPageList = memberTabs.map<Widget>((e) => e['page']).toList();
     mid = int.parse(Get.parameters['mid']!);
     prefs = await SharedPreferencesInstance.instance();
     //获取当前登录用户的mid
@@ -91,16 +101,12 @@ class MemberController extends GetxController {
       act: memberInfo.value.isFollowed! ? 2 : 1,
       reSrc: 11,
     );
+    SmartDialog.showToast('操作成功');
+
     memberInfo.value.isFollowed = !memberInfo.value.isFollowed!;
     relationSearch();
     memberInfo.update((val) {});
   }
 
-  Future getUserFolder() async {
-    var res = await MemberHttp.getUserFolder(mid: mid);
-    if (res['status']) {
-      folders.value = res['data'];
-    }
-    return res;
-  }
+  
 }

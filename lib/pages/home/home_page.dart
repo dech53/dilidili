@@ -1,12 +1,8 @@
-import 'package:dilidili/component/video_card_component.dart';
 import 'package:dilidili/pages/home/controller.dart';
-import 'package:dilidili/pages/home/home_page_vm.dart';
-import 'package:dilidili/pages/video/detail/video_page.dart';
 import 'package:dilidili/utils/string_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});

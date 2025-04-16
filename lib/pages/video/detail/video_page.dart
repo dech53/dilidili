@@ -1,13 +1,9 @@
 import 'dart:async';
-import 'package:dilidili/pages/video/detail/video_page_vm.dart';
 import 'package:dilidili/pages/video/introduction/view.dart';
 import 'package:dilidili/pages/video/related/view.dart';
-import 'package:dilidili/utils/log_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:media_kit_video/media_kit_video.dart';
-import 'package:provider/provider.dart';
 
 class VideoPage extends StatefulWidget {
   const VideoPage({super.key});
@@ -20,7 +16,6 @@ class _VideoPageState extends State<VideoPage>
   late String bvid;
   late int cid;
   late int mid;
-  final VideoPageViewModel _viewmodel = VideoPageViewModel();
   Timer? _peopleCountTimer;
   late PageController _pageController;
   late TabController _tabController;
@@ -31,8 +26,6 @@ class _VideoPageState extends State<VideoPage>
   void dispose() {
     super.dispose();
 
-    _viewmodel.player.dispose();
-    _viewmodel.main_controller = null;
     _peopleCountTimer?.cancel();
     _peopleCountTimer = null;
   }
@@ -45,28 +38,21 @@ class _VideoPageState extends State<VideoPage>
     mid = int.parse(Get.parameters['mid']!);
     _tabController = TabController(length: tabs.length, vsync: this);
     _pageController = PageController();
-    _viewmodel.fetchVideoPlayurl(cid, bvid);
-    _viewmodel.fetchUpInfo(mid);
-    _viewmodel.fetchBasicVideoInfo(cid, bvid);
-    _viewmodel.fetchRelatedVideo(bvid);
   }
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider.value(
-      value: _viewmodel,
-      child: Scaffold(
-        extendBody: true,
-        appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(0),
-          child: AppBar(
-            backgroundColor: Colors.black,
-            elevation: 0,
-          ),
+    return Scaffold(
+      extendBody: true,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(0),
+        child: AppBar(
+          backgroundColor: Colors.black,
+          elevation: 0,
         ),
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        body: _getBodyUI(),
       ),
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      body: _getBodyUI(),
     );
   }
 
@@ -75,30 +61,30 @@ class _VideoPageState extends State<VideoPage>
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.max,
       children: [
-        Selector<VideoPageViewModel, VideoController?>(
-            builder: (context, controller, child) {
-              return (controller != null)
-                  ? AspectRatio(
-                      aspectRatio: 16 / 9,
-                      child: Video(
-                        controller: controller,
-                      ),
-                    )
-                  : AspectRatio(
-                      aspectRatio: 16 / 9,
-                      child: Container(
-                        color: Colors.black,
-                        child: const Center(
-                          child: CircularProgressIndicator(
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(Colors.black),
-                            backgroundColor: Colors.white,
-                          ),
-                        ),
-                      ),
-                    );
-            },
-            selector: (_, viewModel) => viewModel.main_controller),
+        // Selector<VideoPageViewModel, VideoController?>(
+        //     builder: (context, controller, child) {
+        //       return (controller != null)
+        //           ? AspectRatio(
+        //               aspectRatio: 16 / 9,
+        //               child: Video(
+        //                 controller: controller,
+        //               ),
+        //             )
+        //           : AspectRatio(
+        //               aspectRatio: 16 / 9,
+        //               child: Container(
+        //                 color: Colors.black,
+        //                 child: const Center(
+        //                   child: CircularProgressIndicator(
+        //                     valueColor:
+        //                         AlwaysStoppedAnimation<Color>(Colors.black),
+        //                     backgroundColor: Colors.white,
+        //                   ),
+        //                 ),
+        //               ),
+        //             );
+        //     },
+        //     selector: (_, viewModel) => viewModel.main_controller),
         Expanded(
           child: Column(
             mainAxisSize: MainAxisSize.max,

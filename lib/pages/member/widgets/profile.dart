@@ -60,6 +60,7 @@ class ProfilePanel extends StatelessWidget {
                             ],
                           ),
                         ),
+                        const Text("|"),
                         InkWell(
                           onTap: () {},
                           child: Column(
@@ -85,6 +86,7 @@ class ProfilePanel extends StatelessWidget {
                             ],
                           ),
                         ),
+                        const Text("|"),
                         Column(
                           children: [
                             Text(
@@ -132,9 +134,7 @@ class ProfilePanel extends StatelessWidget {
                                     ? Theme.of(context)
                                         .colorScheme
                                         .onInverseSurface
-                                    : Theme.of(context)
-                                        .colorScheme
-                                        .primary,
+                                    : Theme.of(context).colorScheme.primary,
                               ),
                               child: Obx(() => Text(ctr.attributeText.value)),
                             ),

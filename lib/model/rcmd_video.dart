@@ -3,7 +3,7 @@ part 'rcmd_video.g.dart';
 
 @JsonSerializable()
 class RcmdVideo {
-  List<VideoItem> item;
+  List<RcmdVideoItem> item;
   dynamic business_card;
   dynamic floor_info;
   dynamic user_feature;
@@ -26,7 +26,7 @@ class RcmdVideo {
 }
 
 @JsonSerializable()
-class VideoItem {
+class RcmdVideoItem {
   int id;
   String bvid;
   int cid;
@@ -54,7 +54,7 @@ class VideoItem {
   int dislike_switch;
   int dislike_switch_pc;
 
-  VideoItem({
+  RcmdVideoItem({
     required this.id,
     required this.bvid,
     required this.cid,
@@ -83,8 +83,8 @@ class VideoItem {
     required this.dislike_switch_pc,
   });
 
-  factory VideoItem.fromJson(Map<String, dynamic> json) =>
-      _$VideoItemFromJson(json);
+  factory RcmdVideoItem.fromJson(Map<String, dynamic> json) =>
+      _$RcmdVideoItemFromJson(json);
 }
 
 @JsonSerializable()

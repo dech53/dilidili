@@ -45,4 +45,18 @@ class ApiString {
   //获取收藏夹内容明细
   //传入media_id、ps(页数)
   static const String getFolerContent = '/x/v3/fav/resource/list';
+  // 用户投稿
+  // https://api.bilibili.com/x/space/wbi/arc/search?
+  // mid=85754245&
+  // ps=30&
+  // tid=0&
+  // pn=1&
+  // keyword=&
+  // order=pubdate&
+  // platform=web&
+  // web_location=1550101&
+  // order_avoided=true&
+  // w_rid=d893cf98a4e010cf326373194a648360&
+  // wts=1689767832
+  static const String memberArchive = '/x/space/wbi/arc/search';
 }

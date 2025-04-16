@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class VideoCardComponent extends StatelessWidget {
-  final VideoItem video;
-  final Function(VideoItem video)? itemTap;
+  final RcmdVideoItem video;
+  final Function(RcmdVideoItem video)? itemTap;
   const VideoCardComponent({
     required this.video,
     super.key,

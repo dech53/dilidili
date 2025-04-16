@@ -6,7 +6,9 @@ import 'package:dilidili/model/root_data.dart';
 import 'package:dilidili/model/user/fav_folder.dart';
 import 'package:dilidili/model/video/hot_video.dart';
 import 'package:dilidili/model/video/related_video.dart';
+import 'package:dilidili/model/video/url.dart';
 import 'package:dilidili/model/video/video_basic_info.dart';
+import 'package:dilidili/utils/wbi_utils.dart';
 
 class VideoHttp {
   static Future relatedVideoList({required String bvid}) async {
@@ -79,7 +81,7 @@ class VideoHttp {
         },
       );
       if (res.data['code'] == 0) {
-        List<VideoItem> list = [];
+        List<RcmdVideoItem> list = [];
         list.addAll(
           Rootdata.fromJson(
               res.data, (dynamic data) => RcmdVideo.fromJson(data)).data.item,
@@ -289,6 +291,36 @@ class VideoHttp {
       return {'status': true, 'data': res.data['data']};
     } else {
       return {'status': false, 'data': [], 'msg': res.data['message']};
+    }
+  }
+
+  static Future videoUrl(
+      {int? avid, String? bvid, required int cid, int? qn}) async {
+    var res = await DioInstance.instance().get(
+      path: ApiString.baseUrl + ApiString.video_playurl,
+      param: await WbiUtils.getWbi(
+        {
+          'cid': cid,
+          'avid': avid,
+          'bvid': bvid,
+          'qn': qn ?? 80,
+          'fourk': 1,
+          'voice_balance': 1,
+          'gaia_source': 'pre-load',
+          'web_location': 1550101,
+          'fnval': 4048,
+        },
+      ),
+    );
+    if (res.data['code'] == 0) {
+      return {'status': true, 'data': PlayUrlModel.fromJson(res.data['data'])};
+    } else {
+      return {
+        'status': false,
+        'data': [],
+        'code': res.data['code'],
+        'msg': res.data['message'],
+      };
     }
   }
 }

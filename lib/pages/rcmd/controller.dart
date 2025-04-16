@@ -15,7 +15,7 @@ class RcmdController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    videoList = <VideoItem>[].obs;
+    videoList = <RcmdVideoItem>[].obs;
   }
 
   Future queryRcmdFeed(type) async {

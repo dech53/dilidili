@@ -8,7 +8,7 @@ part of 'rcmd_video.dart';
 
 RcmdVideo _$RcmdVideoFromJson(Map<String, dynamic> json) => RcmdVideo(
       item: (json['item'] as List<dynamic>)
-          .map((e) => VideoItem.fromJson(e as Map<String, dynamic>))
+          .map((e) => RcmdVideoItem.fromJson(e as Map<String, dynamic>))
           .toList(),
       business_card: json['business_card'],
       floor_info: json['floor_info'],
@@ -29,7 +29,8 @@ Map<String, dynamic> _$RcmdVideoToJson(RcmdVideo instance) => <String, dynamic>{
       'mid': instance.mid,
     };
 
-VideoItem _$VideoItemFromJson(Map<String, dynamic> json) => VideoItem(
+RcmdVideoItem _$RcmdVideoItemFromJson(Map<String, dynamic> json) =>
+    RcmdVideoItem(
       id: (json['id'] as num).toInt(),
       bvid: json['bvid'] as String,
       cid: (json['cid'] as num).toInt(),
@@ -60,7 +61,8 @@ VideoItem _$VideoItemFromJson(Map<String, dynamic> json) => VideoItem(
       dislike_switch_pc: (json['dislike_switch_pc'] as num).toInt(),
     );
 
-Map<String, dynamic> _$VideoItemToJson(VideoItem instance) => <String, dynamic>{
+Map<String, dynamic> _$RcmdVideoItemToJson(RcmdVideoItem instance) =>
+    <String, dynamic>{
       'id': instance.id,
       'bvid': instance.bvid,
       'cid': instance.cid,
