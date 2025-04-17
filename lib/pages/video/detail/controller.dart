@@ -1,9 +1,12 @@
+import 'package:dilidili/http/video.dart';
 import 'package:dilidili/model/bottom_control_type.dart';
 import 'package:dilidili/model/play_status.dart';
 import 'package:dilidili/model/video/quality.dart';
 import 'package:dilidili/model/video/url.dart';
 import 'package:dilidili/utils/id_utils.dart';
+import 'package:dilidili/utils/log_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 
 class VideoDetailController extends GetxController
@@ -41,7 +44,16 @@ class VideoDetailController extends GetxController
     oid.value = IdUtils.bv2av(Get.parameters['bvid']!);
   }
 
-
-  
-
+// 视频链接
+  Future queryVideoUrl() async {
+    var result = await VideoHttp.videoUrl(cid: cid.value, bvid: bvid);
+    if (result['status']) {
+      data = result['data'];
+      Logutils.println(data.dash!.video!.first.baseUrl!);
+      Logutils.println(data.dash!.audio!.first.baseUrl!);
+    } else {
+      SmartDialog.showToast(result['msg'].toString());
+    }
+    return result;
+  }
 }
