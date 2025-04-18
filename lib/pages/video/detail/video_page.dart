@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:dilidili/pages/dplayer/controller.dart';
 import 'package:dilidili/pages/dplayer/view.dart';
 import 'package:dilidili/pages/video/detail/controller.dart';
 import 'package:dilidili/pages/video/introduction/view.dart';
@@ -20,23 +21,22 @@ class VideoPage extends StatefulWidget {
 class _VideoPageState extends State<VideoPage>
     with SingleTickerProviderStateMixin {
   late VideoDetailController vdCtr;
+  late double statusBarHeight;
+  DPlayerController? dPlayerController;
   final ScrollController _extendNestCtr = ScrollController();
-
+  final double videoHeight = Get.size.width * 9 / 16;
   late String bvid;
   late int cid;
   late int mid;
-  Timer? _peopleCountTimer;
   late TabController _tabController;
-  late VideoController controller;
   late Future _futureBuilderFuture;
 
-  List tabs = ["简介", "评论"];
   @override
   void dispose() {
     super.dispose();
-
-    _peopleCountTimer?.cancel();
-    _peopleCountTimer = null;
+    if(dPlayerController != null){
+      dPlayerController!.dispose();
+    }
   }
 
   @override
@@ -47,76 +47,85 @@ class _VideoPageState extends State<VideoPage>
     mid = int.parse(Get.parameters['mid']!);
     vdCtr = Get.put(VideoDetailController());
     _futureBuilderFuture = vdCtr.queryVideoUrl();
-    _tabController = TabController(length: tabs.length, vsync: this);
-    controller = VideoController(Player());
+    _tabController = TabController(length: vdCtr.tabs.length, vsync: this);
+    dPlayerController = vdCtr.dPlayerController;
   }
 
   @override
   Widget build(BuildContext context) {
-    return _getBodyUI();
-  }
+    final sizeContext = MediaQuery.sizeOf(context);
+    final _context = MediaQuery.of(context);
+    late double defaultVideoHeight = sizeContext.width * 9 / 16;
+    late RxDouble videoHeight = defaultVideoHeight.obs;
+    Widget buildLoadingWidget() {
+      return Center(child: Lottie.asset('assets/loading.json', width: 200));
+    }
 
-  Widget buildLoadingWidget() {
-    return Center(child: Lottie.asset('assets/loading.json', width: 200));
-  }
-
-  Widget buildErrorWidget(dynamic error) {
-    return Obx(
-      () => SizedBox(
-        height: 200.0,
-        width: Get.size.width,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const Text('加载失败', style: TextStyle(color: Colors.white)),
-            Text('$error', style: const TextStyle(color: Colors.white)),
-            const SizedBox(height: 10),
-            IconButton.filled(
-              onPressed: () {
-                setState(() {
-                  _futureBuilderFuture = vdCtr.queryVideoUrl();
-                });
-              },
-              icon: const Icon(Icons.refresh),
-            )
-          ],
+    Widget buildErrorWidget(dynamic error) {
+      return Obx(
+        () => SizedBox(
+          height: videoHeight.value,
+          width: Get.size.width,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Text('加载失败', style: TextStyle(color: Colors.white)),
+              Text('$error', style: const TextStyle(color: Colors.white)),
+              const SizedBox(height: 10),
+              IconButton.filled(
+                onPressed: () {
+                  setState(() {
+                    _futureBuilderFuture = vdCtr.queryVideoUrl();
+                  });
+                },
+                icon: const Icon(Icons.refresh),
+              )
+            ],
+          ),
         ),
-      ),
-    );
-  }
+      );
+    }
 
-  Widget buildVideoPlayerWidget(AsyncSnapshot snapshot) {
-    return DPlayer(controller: controller);
-  }
+    Widget buildVideoPlayerWidget(AsyncSnapshot snapshot) {
+      return DPlayer(controller: dPlayerController!);
+    }
 
-  Widget buildVideoPlayerPanel() {
-    return FutureBuilder(
-      future: _futureBuilderFuture,
-      builder: (BuildContext context, AsyncSnapshot snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return buildLoadingWidget();
-        } else if (snapshot.connectionState == ConnectionState.done) {
-          if (snapshot.hasData && snapshot.data['status']) {
-            return buildVideoPlayerWidget(snapshot);
+    Widget buildVideoPlayerPanel() {
+      return FutureBuilder(
+        future: _futureBuilderFuture,
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return buildLoadingWidget();
+          } else if (snapshot.connectionState == ConnectionState.done) {
+            if (snapshot.hasData && snapshot.data['status']) {
+              return buildVideoPlayerWidget(snapshot);
+            } else {
+              return buildErrorWidget(snapshot.error);
+            }
           } else {
-            return buildErrorWidget(snapshot.error);
+            return buildErrorWidget('未知错误');
           }
-        } else {
-          return buildErrorWidget('未知错误');
-        }
-      },
-    );
-  }
+        },
+      );
+    }
 
-  Widget _getBodyUI() {
     return SafeArea(
+      bottom: false,
       left: false,
       right: false,
       child: Stack(
         children: [
           Scaffold(
             resizeToAvoidBottomInset: false,
+            appBar: PreferredSize(
+              preferredSize: const Size.fromHeight(0),
+              child: AppBar(
+                backgroundColor: Colors.black,
+                elevation: 0,
+                scrolledUnderElevation: 0,
+              ),
+            ),
             body: ExtendedNestedScrollView(
               controller: _extendNestCtr,
               headerSliverBuilder:
@@ -128,7 +137,7 @@ class _VideoPageState extends State<VideoPage>
                     elevation: 0,
                     scrolledUnderElevation: 0,
                     forceElevated: innerBoxIsScrolled,
-                    expandedHeight: 200.0,
+                    expandedHeight: videoHeight.value,
                     backgroundColor: Colors.black,
                     flexibleSpace: FlexibleSpaceBar(
                       background: PopScope(
@@ -182,7 +191,7 @@ class _VideoPageState extends State<VideoPage>
                                 labelPadding: const EdgeInsets.symmetric(
                                     horizontal: 10.0),
                                 dividerColor: Colors.transparent,
-                                tabs: tabs
+                                tabs: vdCtr.tabs
                                     .map((e) => Tab(
                                           text: e,
                                         ))

@@ -31,8 +31,8 @@ class _FavoritePageState extends State<FavoritePage>
       child: Container(
         clipBehavior: Clip.hardEdge,
         margin: const EdgeInsets.symmetric(horizontal: 4),
-        decoration: BoxDecoration(
-          borderRadius: const BorderRadius.all(Radius.circular(12)),
+        decoration: const BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(12)),
         ),
         child: CustomScrollView(
           controller: _favoriteController.scrollController,
@@ -185,7 +185,7 @@ class VideoContent extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontWeight: FontWeight.w600,
-                fontSize: Theme.of(context).textTheme.titleMedium!.fontSize,
+                fontSize: Theme.of(context).textTheme.labelLarge!.fontSize,
                 letterSpacing: 0.3,
                 color: Theme.of(context).textTheme.titleMedium!.color,
               ),

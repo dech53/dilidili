@@ -1,16 +1,23 @@
+import 'package:dilidili/common/widgets/video_card_h.dart';
+import 'package:dilidili/http/static/api_string.dart';
 import 'package:dilidili/http/video.dart';
 import 'package:dilidili/model/bottom_control_type.dart';
 import 'package:dilidili/model/play_status.dart';
 import 'package:dilidili/model/video/quality.dart';
 import 'package:dilidili/model/video/url.dart';
+import 'package:dilidili/pages/dplayer/controller.dart';
+import 'package:dilidili/pages/dplayer/models/data_source.dart';
 import 'package:dilidili/utils/id_utils.dart';
 import 'package:dilidili/utils/log_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
+import 'package:media_kit/media_kit.dart';
+import 'package:media_kit_video/media_kit_video.dart';
 
 class VideoDetailController extends GetxController
     with GetSingleTickerProviderStateMixin {
+  DPlayerController dPlayerController = DPlayerController();
   // 路由传参
   String bvid = Get.parameters['bvid']!;
   late VideoQuality currentVideoQa;
@@ -49,11 +56,58 @@ class VideoDetailController extends GetxController
     var result = await VideoHttp.videoUrl(cid: cid.value, bvid: bvid);
     if (result['status']) {
       data = result['data'];
-      Logutils.println(data.dash!.video!.first.baseUrl!);
-      Logutils.println(data.dash!.audio!.first.baseUrl!);
+      if (data.acceptDesc!.isNotEmpty && data.acceptDesc!.contains('试看')) {
+        SmartDialog.showToast(
+          '该视频为专属视频，仅提供试看',
+          displayTime: const Duration(seconds: 3),
+        );
+        videoUrl = data.durl!.first.url!;
+        audioUrl = '';
+        defaultST = Duration.zero;
+        firstVideo = VideoItem();
+        await playerInit();
+        return result;
+      }
+      if (data.durl != null) {
+        archiveSourceType.value = 'durl';
+        videoUrl = data.durl!.first.url!;
+        audioUrl = '';
+        defaultST = Duration.zero;
+        firstVideo = VideoItem();
+        currentVideoQa = VideoQualityCode.fromCode(data.quality!)!;
+        await playerInit();
+        return result;
+      }
+      final List<VideoItem> allVideosList = data.dash!.video!;
+      int currentHighVideoQa = allVideosList.first.quality!.code;
+      final List<VideoItem> videosList = allVideosList
+          .where((e) => e.quality!.code == currentHighVideoQa)
+          .toList();
+      firstVideo = videosList.first;
+      videoUrl = firstVideo.baseUrl!;
+      final List<AudioItem> audiosList = data.dash!.audio!;
+      firstAudio = audiosList.first;
+      audioUrl = firstAudio.baseUrl!;
+      await playerInit();
     } else {
       SmartDialog.showToast(result['msg'].toString());
     }
+
     return result;
+  }
+
+  Future playerInit() async {
+    await dPlayerController.setDataSource(
+      DataSource(
+        videoSource: videoUrl,
+        audioSource: audioUrl,
+        type: DataSourceType.network,
+        httpHeaders: {
+          'user-agent':
+              'Mozilla/5.0 (Macintosh; Intel Mac OS X 13_3_1) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.4 Safari/605.1.15',
+          'referer': ApiString.mainUrl
+        },
+      ),
+    );
   }
 }
