@@ -1,22 +1,32 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:dilidili/pages/dplayer/models/data_source.dart';
 import 'package:dilidili/pages/dplayer/models/data_status.dart';
 import 'package:dilidili/pages/video/detail/play/ao_output.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 
 class DPlayerController extends GetxController {
+  //头部控制栏
+  PreferredSizeWidget? headerControl;
   //数据状态、监听
   final DPlayerDataStatus dataStatus = DPlayerDataStatus();
   Stream<DataStatus> get onDataStatusChanged => dataStatus.status.stream;
 
+  Timer? _timer;
   //主控制器
   Player? _videoPlayerController;
   VideoController? _videoController;
   final Rx<int> _playerCount = Rx(0);
+
+  /// 是否展示控制条及监听
+  final Rx<bool> _showControls = false.obs;
+  Rx<bool> get showControls => _showControls;
+  Stream<bool> get onShowControlsChanged => _showControls.stream;
 
   //是否倍速
   final Rx<bool> _doubleSpeedStatus = false.obs;
@@ -38,6 +48,25 @@ class DPlayerController extends GetxController {
   //获取私有控制器
   Player? get videoPlayerController => _videoPlayerController;
   VideoController? get videoController => _videoController;
+
+  set controls(bool visible) {
+    _showControls.value = visible;
+    _timer?.cancel();
+    if (visible) {
+      _hideTaskControls();
+    }
+  }
+
+  /// 隐藏控制条
+  void _hideTaskControls() {
+    if (_timer != null) {
+      _timer!.cancel();
+    }
+    _timer = Timer(const Duration(milliseconds: 3000), () {
+      controls = false;
+      _timer = null;
+    });
+  }
 
   //构造函数
   factory DPlayerController({
@@ -153,6 +182,7 @@ class DPlayerController extends GetxController {
 
   Future<void> dispose() async {
     try {
+      _timer?.cancel();
       if (_videoPlayerController != null) {
         var pp = _videoPlayerController!.platform as NativePlayer;
         await pp.setProperty('audio-files', '');

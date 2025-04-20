@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:dilidili/pages/dplayer/controller.dart';
+import 'package:dilidili/pages/dplayer/widgets/app_bar_ani.dart';
 import 'package:dilidili/pages/dplayer/widgets/control_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -9,26 +10,31 @@ import 'package:media_kit_video/media_kit_video.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 
 class DPlayer extends StatefulWidget {
-  const DPlayer({super.key, required this.controller});
+  const DPlayer({super.key, required this.controller, this.headerControl});
   final DPlayerController controller;
+  final PreferredSizeWidget? headerControl;
   @override
   State<DPlayer> createState() => _DPlayerState();
 }
 
-class _DPlayerState extends State<DPlayer> {
+class _DPlayerState extends State<DPlayer> with TickerProviderStateMixin {
   final RxDouble _brightnessValue = 0.0.obs;
   final RxBool _brightnessIndicator = false.obs;
+  late AnimationController animationController;
   Timer? _brightnessTimer;
   late double screenWidth;
   @override
   void initState() {
     super.initState();
     screenWidth = Get.size.width;
+    widget.controller.headerControl = widget.headerControl;
+    animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 150),
+    );
     Future.microtask(() async {
       try {
-        // ignore: deprecated_member_use
-        _brightnessValue.value = await ScreenBrightness().current;
-        // ignore: deprecated_member_use
+        _brightnessValue.value = await ScreenBrightness.instance.system;
         ScreenBrightness().onCurrentBrightnessChanged.listen((double value) {
           if (mounted) {
             _brightnessValue.value = value;
@@ -36,6 +42,12 @@ class _DPlayerState extends State<DPlayer> {
         });
       } catch (_) {}
     });
+  }
+
+  @override
+  void dispose() {
+    animationController.dispose();
+    super.dispose();
   }
 
   Future<void> setBrightness(double value) async {
@@ -129,6 +141,9 @@ class _DPlayerState extends State<DPlayer> {
           right: 15,
           bottom: 15,
           child: GestureDetector(
+            onTap: () {
+              _.controls = !_.showControls.value;
+            },
             onDoubleTapDown: (TapDownDetails details) {
               onDoubleTapCenter();
             },
@@ -154,6 +169,22 @@ class _DPlayerState extends State<DPlayer> {
               } else if (tapPosition < sectionWidth * 2) {
               } else {}
             },
+          ),
+        ),
+        Obx(
+          () => Column(
+            children: [
+              if (widget.headerControl != null || _.headerControl != null)
+                ClipRect(
+                  child: AppBarAni(
+                    position: 'top',
+                    controller: animationController,
+                    visible: _.showControls.value,
+                    child: widget.headerControl ?? _.headerControl!,
+                  ),
+                ),
+              const Spacer(),
+            ],
           ),
         ),
         //

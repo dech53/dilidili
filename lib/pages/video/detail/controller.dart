@@ -1,3 +1,4 @@
+import 'package:dilidili/component/common_btn.dart';
 import 'package:dilidili/http/static/api_string.dart';
 import 'package:dilidili/http/video.dart';
 import 'package:dilidili/model/bottom_control_type.dart';
@@ -9,6 +10,7 @@ import 'package:dilidili/pages/dplayer/models/data_source.dart';
 import 'package:dilidili/utils/id_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 
 class VideoDetailController extends GetxController
@@ -45,6 +47,48 @@ class VideoDetailController extends GetxController
     tabCtr = TabController(length: 2, vsync: this);
     danmakuCid.value = cid.value;
     oid.value = IdUtils.bv2av(Get.parameters['bvid']!);
+
+    headerControl = AppBar(
+      backgroundColor: Colors.transparent,
+      foregroundColor: Colors.white,
+      elevation: 0,
+      scrolledUnderElevation: 0,
+      primary: false,
+      centerTitle: false,
+      automaticallyImplyLeading: false,
+      titleSpacing: 14,
+      title: Row(
+        children: [
+          ComBtn(
+            icon: const Icon(
+              FontAwesomeIcons.arrowLeft,
+              size: 15,
+              color: Colors.white,
+            ),
+            fuc: () => Get.back(),
+          ),
+          const Spacer(),
+          ComBtn(
+            icon: const Icon(
+              Icons.cast,
+              size: 19,
+              color: Colors.white,
+            ),
+            fuc: () async {},
+          ),
+          ComBtn(
+            icon: const Icon(
+              Icons.closed_caption_off,
+              size: 22,
+              color: Colors.white,
+            ),
+            fuc: () {},
+          ),
+          const SizedBox(width: 8),
+          
+        ],
+      ),
+    );
   }
 
 // 视频链接
@@ -105,7 +149,9 @@ class VideoDetailController extends GetxController
         },
       ),
     );
+    dPlayerController.headerControl = headerControl;
   }
+
   @override
   void onClose() {
     super.onClose();

@@ -31,7 +31,7 @@ class _VideoPageState extends State<VideoPage>
 
   @override
   void dispose() {
-    if(dPlayerController != null){
+    if (dPlayerController != null) {
       dPlayerController!.dispose();
     }
     super.dispose();
@@ -86,7 +86,10 @@ class _VideoPageState extends State<VideoPage>
     }
 
     Widget buildVideoPlayerWidget(AsyncSnapshot snapshot) {
-      return DPlayer(controller: dPlayerController!);
+      return DPlayer(
+        controller: dPlayerController!,
+        headerControl: vdCtr.headerControl,
+      );
     }
 
     Widget buildVideoPlayerPanel() {
