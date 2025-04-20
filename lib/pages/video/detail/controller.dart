@@ -106,4 +106,9 @@ class VideoDetailController extends GetxController
       ),
     );
   }
+  @override
+  void onClose() {
+    super.onClose();
+    dPlayerController.dispose();
+  }
 }

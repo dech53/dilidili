@@ -6,6 +6,7 @@ import 'package:dilidili/pages/video/detail/play/ao_output.dart';
 import 'package:get/get.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
+import 'package:screen_brightness/screen_brightness.dart';
 
 class DPlayerController extends GetxController {
   //数据状态、监听
@@ -27,6 +28,10 @@ class DPlayerController extends GetxController {
 
   static DPlayerController? _instance;
 
+  /// 亮度控制
+  final Rx<double> _currentBrightness = 0.0.obs;
+  Rx<double> get brightness => _currentBrightness;
+
   //私有构造函数
   DPlayerController._internal();
 
@@ -43,6 +48,24 @@ class DPlayerController extends GetxController {
       _instance!._playerCount.value += 1;
     }
     return _instance!;
+  }
+
+  Future<void> setBrightness(double brightnes) async {
+    try {
+      brightness.value = brightnes;
+      ScreenBrightness().setScreenBrightness(brightnes);
+      // setVideoBrightness();
+    } catch (e) {
+      throw 'Failed to set brightness';
+    }
+  }
+
+  Future<void> resetBrightness() async {
+    try {
+      await ScreenBrightness().resetScreenBrightness();
+    } catch (e) {
+      throw 'Failed to reset brightness';
+    }
   }
 
   Future<void> setDataSource(DataSource dataSource) async {
@@ -137,6 +160,7 @@ class DPlayerController extends GetxController {
         _videoPlayerController = null;
       }
       _instance = null;
+      resetBrightness();
     } catch (e) {
       print(e);
     }

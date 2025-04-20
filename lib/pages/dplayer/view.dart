@@ -1,8 +1,12 @@
+import 'dart:async';
+
 import 'package:dilidili/pages/dplayer/controller.dart';
+import 'package:dilidili/pages/dplayer/widgets/control_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
 import 'package:media_kit_video/media_kit_video.dart';
+import 'package:screen_brightness/screen_brightness.dart';
 
 class DPlayer extends StatefulWidget {
   const DPlayer({super.key, required this.controller});
@@ -12,12 +16,42 @@ class DPlayer extends StatefulWidget {
 }
 
 class _DPlayerState extends State<DPlayer> {
+  final RxDouble _brightnessValue = 0.0.obs;
+  final RxBool _brightnessIndicator = false.obs;
+  Timer? _brightnessTimer;
+  late double screenWidth;
   @override
   void initState() {
     super.initState();
+    screenWidth = Get.size.width;
+    Future.microtask(() async {
+      try {
+        // ignore: deprecated_member_use
+        _brightnessValue.value = await ScreenBrightness().current;
+        // ignore: deprecated_member_use
+        ScreenBrightness().onCurrentBrightnessChanged.listen((double value) {
+          if (mounted) {
+            _brightnessValue.value = value;
+          }
+        });
+      } catch (_) {}
+    });
   }
 
-  
+  Future<void> setBrightness(double value) async {
+    try {
+      // ignore: deprecated_member_use
+      await ScreenBrightness().setScreenBrightness(value);
+    } catch (_) {}
+    _brightnessIndicator.value = true;
+    _brightnessTimer?.cancel();
+    _brightnessTimer = Timer(const Duration(milliseconds: 200), () {
+      if (mounted) {
+        _brightnessIndicator.value = false;
+      }
+    });
+    widget.controller.brightness.value = value;
+  }
 
   // 双击播放、暂停
   void onDoubleTapCenter() {
@@ -76,6 +110,19 @@ class _DPlayerState extends State<DPlayer> {
             ),
           ),
         ),
+
+        //亮度控制条展示
+        Obx(
+          () => ControlBar(
+            visible: _brightnessIndicator.value,
+            icon: _brightnessValue.value < 1.0 / 3.0
+                ? Icons.brightness_low
+                : _brightnessValue.value < 2.0 / 3.0
+                    ? Icons.brightness_medium
+                    : Icons.brightness_high,
+            value: _brightnessValue.value,
+          ),
+        ),
         Positioned.fill(
           left: 16,
           top: 25,
@@ -90,6 +137,22 @@ class _DPlayerState extends State<DPlayer> {
             },
             onLongPressEnd: (LongPressEndDetails details) {
               _.setDoubleSpeedStatus(false);
+            },
+            // 垂直方向 音量/亮度调节
+            onVerticalDragUpdate: (DragUpdateDetails details) async {
+              final double totalWidth = MediaQuery.sizeOf(context).width;
+              final double tapPosition = details.localPosition.dx;
+              final double sectionWidth = totalWidth / 3;
+              final double delta = details.delta.dy;
+              if (tapPosition < sectionWidth) {
+                // 左边区域 👈
+                final double level = (screenWidth * 9 / 16) * 3;
+                final double brightness =
+                    _brightnessValue.value - delta / level;
+                final double result = brightness.clamp(0.0, 1.0);
+                setBrightness(result);
+              } else if (tapPosition < sectionWidth * 2) {
+              } else {}
             },
           ),
         ),

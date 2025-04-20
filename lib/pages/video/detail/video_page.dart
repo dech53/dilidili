@@ -31,10 +31,10 @@ class _VideoPageState extends State<VideoPage>
 
   @override
   void dispose() {
-    super.dispose();
     if(dPlayerController != null){
       dPlayerController!.dispose();
     }
+    super.dispose();
   }
 
   @override
