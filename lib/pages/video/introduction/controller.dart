@@ -46,6 +46,14 @@ class VideoIntroController extends GetxController {
     lastPlayCid.value = int.parse(Get.parameters['cid']!);
   }
 
+  @override
+  void onClose() {
+    if (timer != null) {
+      timer!.cancel();
+    }
+    super.onClose();
+  }
+
   // 计时器
   void startTimer() {
     const duration = Duration(seconds: 30);

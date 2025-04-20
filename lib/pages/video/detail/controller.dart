@@ -1,4 +1,3 @@
-import 'package:dilidili/common/widgets/video_card_h.dart';
 import 'package:dilidili/http/static/api_string.dart';
 import 'package:dilidili/http/video.dart';
 import 'package:dilidili/model/bottom_control_type.dart';
@@ -8,12 +7,9 @@ import 'package:dilidili/model/video/url.dart';
 import 'package:dilidili/pages/dplayer/controller.dart';
 import 'package:dilidili/pages/dplayer/models/data_source.dart';
 import 'package:dilidili/utils/id_utils.dart';
-import 'package:dilidili/utils/log_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
-import 'package:media_kit/media_kit.dart';
-import 'package:media_kit_video/media_kit_video.dart';
 
 class VideoDetailController extends GetxController
     with GetSingleTickerProviderStateMixin {
