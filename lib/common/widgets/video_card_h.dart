@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dilidili/common/constants.dart';
+import 'package:dilidili/utils/string_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -21,6 +22,7 @@ class VideoCardH extends StatelessWidget {
         if (enableTap) {
           Get.toNamed(
             '/video?bvid=${videoItem.bvid}&cid=${videoItem.cid}&mid=${videoItem.owner.mid}',
+            arguments: {'heroTag':StringUtils.makeHeroTag(videoItem.aid)}
           );
         }
       },

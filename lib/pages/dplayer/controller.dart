@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:dilidili/pages/dplayer/models/data_source.dart';
 import 'package:dilidili/pages/dplayer/models/data_status.dart';
+import 'package:dilidili/pages/dplayer/models/play_status.dart';
 import 'package:dilidili/pages/video/detail/play/ao_output.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -13,6 +14,11 @@ import 'package:screen_brightness/screen_brightness.dart';
 class DPlayerController extends GetxController {
   //头部控制栏
   PreferredSizeWidget? headerControl;
+
+  final DPPlayerStatus playerStatus = DPPlayerStatus();
+
+  /// 播放状态监听
+  Stream<DPlayerStatus> get onPlayerStatusChanged => playerStatus.status.stream;
   //数据状态、监听
   final DPlayerDataStatus dataStatus = DPlayerDataStatus();
   Stream<DataStatus> get onDataStatusChanged => dataStatus.status.stream;
@@ -21,7 +27,8 @@ class DPlayerController extends GetxController {
   //主控制器
   Player? _videoPlayerController;
   VideoController? _videoController;
-  final Rx<int> _playerCount = Rx(0);
+  final Rx<int> _playerCount = Rx(1);
+  Rx<int> get playerCount => _playerCount;
 
   /// 是否展示控制条及监听
   final Rx<bool> _showControls = false.obs;
@@ -98,6 +105,9 @@ class DPlayerController extends GetxController {
   }
 
   Future<void> setDataSource(DataSource dataSource) async {
+    if (_playerCount.value == 0) {
+      return;
+    }
     dataStatus.status.value = DataStatus.loading;
     _videoPlayerController = await _createVideoController(
         dataSource, PlaylistMode.none, true, Duration.zero);
@@ -181,6 +191,11 @@ class DPlayerController extends GetxController {
   }
 
   Future<void> dispose() async {
+    if (playerCount.value > 1) {
+      _playerCount.value -= 1;
+      pause();
+      return;
+    }
     try {
       _timer?.cancel();
       if (_videoPlayerController != null) {
@@ -203,5 +218,16 @@ class DPlayerController extends GetxController {
     } else {
       setPlaybackSpeed(playbackSpeed);
     }
+  }
+
+  /// 暂停播放
+  Future<void> pause({bool notify = true, bool isInterrupt = false}) async {
+    await _videoPlayerController?.pause();
+    playerStatus.status.value = DPlayerStatus.paused;
+  }
+
+  Future<void> play() async {
+    await _videoPlayerController?.play();
+    playerStatus.status.value = DPlayerStatus.playing;
   }
 }

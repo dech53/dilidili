@@ -1,4 +1,5 @@
 import 'package:dilidili/http/dio_instance.dart';
+import 'package:dilidili/pages/video/detail/video_page.dart';
 import 'package:dilidili/router/app_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
@@ -16,6 +17,9 @@ void main() async {
       getPages: Routes.getPages,
       debugShowCheckedModeBanner: false,
       home: const MyApp(),
+      navigatorObservers: [
+        VideoPage.routeObserver,
+      ],
     ),
   );
 }

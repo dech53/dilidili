@@ -23,7 +23,10 @@ class _RelatedVideoPanelState extends State<RelatedVideoPanel>
   @override
   void initState() {
     super.initState();
-    _relatedVideoController = Get.put(ReleatedVideoController());
+    _relatedVideoController = Get.put(
+      ReleatedVideoController(),
+      tag: Get.arguments?['heroTag'],
+    );
     _futureBuilder = _relatedVideoController
         .queryRelatedVideo()
         .catchError((e) => {'status': false, 'message': e.toString()});
@@ -53,7 +56,10 @@ class _RelatedVideoPanelState extends State<RelatedVideoPanel>
                 delegate: SliverChildBuilderDelegate(
                   (_, i) {
                     return Material(
-                      child: VideoCardH(videoItem: relatedVideoList[i],enableTap: false,),
+                      child: VideoCardH(
+                        videoItem: relatedVideoList[i],
+                        enableTap: true,
+                      ),
                     );
                   },
                   childCount: relatedVideoList.length,

@@ -14,10 +14,12 @@ class VideoPage extends StatefulWidget {
   const VideoPage({super.key});
   @override
   State<VideoPage> createState() => _VideoPageState();
+  static final RouteObserver<PageRoute> routeObserver =
+      RouteObserver<PageRoute>();
 }
 
 class _VideoPageState extends State<VideoPage>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, RouteAware, WidgetsBindingObserver {
   late VideoDetailController vdCtr;
   late double statusBarHeight;
   DPlayerController? dPlayerController;
@@ -25,6 +27,7 @@ class _VideoPageState extends State<VideoPage>
   final double videoHeight = Get.size.width * 9 / 16;
   late String bvid;
   late int cid;
+  late String heroTag;
   late int mid;
   late TabController _tabController;
   late Future _futureBuilderFuture;
@@ -38,15 +41,39 @@ class _VideoPageState extends State<VideoPage>
   }
 
   @override
+  void didPushNext() {
+    if (dPlayerController != null) {
+      dPlayerController!.pause();
+    }
+    super.didPushNext();
+  }
+
+  @override
+  void didPopNext() {
+    vdCtr.playerInit();
+    dPlayerController?.play();
+    super.didPopNext();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    VideoPage.routeObserver
+        .subscribe(this, ModalRoute.of(context)! as PageRoute);
+  }
+
+  @override
   void initState() {
     super.initState();
+    heroTag = Get.arguments['heroTag'];
     bvid = Get.parameters['bvid']!;
     cid = int.parse(Get.parameters['cid']!);
     mid = int.parse(Get.parameters['mid']!);
-    vdCtr = Get.put(VideoDetailController());
+    vdCtr = Get.put(VideoDetailController(), tag: heroTag);
     _futureBuilderFuture = vdCtr.queryVideoUrl();
     _tabController = TabController(length: vdCtr.tabs.length, vsync: this);
     dPlayerController = vdCtr.dPlayerController;
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
@@ -112,6 +139,7 @@ class _VideoPageState extends State<VideoPage>
     }
 
     return SafeArea(
+      top: false,
       bottom: false,
       left: false,
       right: false,

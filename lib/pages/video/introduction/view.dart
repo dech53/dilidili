@@ -31,6 +31,7 @@ class _VideoIntroPanelState extends State<VideoIntroPanel>
   bool get wantKeepAlive => true;
 
   late VideoIntroController videoIntroController;
+  late String heroTag;
   late Future? _futureBuilderFuture;
   VideoDetailData? videoDetail;
 
@@ -43,9 +44,9 @@ class _VideoIntroPanelState extends State<VideoIntroPanel>
   @override
   void initState() {
     super.initState();
-    videoIntroController = Get.put(
-      VideoIntroController(bvid: widget.bvid),
-    );
+    heroTag = Get.arguments['heroTag'];
+    videoIntroController =
+        Get.put(VideoIntroController(bvid: widget.bvid), tag: heroTag);
     _futureBuilderFuture = videoIntroController.queryVideoIntro();
     videoIntroController.videoDetail.listen((value) {
       videoDetail = value;

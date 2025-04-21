@@ -3,6 +3,7 @@ import 'package:dilidili/common/skeleton/video_card_v.dart';
 import 'package:dilidili/common/widgets/http_error.dart';
 import 'package:dilidili/component/video_card_component.dart';
 import 'package:dilidili/pages/rcmd/controller.dart';
+import 'package:dilidili/utils/string_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -130,6 +131,9 @@ class _RcmdPageState extends State<RcmdPage>
                   itemTap: (video) {
                     Get.toNamed(
                       '/video?bvid=${video.bvid}&cid=${video.cid}&mid=${video.owner.mid}',
+                      arguments: {
+                        'heroTag': StringUtils.makeHeroTag(videoList[index].id)
+                      },
                     );
                   },
                 )
