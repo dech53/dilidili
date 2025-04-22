@@ -27,7 +27,7 @@ class DPlayerController extends GetxController {
   //主控制器
   Player? _videoPlayerController;
   VideoController? _videoController;
-  final Rx<int> _playerCount = Rx(1);
+  final Rx<int> _playerCount = Rx(0);
   Rx<int> get playerCount => _playerCount;
 
   /// 是否展示控制条及监听
@@ -82,6 +82,7 @@ class DPlayerController extends GetxController {
     _instance ??= DPlayerController._internal();
     if (videoType != 'none') {
       _instance!._playerCount.value += 1;
+      
     }
     return _instance!;
   }
@@ -190,12 +191,13 @@ class DPlayerController extends GetxController {
     return player;
   }
 
-  Future<void> dispose() async {
-    if (playerCount.value > 1) {
+  Future<void> dispose({String type = 'single'}) async {
+    if (type == 'single' && playerCount.value > 1) {
       _playerCount.value -= 1;
       pause();
       return;
     }
+    _playerCount.value = 0;
     try {
       _timer?.cancel();
       if (_videoPlayerController != null) {

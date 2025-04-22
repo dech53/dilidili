@@ -6,6 +6,7 @@ import 'package:dilidili/pages/video/introduction/view.dart';
 import 'package:dilidili/pages/video/related/view.dart';
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
@@ -35,13 +36,15 @@ class _VideoPageState extends State<VideoPage>
   @override
   void dispose() {
     if (dPlayerController != null) {
-      dPlayerController!.dispose();
+      // dPlayerController!.dispose();
+      // print("界面内部实例数量${dPlayerController!.playerCount.value.toString()}");
     }
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
   @override
-  void didPushNext() {
+  void didPushNext() async {
     if (dPlayerController != null) {
       dPlayerController!.pause();
     }
@@ -49,8 +52,9 @@ class _VideoPageState extends State<VideoPage>
   }
 
   @override
-  void didPopNext() {
+  void didPopNext() async {
     vdCtr.playerInit();
+    await Future.delayed(const Duration(milliseconds: 300));
     dPlayerController?.play();
     super.didPopNext();
   }
@@ -190,107 +194,105 @@ class _VideoPageState extends State<VideoPage>
                 return MediaQuery.sizeOf(context).height;
               },
               onlyOneScrollInBody: true,
-              body: Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      width: double.infinity,
-                      height: 45,
-                      decoration: BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(
-                            width: 1,
-                            color: Theme.of(context)
-                                .dividerColor
-                                // ignore: deprecated_member_use
-                                .withOpacity(0.1),
-                          ),
-                        ),
-                      ),
-                      child: Material(
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: TabBar(
-                                controller: _tabController,
-                                padding: EdgeInsets.zero,
-                                labelStyle: const TextStyle(fontSize: 13),
-                                labelPadding: const EdgeInsets.symmetric(
-                                    horizontal: 10.0),
-                                dividerColor: Colors.transparent,
-                                tabs: vdCtr.tabs
-                                    .map((e) => Tab(
-                                          text: e,
-                                        ))
-                                    .toList(),
-                                onTap: (index) {},
-                              ),
-                            ),
-                            Flexible(
-                              flex: 1,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  const Icon(
-                                    Icons.drag_handle_rounded,
-                                    size: 20,
-                                    color: Colors.grey,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  SizedBox(
-                                    height: 32,
-                                    child: TextButton(
-                                      style: ButtonStyle(
-                                        padding: WidgetStateProperty.all(
-                                            EdgeInsets.zero),
-                                      ),
-                                      onPressed: () {},
-                                      child: const Text('发弹幕',
-                                          style: TextStyle(fontSize: 12)),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: 38,
-                                    height: 38,
-                                    child: IconButton(
-                                      icon: SvgPicture.asset(
-                                        'assets/images/video/danmu_close.svg',
-                                        colorFilter: const ColorFilter.mode(
-                                            Colors.grey, BlendMode.srcIn),
-                                      ),
-                                      onPressed: () {},
-                                    ),
-                                  ),
-                                  const SizedBox(width: 18),
-                                ],
-                              ),
-                            )
-                          ],
+              body: Column(
+                mainAxisSize: MainAxisSize.max,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: double.infinity,
+                    height: 45,
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                          width: 1,
+                          color: Theme.of(context)
+                              .dividerColor
+                              // ignore: deprecated_member_use
+                              .withOpacity(0.1),
                         ),
                       ),
                     ),
-                    Expanded(
-                      child: TabBarView(
-                        controller: _tabController,
-                        children: <Widget>[
-                          Builder(
-                            builder: (BuildContext context) {
-                              return CustomScrollView(
-                                slivers: <Widget>[
-                                  VideoIntroPanel(bvid: bvid),
-                                  const RelatedVideoPanel(),
-                                ],
-                              );
-                            },
+                    child: Material(
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: TabBar(
+                              controller: _tabController,
+                              padding: EdgeInsets.zero,
+                              labelStyle: const TextStyle(fontSize: 13),
+                              labelPadding:
+                                  const EdgeInsets.symmetric(horizontal: 10.0),
+                              dividerColor: Colors.transparent,
+                              tabs: vdCtr.tabs
+                                  .map((e) => Tab(
+                                        text: e,
+                                      ))
+                                  .toList(),
+                              onTap: (index) {},
+                            ),
                           ),
-                          const Center(child: Text('评论功能待实现')),
+                          Flexible(
+                            flex: 1,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                const Icon(
+                                  Icons.drag_handle_rounded,
+                                  size: 20,
+                                  color: Colors.grey,
+                                ),
+                                const SizedBox(width: 8),
+                                SizedBox(
+                                  height: 32,
+                                  child: TextButton(
+                                    style: ButtonStyle(
+                                      padding: WidgetStateProperty.all(
+                                          EdgeInsets.zero),
+                                    ),
+                                    onPressed: () {},
+                                    child: const Text('发弹幕',
+                                        style: TextStyle(fontSize: 12)),
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 38,
+                                  height: 38,
+                                  child: IconButton(
+                                    icon: SvgPicture.asset(
+                                      'assets/images/video/danmu_close.svg',
+                                      colorFilter: const ColorFilter.mode(
+                                          Colors.grey, BlendMode.srcIn),
+                                    ),
+                                    onPressed: () {},
+                                  ),
+                                ),
+                                const SizedBox(width: 18),
+                              ],
+                            ),
+                          )
                         ],
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                  Expanded(
+                    child: TabBarView(
+                      controller: _tabController,
+                      children: <Widget>[
+                        Builder(
+                          builder: (BuildContext context) {
+                            return CustomScrollView(
+                              slivers: <Widget>[
+                                VideoIntroPanel(bvid: bvid),
+                                const RelatedVideoPanel(),
+                              ],
+                            );
+                          },
+                        ),
+                        const Center(child: Text('评论功能待实现')),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
           ),

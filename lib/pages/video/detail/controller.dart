@@ -85,7 +85,6 @@ class VideoDetailController extends GetxController
             fuc: () {},
           ),
           const SizedBox(width: 8),
-          
         ],
       ),
     );
@@ -132,15 +131,17 @@ class VideoDetailController extends GetxController
     } else {
       SmartDialog.showToast(result['msg'].toString());
     }
-
     return result;
   }
 
-  Future playerInit() async {
+  Future playerInit({
+    video,
+    audio,
+  }) async {
     await dPlayerController.setDataSource(
       DataSource(
-        videoSource: videoUrl,
-        audioSource: audioUrl,
+        videoSource: video ?? videoUrl,
+        audioSource: audio ?? audioUrl,
         type: DataSourceType.network,
         httpHeaders: {
           'user-agent':
@@ -156,5 +157,6 @@ class VideoDetailController extends GetxController
   void onClose() {
     super.onClose();
     dPlayerController.dispose();
+    // print("控制器内部实例数量${dPlayerController!.playerCount.value.toString()}");
   }
 }
