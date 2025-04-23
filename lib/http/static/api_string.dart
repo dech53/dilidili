@@ -1,4 +1,7 @@
 class ApiString {
+  static const String searchUrl = 'https://s.search.bilibili.com';
+  static const String hotSearchUrl = '/main/hotword';
+  static const String searchSuggestUrl = '/main/suggest';
   static const String mainUrl = 'https://www.bilibili.com';
   static const String baseUrl = "https://api.bilibili.com";
   static const String live_base = "https://api.live.bilibili.com";

@@ -1,4 +1,4 @@
-import 'package:dilidili/pages/home/home_page.dart';
+import 'package:dilidili/pages/home/view.dart';
 import 'package:dilidili/pages/issue/issue_page.dart';
 import 'package:dilidili/pages/moments/moments_page.dart';
 import 'package:dilidili/pages/trend/trend_page.dart';

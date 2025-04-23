@@ -1,6 +1,8 @@
-import 'package:dilidili/pages/home/home_page.dart';
+import 'package:dilidili/pages/home/view.dart';
 import 'package:dilidili/pages/member/view.dart';
-import 'package:dilidili/pages/video/detail/video_page.dart';
+import 'package:dilidili/pages/search/view.dart';
+import 'package:dilidili/pages/search_result/view.dart';
+import 'package:dilidili/pages/video/detail/view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -8,7 +10,9 @@ class Routes {
   static final List<GetPage<dynamic>> getPages = [
     CustomGetPage(name: '/', page: () => const HomePage()),
     CustomGetPage(name: '/video', page: () => const VideoPage()),
-    CustomGetPage(name: '/member', page: () => const MemberPage())
+    CustomGetPage(name: '/member', page: () => const MemberPage()),
+    CustomGetPage(name: '/search', page: () => const SearchPage()),
+    CustomGetPage(name: '/searchResult', page: () => const SearchResultPage())
   ];
 }
 

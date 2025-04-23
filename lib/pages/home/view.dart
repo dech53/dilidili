@@ -80,29 +80,32 @@ class _HomePageState extends State<HomePage>
                 children: [
                   //搜索框
                   Expanded(
-                    child: Container(
-                      padding: EdgeInsets.only(left: 12.w),
-                      alignment: Alignment.centerLeft,
-                      height: 40.h,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surfaceContainer,
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.search_outlined,
-                            size: 25.r,
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ),
-                          5.horizontalSpace,
-                          Text(
-                            "搜索...",
-                            style: TextStyle(
+                    child: InkWell(
+                      onTap: () => Get.toNamed('/search'),
+                      child: Container(
+                        padding: EdgeInsets.only(left: 12.w),
+                        alignment: Alignment.centerLeft,
+                        height: 40.h,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.surfaceContainer,
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.search_outlined,
+                              size: 25.r,
                               color: Theme.of(context).colorScheme.onSurface,
                             ),
-                          ),
-                        ],
+                            5.horizontalSpace,
+                            Text(
+                              "搜索...",
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),

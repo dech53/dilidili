@@ -3,6 +3,7 @@ import 'package:dilidili/common/widgets/action_item.dart';
 import 'package:dilidili/common/widgets/http_error.dart';
 import 'package:dilidili/model/nav_user_info.dart';
 import 'package:dilidili/model/video/video_basic_info.dart';
+import 'package:dilidili/pages/video/detail/controller.dart';
 import 'package:dilidili/pages/video/introduction/controller.dart';
 import 'package:dilidili/pages/video/introduction/widgets/intro_detail.dart';
 import 'package:dilidili/utils/num_utils.dart';
@@ -69,6 +70,7 @@ class _VideoIntroPanelState extends State<VideoIntroPanel>
                 bvid: widget.bvid,
                 videoDetail: videoIntroController.videoDetail.value,
                 userInfo: videoIntroController.userInfo.value,
+                heroTag: heroTag,
               ),
             );
           } else {
@@ -103,10 +105,12 @@ class _VideoIntroPanelState extends State<VideoIntroPanel>
 class VideoInfo extends StatefulWidget {
   final VideoDetailData? videoDetail;
   final String bvid;
+  final String? heroTag;
   final UserCardInfo? userInfo;
   const VideoInfo({
     Key? key,
     this.videoDetail,
+    this.heroTag,
     required this.bvid,
     this.userInfo,
   }) : super(key: key);
@@ -117,12 +121,16 @@ class VideoInfo extends StatefulWidget {
 
 class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   RxBool isExpanded = false.obs;
+  late String heroTag;
+  late final VideoDetailController videoDetailCtr;
   late final VideoIntroController videoIntroController;
   late ExpandableController _expandableController;
   @override
   void initState() {
     super.initState();
+    heroTag = widget.heroTag!;
     videoIntroController = Get.put(VideoIntroController(bvid: widget.bvid));
+    videoDetailCtr = Get.find<VideoDetailController>(tag: heroTag);
     _expandableController = ExpandableController(initialExpanded: false);
   }
 
@@ -344,6 +352,18 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
             ),
             //点赞、投币、收藏、转发
             Material(child: actionGrid(context, videoIntroController)),
+            // if (widget.videoDetail!.ugcSeason != null) ...[
+            //   ListTile(
+            //     onTap: () {},
+            //     dense: false,
+            //     leading: Image.asset(
+            //       'assets/images/live.gif',
+            //       color: Theme.of(context).colorScheme.primary,
+            //       height: 12,
+            //     ),
+            //     title: Text(widget.videoDetail!.ugcSeason!.title!),
+            //   )
+            // ],
             //分割线
             Divider(
               color: Colors.grey.shade300,
