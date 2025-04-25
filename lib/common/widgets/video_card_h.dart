@@ -1,9 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dilidili/common/constants.dart';
+import 'package:dilidili/common/widgets/badge.dart';
 import 'package:dilidili/http/search.dart';
 import 'package:dilidili/utils/string_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 
 import '../../utils/num_utils.dart';
@@ -20,8 +22,16 @@ class VideoCardH extends StatelessWidget {
   Widget build(BuildContext context) {
     final int aid = videoItem.aid;
     final String bvid = videoItem.bvid;
+    String type = 'video';
+    try {
+      type = videoItem.type;
+    } catch (_) {}
     return InkWell(
       onTap: () async {
+        if (type == 'ketang') {
+          SmartDialog.showToast('课堂视频暂不支持播放');
+          return;
+        }
         if (enableTap) {
           final int cid =
               videoItem.cid ?? await SearchHttp.ab2c(aid: aid, bvid: bvid);
@@ -60,26 +70,20 @@ class VideoCardH extends StatelessWidget {
                           ),
                         ),
                       ),
-                      Positioned(
-                        right: 3.0,
-                        bottom: 3.0,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(3.r),
-                            color: Colors.black.withValues(alpha: 0.3),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(1.5),
-                            child: Text(
-                              NumUtils.int2time(videoItem.duration!),
-                              style: TextStyle(
-                                fontSize: 10.sp,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
+                      if (videoItem.duration != 0)
+                        PBadge(
+                          text: NumUtils.int2time(videoItem.duration!),
+                          right: 6.0,
+                          bottom: 6.0,
+                          type: 'gray',
                         ),
-                      ),
+                      if (type != 'video')
+                        PBadge(
+                          text: type,
+                          left: 6.0,
+                          bottom: 6.0,
+                          type: 'primary',
+                        ),
                     ],
                   ),
                   VideoContent(videoItem: videoItem),

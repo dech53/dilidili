@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:dilidili/http/http_methods.dart';
 import 'package:dilidili/http/static/api_string.dart';
 import 'package:dilidili/utils/file_utils.dart';
-import 'package:dilidili/utils/header_utils.dart';
 import 'package:dio/dio.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
@@ -48,7 +47,6 @@ class DioInstance {
         .map((Cookie cookie) => '${cookie.name}=${cookie.value}')
         .join('; ');
     _dio.options.headers['cookie'] = cookieString;
-    _dio.options.headers['user-agent'] = HeaderUtil.randomHeader();
     // _dio.interceptors.add(ResponseInterceptor());
     // _dio.interceptors.add(PrintLogInterceptor());
   }
@@ -105,6 +103,10 @@ class DioInstance {
       cancelToken: cancelToken,
       options: options ??
           Options(
+            headers: {
+              'user-agent': headerUa(),
+              'referer': 'https://www.bilibili.com/',
+            },
             method: HttpMethods.get,
             receiveTimeout: _defaultTimeout,
             sendTimeout: _defaultTimeout,
@@ -128,6 +130,10 @@ class DioInstance {
       cancelToken: cancelToken,
       options: options ??
           Options(
+            headers: {
+              'user-agent': headerUa(),
+              'referer': 'https://www.bilibili.com/',
+            },
             method: HttpMethods.post,
             receiveTimeout: _defaultTimeout,
             sendTimeout: _defaultTimeout,

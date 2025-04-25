@@ -2,7 +2,11 @@ import 'package:dilidili/common/skeleton/video_card_h.dart';
 import 'package:dilidili/common/widgets/http_error.dart';
 import 'package:dilidili/model/search_type.dart';
 import 'package:dilidili/pages/search_panel/controller.dart';
+import 'package:dilidili/pages/search_panel/widgets/article_panel.dart';
+import 'package:dilidili/pages/search_panel/widgets/live_panel.dart';
+import 'package:dilidili/pages/search_panel/widgets/media_bangumi_panel.dart';
 import 'package:dilidili/pages/search_panel/widgets/test_panel.dart';
+import 'package:dilidili/pages/search_panel/widgets/user_panel.dart';
 import 'package:dilidili/pages/search_panel/widgets/video_panel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -82,6 +86,17 @@ class _SearchPanelState extends State<SearchPanel>
                   switch (widget.searchType) {
                     case SearchType.video:
                       return SearchVideoPanel(
+                        ctr: _searchPanelController,
+                        list: list.value,
+                      );
+                    case SearchType.live_room:
+                      return searchLivePanel(context, ctr, list);
+                    case SearchType.bili_user:
+                      return searchUserPanel(context, ctr, list);
+                    case SearchType.media_bangumi:
+                      return searchMbangumiPanel(context, ctr, list);
+                    case SearchType.article:
+                      return SearchArticlePanel(
                         ctr: _searchPanelController,
                         list: list.value,
                       );
