@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dilidili/common/constants.dart';
+import 'package:dilidili/http/search.dart';
 import 'package:dilidili/utils/string_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -17,18 +18,20 @@ class VideoCardH extends StatelessWidget {
   final bool enableTap;
   @override
   Widget build(BuildContext context) {
+    final int aid = videoItem.aid;
+    final String bvid = videoItem.bvid;
     return InkWell(
-      onTap: () {
+      onTap: () async {
         if (enableTap) {
+          final int cid =
+              videoItem.cid ?? await SearchHttp.ab2c(aid: aid, bvid: bvid);
           Get.toNamed(
-            '/video?bvid=${videoItem.bvid}&cid=${videoItem.cid}&mid=${videoItem.owner.mid}',
-            arguments: {'heroTag':StringUtils.makeHeroTag(videoItem.aid)}
-          );
+              '/video?bvid=${videoItem.bvid}&cid=${cid}&mid=${videoItem.owner.mid}',
+              arguments: {'heroTag': StringUtils.makeHeroTag(videoItem.aid)});
         }
       },
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(
-            10, 5, 10, 5),
+        padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
         child: LayoutBuilder(
           builder: (BuildContext context, BoxConstraints boxConstraints) {
             final double width = (boxConstraints.maxWidth -

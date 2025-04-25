@@ -1,4 +1,5 @@
 import 'package:dilidili/model/search_type.dart';
+import 'package:dilidili/pages/search_panel/controller.dart';
 import 'package:dilidili/pages/search_panel/view.dart';
 import 'package:dilidili/pages/search_result/controller.dart';
 import 'package:flutter/cupertino.dart';
@@ -88,12 +89,12 @@ class _SearchResultPageState extends State<SearchResultPage>
                   unselectedLabelColor: Theme.of(context).colorScheme.outline,
                   tabAlignment: TabAlignment.start,
                   onTap: (index) {
-                    // if (index == _searchResultController.tabIndex) {
-                    //   Get.find<SearchPanelController>(
-                    //           tag: SearchType.values[index].type +
-                    //               _searchResultController.keyword!)
-                    //       .animateToTop();
-                    // }
+                    if (index == _searchResultController.tabIndex) {
+                      Get.find<SearchPanelController>(
+                        tag: SearchType.values[index].type +
+                            _searchResultController.keyword!,
+                      ).animateToTop();
+                    }
                     _searchResultController.tabIndex = index;
                   },
                 )),
@@ -108,6 +109,8 @@ class _SearchResultPageState extends State<SearchResultPage>
                 for (var i in SearchType.values) ...{
                   SearchPanel(
                     keyword: _searchResultController.keyword,
+                    searchType: i,
+                    tag: DateTime.now().millisecondsSinceEpoch.toString(),
                   ),
                 },
               ],

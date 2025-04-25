@@ -62,4 +62,12 @@ class ApiString {
   // w_rid=d893cf98a4e010cf326373194a648360&
   // wts=1689767832
   static const String memberArchive = '/x/space/wbi/arc/search';
+
+  /// 搜索结果计数
+  static const String searchCount = '/x/web-interface/wbi/search/all/v2';
+
+  // 分类搜索
+  static const String searchByType = '/x/web-interface/wbi/search/type';
+  // 查询视频分P列表 (avid/bvid转cid)
+  static const String ab2c = '/x/player/pagelist';
 }

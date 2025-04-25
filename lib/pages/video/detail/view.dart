@@ -27,7 +27,7 @@ class _VideoPageState extends State<VideoPage>
   final ScrollController _extendNestCtr = ScrollController();
   final double videoHeight = Get.size.width * 9 / 16;
   late String bvid;
-  late int cid;
+  // late int cid;
   late String heroTag;
   late int mid;
   late TabController _tabController;
@@ -71,7 +71,7 @@ class _VideoPageState extends State<VideoPage>
     super.initState();
     heroTag = Get.arguments['heroTag'];
     bvid = Get.parameters['bvid']!;
-    cid = int.parse(Get.parameters['cid']!);
+    // cid = int.parse(Get.parameters['cid']!);
     mid = int.parse(Get.parameters['mid']!);
     vdCtr = Get.put(VideoDetailController(), tag: heroTag);
     _futureBuilderFuture = vdCtr.queryVideoUrl();
