@@ -5,7 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class SearchVideoPanel extends StatelessWidget {
-  SearchVideoPanel({super.key, this.ctr, this.list});
+  SearchVideoPanel({
+    this.ctr,
+    this.list,
+    Key? key,
+  }) : super(key: key);
   final SearchPanelController? ctr;
   final List? list;
 

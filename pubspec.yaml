@@ -66,6 +66,7 @@ dependencies:
   share_plus: ^10.1.4
   extended_nested_scroll_view: ^6.2.1
   screen_brightness: ^2.1.2
+  easy_debounce: ^2.0.3
 
 dev_dependencies:
   flutter_test:

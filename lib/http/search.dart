@@ -8,6 +8,7 @@ import 'package:dilidili/model/search/result.dart';
 import 'package:dilidili/model/search/suggest.dart';
 import 'package:dilidili/model/search_type.dart';
 import 'package:dilidili/utils/wbi_utils.dart';
+import 'package:dio/dio.dart';
 
 class SearchHttp {
   static Future hotSearchList() async {
@@ -107,19 +108,16 @@ class SearchHttp {
     int? duration,
     int? tids,
   }) async {
-    var reqData = {
-      'search_type': searchType.type,
-      'keyword': keyword,
-      // 'order_sort': 0,
-      // 'user_type': 0,
-      'page': page,
-      if (order != null) 'order': order,
-      if (duration != null) 'duration': duration,
-      if (tids != null && tids != -1) 'tids': tids,
-    };
     var res = await DioInstance.instance().get(
       path: ApiString.baseUrl + ApiString.searchByType,
-      param: reqData,
+      param: {
+        'search_type': searchType.type,
+        'keyword': keyword,
+        'page': page,
+        if (order != null) 'order': order,
+        if (duration != null) 'duration': duration,
+        if (tids != null && tids != -1) 'tids': tids,
+      },
     );
     if (res.data['code'] == 0) {
       if (res.data['data']['numPages'] == 0) {
@@ -149,7 +147,11 @@ class SearchHttp {
           'data': data,
         };
       } catch (err) {
-        return {'status': false, 'data': Data()};
+        return {
+          'status': false,
+          'data': [],
+          'msg': '数据解析错误',
+        };
       }
     } else {
       return {

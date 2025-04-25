@@ -23,6 +23,7 @@ class _SearchResultPageState extends State<SearchResultPage>
     super.initState();
     _searchResultController = Get.put(SearchResultController(),
         tag: DateTime.now().millisecondsSinceEpoch.toString());
+        
     _tabController = TabController(
       vsync: this,
       length: SearchType.values.length,
@@ -88,15 +89,6 @@ class _SearchResultPageState extends State<SearchResultPage>
                   dividerColor: Colors.transparent,
                   unselectedLabelColor: Theme.of(context).colorScheme.outline,
                   tabAlignment: TabAlignment.start,
-                  onTap: (index) {
-                    if (index == _searchResultController.tabIndex) {
-                      Get.find<SearchPanelController>(
-                        tag: SearchType.values[index].type +
-                            _searchResultController.keyword!,
-                      ).animateToTop();
-                    }
-                    _searchResultController.tabIndex = index;
-                  },
                 )),
               ),
             ),

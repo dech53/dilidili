@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dilidili/http/http_methods.dart';
 import 'package:dilidili/http/static/api_string.dart';
 import 'package:dilidili/utils/file_utils.dart';
@@ -78,7 +80,8 @@ class DioInstance {
       options: options ??
           Options(
             headers: {
-              'user-agent': HeaderUtil.randomHeader(),
+              'user-agent': headerUa(),
+              'referer': 'https://www.bilibili.com/',
             },
             method: HttpMethods.get,
             receiveTimeout: _defaultTimeout,
@@ -130,5 +133,22 @@ class DioInstance {
             sendTimeout: _defaultTimeout,
           ),
     );
+  }
+
+  String headerUa({type = 'mob'}) {
+    String headerUa = '';
+    if (type == 'mob') {
+      if (Platform.isIOS) {
+        headerUa =
+            'Mozilla/5.0 (iPhone; CPU iPhone OS 14_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1 Mobile/15E148 Safari/604.1';
+      } else {
+        headerUa =
+            'Mozilla/5.0 (Linux; Android 10; SM-G975F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.101 Mobile Safari/537.36';
+      }
+    } else {
+      headerUa =
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.2 Safari/605.1.15';
+    }
+    return headerUa;
   }
 }

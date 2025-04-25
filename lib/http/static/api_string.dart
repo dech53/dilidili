@@ -68,6 +68,7 @@ class ApiString {
 
   // 分类搜索
   static const String searchByType = '/x/web-interface/wbi/search/type';
+  
   // 查询视频分P列表 (avid/bvid转cid)
   static const String ab2c = '/x/player/pagelist';
 }

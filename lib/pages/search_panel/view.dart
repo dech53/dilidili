@@ -2,13 +2,17 @@ import 'package:dilidili/common/skeleton/video_card_h.dart';
 import 'package:dilidili/common/widgets/http_error.dart';
 import 'package:dilidili/model/search_type.dart';
 import 'package:dilidili/pages/search_panel/controller.dart';
+import 'package:dilidili/pages/search_panel/widgets/test_panel.dart';
 import 'package:dilidili/pages/search_panel/widgets/video_panel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:easy_debounce/easy_throttle.dart';
 
 class SearchPanel extends StatefulWidget {
-  const SearchPanel({super.key, this.keyword, this.searchType, this.tag});
+  const SearchPanel(
+      {required this.keyword, required this.searchType, this.tag, Key? key})
+      : super(key: key);
   final SearchType? searchType;
   final String? tag;
   final String? keyword;
@@ -45,11 +49,12 @@ class _SearchPanelState extends State<SearchPanel>
     scrollController.addListener(() async {
       if (scrollController.position.pixels >=
           scrollController.position.maxScrollExtent - 100) {
-        _searchPanelController.onSearch(type: 'onLoad');
+        EasyThrottle.throttle('history', const Duration(seconds: 1), () {
+          _searchPanelController.onSearch(type: 'onLoad');
+        });
       }
     });
     _futureBuilderFuture = _searchPanelController.onSearch();
-    _searchPanelController.onSearch();
   }
 
   @override
@@ -73,33 +78,19 @@ class _SearchPanelState extends State<SearchPanel>
               var ctr = _searchPanelController;
               RxList list = ctr.resultList;
               if (data['status']) {
-                return Obx(
-                  () {
-                    switch (widget.searchType) {
-                      case SearchType.video:
-                        return SearchVideoPanel(
-                          ctr: _searchPanelController,
-                          // ignore: invalid_use_of_protected_member
-                          list: list.value,
-                        );
-                      default:
-                        return CustomScrollView(
-                          physics: const NeverScrollableScrollPhysics(),
-                          slivers: [
-                            HttpError(
-                              errMsg: "1",
-                              fn: () {
-                                setState(() {
-                                  _searchPanelController.onSearch();
-                                });
-                              },
-                            ),
-                          ],
-                        );
-                        ;
-                    }
-                  },
-                );
+                return Obx(() {
+                  switch (widget.searchType) {
+                    case SearchType.video:
+                      return SearchVideoPanel(
+                        ctr: _searchPanelController,
+                        list: list.value,
+                      );
+                    default:
+                      return TestPanel(
+                        list: list.value,
+                      );
+                  }
+                });
               } else {
                 return CustomScrollView(
                   physics: const NeverScrollableScrollPhysics(),
@@ -136,9 +127,7 @@ class _SearchPanelState extends State<SearchPanel>
               addAutomaticKeepAlives: false,
               addRepaintBoundaries: false,
               itemCount: 15,
-              itemBuilder: (context, index) {
-                return const VideoCardHSkeleton();
-              },
+              itemBuilder: (context, index) => const VideoCardHSkeleton(),
             );
           }
         },
