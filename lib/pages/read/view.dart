@@ -1,6 +1,8 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dilidili/common/widgets/html_widget.dart';
 import 'package:dilidili/model/read/opus.dart';
 import 'package:dilidili/model/read/read.dart';
+import 'package:dilidili/pages/opus/text_parser.dart';
 import 'package:dilidili/pages/read/controller.dart';
 import 'package:dilidili/utils/num_utils.dart';
 import 'package:flutter/material.dart';
@@ -143,7 +145,56 @@ class _ReadPageState extends State<ReadPage> {
     return Padding(
       padding: EdgeInsets.fromLTRB(
           16, 0, 16, MediaQuery.of(context).padding.bottom + 40),
-      child: _buildNonOpusContent(cvData, imgList),
+      child: cvData.readInfo!.opus == null
+          ? _buildNonOpusContent(cvData, imgList)
+          : _buildOpusContent(cvData, picList),
+    );
+  }
+
+  Widget _buildOpusContent(ReadDataModel cvData, List<String> picList) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 30),
+          child: _buildStatsWidget(cvData),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 20),
+          child: _buildAuthorWidget(cvData),
+        ),
+        ...cvData.readInfo!.opus!.content!.paragraphs!.map(
+          (ModuleParagraph paragraph) {
+            return Column(
+              children: [
+                if (paragraph.paraType == 1)
+                  _buildTextParagraph(paragraph)
+                else if (paragraph.paraType == 2)
+                  ..._buildPics(paragraph, picList)
+                else
+                  const SizedBox(),
+              ],
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTextParagraph(ModuleParagraph paragraph) {
+    return Container(
+      alignment: TextParser.getAlignment(paragraph.align),
+      margin: const EdgeInsets.only(bottom: 10),
+      child: SelectableText.rich(
+        TextSpan(
+          children: paragraph.text?.nodes?.map((node) {
+                //根据返回的json属性构建textspan
+                return TextParser.buildTextSpan(node, paragraph.align, context);
+              }).toList() ??
+              [],
+        ),
+      ),
     );
   }
 
@@ -265,6 +316,28 @@ class _ReadPageState extends State<ReadPage> {
         child: CircularProgressIndicator(),
       ),
     );
+  }
+
+  List<Widget> _buildPics(ModuleParagraph paragraph, List<String> picList) {
+    return paragraph.pic?.pics
+            ?.map(
+              (Pic pic) => Center(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 10, bottom: 10),
+                  child: InkWell(
+                    onTap: () {},
+                    child: CachedNetworkImage(
+                      imageUrl: pic.url!,
+                      width: (Get.size.width - 32) * pic.scale!,
+                      height:
+                          (Get.size.width - 32) * pic.scale! / pic.aspectRatio!,
+                    ),
+                  ),
+                ),
+              ),
+            )
+            .toList() ??
+        [];
   }
 }
 
