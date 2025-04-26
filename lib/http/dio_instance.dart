@@ -34,6 +34,7 @@ class DioInstance {
       sendTimeout: sendTimeout ?? _defaultTimeout,
       responseType: responseType,
       contentType: contentType,
+      maxRedirects: 3,
     );
     final PersistCookieJar cookieJar = PersistCookieJar(
       ignoreExpires: true,
@@ -63,13 +64,13 @@ class DioInstance {
   }
 
   //get请求
-  Future<Response> get({
-    required String path,
-    Object? data,
-    Map<String, dynamic>? param,
-    Options? options,
-    CancelToken? cancelToken,
-  }) async {
+  Future<Response> get(
+      {required String path,
+      Object? data,
+      Map<String, dynamic>? param,
+      Options? options,
+      CancelToken? cancelToken,
+      extra}) async {
     return _dio.get(
       path,
       queryParameters: param,
@@ -78,7 +79,10 @@ class DioInstance {
       options: options ??
           Options(
             headers: {
-              'user-agent': headerUa(),
+              'user-agent': headerUa(
+                  type: (extra != null && extra['ua'] != null)
+                      ? extra['ua']
+                      : null),
               'referer': 'https://www.bilibili.com/',
             },
             method: HttpMethods.get,

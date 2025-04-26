@@ -67,7 +67,10 @@ dependencies:
   extended_nested_scroll_view: ^6.2.1
   screen_brightness: ^2.1.2
   easy_debounce: ^2.0.3
-
+  html: ^0.15.6
+  flutter_html: ^3.0.0
+  webview_flutter: ^4.11.0
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter

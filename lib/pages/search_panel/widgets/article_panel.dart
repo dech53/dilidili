@@ -64,7 +64,13 @@ class SearchArticlePanel extends StatelessWidget {
               itemCount: list.length,
               itemBuilder: (context, index) {
                 return InkWell(
-                  onTap: () {},
+                  onTap: () {
+                    Get.toNamed('/read', parameters: {
+                      'title': list[index].subTitle,
+                      'id': list[index].id.toString(),
+                      'articleType': 'read'
+                    });
+                  },
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(
                         StyleString.safeSpace, 5, StyleString.safeSpace, 5),

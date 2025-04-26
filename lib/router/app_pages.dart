@@ -1,8 +1,10 @@
 import 'package:dilidili/pages/home/view.dart';
 import 'package:dilidili/pages/member/view.dart';
+import 'package:dilidili/pages/read/view.dart';
 import 'package:dilidili/pages/search/view.dart';
 import 'package:dilidili/pages/search_result/view.dart';
 import 'package:dilidili/pages/video/detail/view.dart';
+import 'package:dilidili/pages/webview/view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -12,7 +14,9 @@ class Routes {
     CustomGetPage(name: '/video', page: () => const VideoPage()),
     CustomGetPage(name: '/member', page: () => const MemberPage()),
     CustomGetPage(name: '/search', page: () => const SearchPage()),
-    CustomGetPage(name: '/searchResult', page: () => const SearchResultPage())
+    CustomGetPage(name: '/searchResult', page: () => const SearchResultPage()),
+    CustomGetPage(name: '/read', page: () => const ReadPage()),
+    CustomGetPage(name: '/webview', page: () => const WebviewPage()),
   ];
 }
 
