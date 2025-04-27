@@ -7,6 +7,7 @@ import 'package:dilidili/utils/num_utils.dart';
 import 'package:dilidili/utils/storage.dart';
 import 'package:dilidili/utils/string_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:dilidili/utils/id_utils.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 
@@ -176,7 +177,7 @@ class ChatCard extends StatelessWidget {
               GestureDetector(
                 onTap: () async {
                   SmartDialog.showLoading();
-                  final String bvid = content["bvid"];
+                  final String bvid = IdUtils.av2bv(int.parse(content['id']));
                   // 16番剧 5投稿
                   final int source = content["source"];
                   final String? url = content["url"];
@@ -186,7 +187,7 @@ class ChatCard extends StatelessWidget {
                   await SmartDialog.dismiss();
                   if (source == 5) {
                     Get.toNamed<dynamic>(
-                      '/video?bvid=$bvid&cid=$cid',
+                      '/video?bvid=$bvid&cid=$cid&mid=${content['author_id']}',
                       arguments: <String, String?>{
                         'pic': content['thumb'],
                         'heroTag': heroTag,
