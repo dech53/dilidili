@@ -5,6 +5,7 @@ import 'package:dilidili/http/video.dart';
 import 'package:dilidili/model/member/folder_info.dart';
 import 'package:dilidili/model/member/member_info.dart';
 import 'package:dilidili/model/member_tab_type.dart';
+import 'package:dilidili/utils/storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
@@ -19,7 +20,7 @@ class MemberController extends GetxController with GetTickerProviderStateMixin {
 
   late Map userStat;
   late int ownerMid;
-  late SharedPreferencesInstance prefs;
+  SharedPreferencesInstance prefs = SPStorage.prefs;
   RxInt attribute = (-1).obs;
   RxString attributeText = '关注'.obs;
   RxBool isOwner = false.obs;
@@ -30,7 +31,7 @@ class MemberController extends GetxController with GetTickerProviderStateMixin {
     tabsCtrList = memberTabs.map((e) => e['ctr']).toList();
     tabsPageList = memberTabs.map<Widget>((e) => e['page']).toList();
     mid = int.parse(Get.parameters['mid']!);
-    prefs = await SharedPreferencesInstance.instance();
+    
     //获取当前登录用户的mid
     ownerMid = int.parse(prefs.getString("DedeUserID")!);
     isOwner.value = mid == ownerMid;

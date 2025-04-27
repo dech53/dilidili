@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
-import 'package:dilidili/cache/shared_preferences_instance.dart';
 import 'package:dilidili/http/dio_instance.dart';
 import 'package:dilidili/http/static/api_string.dart';
 import 'package:dilidili/model/nav_user_info.dart';
 import 'package:dilidili/model/root_data.dart';
 import 'package:dilidili/utils/log_utils.dart';
 import 'package:dilidili/utils/regex_utils.dart';
+import 'package:dilidili/utils/storage.dart';
 import 'package:dio/dio.dart';
 
 class WbiUtils {
@@ -79,7 +79,7 @@ class WbiUtils {
   //根据传入的参数返回带wbi签名的参数
   static Future<Map<String, dynamic>> getWbi(
       Map<String, dynamic> params) async {
-    final prefs = await SharedPreferencesInstance.instance();
+    final prefs = SPStorage.prefs;
     String img_key = prefs.getString("img_key") ?? "";
     String sub_key = prefs.getString("sub_key") ?? "";
     final now = DateTime.now();

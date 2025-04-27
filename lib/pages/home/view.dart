@@ -113,7 +113,7 @@ class _HomePageState extends State<HomePage>
                     padding: EdgeInsets.only(left: 10.w),
                     child: IconButton(
                       padding: EdgeInsets.zero,
-                      onPressed: () {},
+                      onPressed: () => Get.toNamed('/whisper'),
                       icon: Icon(
                         Icons.notifications_outlined,
                         size: 25.r,

@@ -7,6 +7,7 @@ import 'package:dilidili/model/nav_user_info.dart';
 import 'package:dilidili/model/user/fav_folder.dart';
 import 'package:dilidili/model/video/video_basic_info.dart';
 import 'package:dilidili/utils/id_utils.dart';
+import 'package:dilidili/utils/storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
@@ -14,7 +15,7 @@ import 'package:share_plus/share_plus.dart';
 
 class VideoIntroController extends GetxController {
   VideoIntroController({required this.bvid});
-  late SharedPreferencesInstance prefs;
+   SharedPreferencesInstance prefs = SPStorage.prefs;
   String bvid;
   // 在线人数
   RxString total = '1'.obs;
@@ -41,7 +42,6 @@ class VideoIntroController extends GetxController {
     super.onInit();
     // 定时更新在线人数
     queryOnlineTotal();
-    prefs = await SharedPreferencesInstance.instance();
     startTimer();
     lastPlayCid.value = int.parse(Get.parameters['cid']!);
   }
@@ -156,7 +156,7 @@ class VideoIntroController extends GetxController {
   // 分享视频
   Future actionShareVideo() async {
     var result = await Share.share(
-            '${videoDetail.value.title} UP主: ${videoDetail.value.owner!.name!} - ${ApiString.baseUrl}/video/$bvid')
+            '${videoDetail.value.title} - ${ApiString.baseUrl}/video/$bvid')
         .whenComplete(() {});
     return result;
   }

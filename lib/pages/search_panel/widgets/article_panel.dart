@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dilidili/common/constants.dart';
 import 'package:dilidili/common/widgets/http_error.dart';
+import 'package:dilidili/common/widgets/network_img_layer.dart';
 import 'package:dilidili/pages/search_panel/controller.dart';
 import 'package:dilidili/utils/num_utils.dart';
 import 'package:flutter/cupertino.dart';
@@ -96,20 +97,10 @@ class SearchArticlePanel extends StatelessWidget {
                                       builder: (context, boxConstraints) {
                                     double maxWidth = boxConstraints.maxWidth;
                                     double maxHeight = boxConstraints.maxHeight;
-                                    return ClipRRect(
-                                      borderRadius: BorderRadius.circular(5.r),
-                                      child: CachedNetworkImage(
-                                        width: maxWidth,
-                                        height: maxHeight,
-                                        filterQuality: FilterQuality.low,
-                                        fit: BoxFit.cover,
-                                        imageUrl: list[index]
-                                                .imageUrls
-                                                .first
-                                                .startsWith('//')
-                                            ? 'https:${list[index].imageUrls.first!}'
-                                            : list[index].imageUrls.first!,
-                                      ),
+                                    return NetworkImgLayer(
+                                      width: maxWidth,
+                                      height: maxHeight,
+                                      src: list[index].imageUrls.first,
                                     );
                                   }),
                                 ),

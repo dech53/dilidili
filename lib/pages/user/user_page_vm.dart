@@ -5,6 +5,7 @@ import 'package:dilidili/http/static/api_string.dart';
 import 'package:dilidili/model/qr_code.dart';
 import 'package:dilidili/model/root_data.dart';
 import 'package:dilidili/utils/log_utils.dart';
+import 'package:dilidili/utils/storage.dart';
 import 'package:dilidili/utils/wbi_utils.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -45,7 +46,7 @@ class UserPageViewModel extends ChangeNotifier {
   }
 
   Future fetchLoginCode() async {
-    final prefs = await SharedPreferencesInstance.instance();
+    final prefs = SPStorage.prefs;
     if (prefs.getString("refresh_token") == null) {
       Response response = await DioInstance.instance().get(
         path: ApiString.passportUrl + ApiString.apply_QRCode,
@@ -66,7 +67,7 @@ class UserPageViewModel extends ChangeNotifier {
       Logutils.println(prefs.getString('DedeUserID')!);
     } else {
       hasUser = true;
-      ID = prefs.getString("DedeUserID");
+      ID = SPStorage.userID;
     }
   }
 

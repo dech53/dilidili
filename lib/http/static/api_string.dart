@@ -1,4 +1,5 @@
 class ApiString {
+  static const String baseMsgUrl = 'https://api.vc.bilibili.com';
   static const String searchUrl = 'https://s.search.bilibili.com';
   static const String hotSearchUrl = '/main/hotword';
   static const String searchSuggestUrl = '/main/suggest';
@@ -68,7 +69,20 @@ class ApiString {
 
   // 分类搜索
   static const String searchByType = '/x/web-interface/wbi/search/type';
-  
+
   // 查询视频分P列表 (avid/bvid转cid)
   static const String ab2c = '/x/player/pagelist';
+
+  static const String sessionList = '/session_svr/v1/session_svr/get_sessions';
+
+  /// 私聊用户信息
+  /// uids
+  /// build=0&mobi_app=web
+  static const String sessionAccountList = '/account/v1/user/cards';
+
+  /// 消息未读数
+  static const String unread = '/x/im/web/msgfeed/unread';
+  static const String sessionMsg = '/svr_sync/v1/svr_sync/fetch_session_msgs';
+  /// 发送私信
+  static const String sendMsg = '/web_im/v1/web_im/send_msg';
 }

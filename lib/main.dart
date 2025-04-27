@@ -2,6 +2,7 @@ import 'package:dilidili/http/dio_instance.dart';
 import 'package:dilidili/pages/search/view.dart';
 import 'package:dilidili/pages/video/detail/view.dart';
 import 'package:dilidili/router/app_pages.dart';
+import 'package:dilidili/utils/storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
@@ -11,6 +12,7 @@ import 'app.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   MediaKit.ensureInitialized();
+  SPStorage.init();
   await DioInstance.initDio();
   runApp(
     GetMaterialApp(

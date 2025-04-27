@@ -5,6 +5,8 @@ import 'package:dilidili/pages/search/view.dart';
 import 'package:dilidili/pages/search_result/view.dart';
 import 'package:dilidili/pages/video/detail/view.dart';
 import 'package:dilidili/pages/webview/view.dart';
+import 'package:dilidili/pages/whisper/view.dart';
+import 'package:dilidili/pages/whisper_detail/view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -17,6 +19,8 @@ class Routes {
     CustomGetPage(name: '/searchResult', page: () => const SearchResultPage()),
     CustomGetPage(name: '/read', page: () => const ReadPage()),
     CustomGetPage(name: '/webview', page: () => const WebviewPage()),
+    CustomGetPage(name: '/whisper', page: () => const WhisperPage()),
+    CustomGetPage(name: '/whisperDetail', page: () => const WhisperDetailPage())
   ];
 }
 

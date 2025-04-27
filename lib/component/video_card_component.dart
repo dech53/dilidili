@@ -1,9 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dilidili/common/constants.dart';
+import 'package:dilidili/common/widgets/network_img_layer.dart';
 import 'package:dilidili/model/rcmd_video.dart';
 import 'package:dilidili/utils/log_utils.dart';
 import 'package:dilidili/utils/num_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:dilidili/common/widgets/badge.dart';
 
 class VideoCardComponent extends StatelessWidget {
   final RcmdVideoItem video;
@@ -26,44 +29,31 @@ class VideoCardComponent extends StatelessWidget {
       },
       child: Column(
         children: [
-          Stack(
-            children: [
-              AspectRatio(
-                aspectRatio: 16 / 9,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(5.r),
-                  child: CachedNetworkImage(
-                    cacheKey: "${video.pic}",
-                    filterQuality: FilterQuality.low,
-                    fit: BoxFit.cover,
-                    imageUrl: video.pic.replaceFirst("http://", "https://"),
-                    httpHeaders: const {},
-                  ),
-                ),
-              ),
-              Positioned(
-                right: 1.0,
-                bottom: 1.0,
-                child: Card(
-                  elevation: 0.0,
-                  color: Colors.black.withValues(alpha: 0.3),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(3.r),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(1.5),
-                    child: Text(
-                      NumUtils.int2time(video.duration),
-                      style: TextStyle(
-                        fontSize: 10.sp,
-                        color: Colors.white,
+          AspectRatio(
+              aspectRatio: StyleString.aspectRatio,
+              child: LayoutBuilder(
+                builder: (context, boxConstraints) {
+                  double maxWidth = boxConstraints.maxWidth;
+                  double maxHeight = boxConstraints.maxHeight;
+                  return Stack(
+                    children: [
+                      NetworkImgLayer(
+                        src: video.pic,
+                        width: maxWidth,
+                        height: maxHeight,
                       ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
+                      if (video.duration > 0) ...[
+                        PBadge(
+                          bottom: 10,
+                          right: 10,
+                          text: NumUtils.int2time(video.duration),
+                          type: 'gray',
+                        )
+                      ]
+                    ],
+                  );
+                },
+              )),
           Padding(
             padding: EdgeInsets.all(0.3),
             child: Column(

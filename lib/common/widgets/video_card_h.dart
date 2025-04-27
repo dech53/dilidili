@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dilidili/common/constants.dart';
 import 'package:dilidili/common/widgets/badge.dart';
+import 'package:dilidili/common/widgets/network_img_layer.dart';
 import 'package:dilidili/http/search.dart';
 import 'package:dilidili/utils/string_utils.dart';
 import 'package:flutter/material.dart';
@@ -56,35 +57,36 @@ class VideoCardH extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Stack(
-                    children: [
-                      AspectRatio(
-                        aspectRatio: 16 / 9,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(5.r),
-                          child: CachedNetworkImage(
-                            fit: BoxFit.cover,
-                            imageUrl: videoItem.pic!
-                                .replaceFirst("http://", "https://"),
-                            httpHeaders: const {},
+                  AspectRatio(
+                    aspectRatio: StyleString.aspectRatio,
+                    child: LayoutBuilder(builder:
+                        (BuildContext context, BoxConstraints boxConstraints) {
+                      final double maxWidth = boxConstraints.maxWidth;
+                      final double maxHeight = boxConstraints.maxHeight;
+                      return Stack(
+                        children: [
+                          NetworkImgLayer(
+                            src: videoItem.pic as String,
+                            width: maxWidth,
+                            height: maxHeight,
                           ),
-                        ),
-                      ),
-                      if (videoItem.duration != 0)
-                        PBadge(
-                          text: NumUtils.int2time(videoItem.duration!),
-                          right: 6.0,
-                          bottom: 6.0,
-                          type: 'gray',
-                        ),
-                      if (type != 'video')
-                        PBadge(
-                          text: type,
-                          left: 6.0,
-                          bottom: 6.0,
-                          type: 'primary',
-                        ),
-                    ],
+                          if (videoItem.duration != 0)
+                            PBadge(
+                              text: NumUtils.int2time(videoItem.duration!),
+                              right: 6.0,
+                              bottom: 6.0,
+                              type: 'gray',
+                            ),
+                          if (type != 'video')
+                            PBadge(
+                              text: type,
+                              left: 6.0,
+                              bottom: 6.0,
+                              type: 'primary',
+                            ),
+                        ],
+                      );
+                    }),
                   ),
                   VideoContent(videoItem: videoItem),
                 ],
