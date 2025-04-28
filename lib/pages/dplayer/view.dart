@@ -35,6 +35,7 @@ class _DPlayerState extends State<DPlayer> with TickerProviderStateMixin {
     Future.microtask(() async {
       try {
         _brightnessValue.value = await ScreenBrightness.instance.system;
+        // ignore: deprecated_member_use
         ScreenBrightness().onCurrentBrightnessChanged.listen((double value) {
           if (mounted) {
             _brightnessValue.value = value;
@@ -171,10 +172,10 @@ class _DPlayerState extends State<DPlayer> with TickerProviderStateMixin {
             },
           ),
         ),
-        Obx(
-          () => Column(
-            children: [
-              if (widget.headerControl != null || _.headerControl != null)
+        if (widget.headerControl != null || _.headerControl != null)
+          Obx(
+            () => Column(
+              children: [
                 ClipRect(
                   child: AppBarAni(
                     position: 'top',
@@ -183,10 +184,10 @@ class _DPlayerState extends State<DPlayer> with TickerProviderStateMixin {
                     child: widget.headerControl ?? _.headerControl!,
                   ),
                 ),
-              const Spacer(),
-            ],
+                const Spacer(),
+              ],
+            ),
           ),
-        ),
         //
         Obx(() {
           if (_.dataStatus.loading) {

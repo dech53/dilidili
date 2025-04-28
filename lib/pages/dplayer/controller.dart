@@ -29,6 +29,8 @@ class DPlayerController extends GetxController {
   VideoController? _videoController;
   final Rx<int> _playerCount = Rx(0);
   Rx<int> get playerCount => _playerCount;
+  // 默认投稿视频格式
+  static Rx<String> _videoType = 'archive'.obs;
 
   /// 是否展示控制条及监听
   final Rx<bool> _showControls = false.obs;
@@ -82,7 +84,7 @@ class DPlayerController extends GetxController {
     _instance ??= DPlayerController._internal();
     if (videoType != 'none') {
       _instance!._playerCount.value += 1;
-      
+      _videoType.value = videoType;
     }
     return _instance!;
   }

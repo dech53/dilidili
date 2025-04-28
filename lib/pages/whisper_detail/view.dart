@@ -20,7 +20,7 @@ class _WhisperDetailPageState extends State<WhisperDetailPage>
   late TextEditingController _replyContentController;
   final FocusNode replyContentFocusNode = FocusNode();
   late double emoteHeight = 230.0;
-  double keyboardHeight = 0.0; // 键盘高度
+  double keyboardHeight = 0.0;
   RxString toolbarType = ''.obs;
   @override
   void initState() {

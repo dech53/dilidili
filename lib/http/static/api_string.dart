@@ -83,6 +83,14 @@ class ApiString {
   /// 消息未读数
   static const String unread = '/x/im/web/msgfeed/unread';
   static const String sessionMsg = '/svr_sync/v1/svr_sync/fetch_session_msgs';
+
   /// 发送私信
   static const String sendMsg = '/web_im/v1/web_im/send_msg';
+  // 直播间详情 H5
+  static const String liveRoomInfoH5 =
+      '/xlive/web-room/v1/index/getH5InfoByRoom';
+  // 直播间详情
+  // cid roomId
+  // qn 80:流畅，150:高清，400:蓝光，10000:原画，20000:4K, 30000:杜比
+  static const String liveRoomInfo = '/xlive/web-room/v2/index/getRoomPlayInfo';
 }

@@ -234,7 +234,15 @@ class LiveFollowingListView extends StatelessWidget {
             child: Column(
               children: [
                 InkWell(
-                  onTap: () {},
+                  onTap: () {
+                    Get.toNamed(
+                      '/liveRoom?roomid=${item.roomid}',
+                      arguments: {
+                        'liveItem': item,
+                        'heroTag': item.roomid.toString()
+                      },
+                    );
+                  },
                   child: Container(
                     width: 54,
                     height: 54,

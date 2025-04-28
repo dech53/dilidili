@@ -1,4 +1,5 @@
 import 'package:dilidili/pages/home/view.dart';
+import 'package:dilidili/pages/live_room/view.dart';
 import 'package:dilidili/pages/member/view.dart';
 import 'package:dilidili/pages/read/view.dart';
 import 'package:dilidili/pages/search/view.dart';
@@ -20,7 +21,9 @@ class Routes {
     CustomGetPage(name: '/read', page: () => const ReadPage()),
     CustomGetPage(name: '/webview', page: () => const WebviewPage()),
     CustomGetPage(name: '/whisper', page: () => const WhisperPage()),
-    CustomGetPage(name: '/whisperDetail', page: () => const WhisperDetailPage())
+    CustomGetPage(
+        name: '/whisperDetail', page: () => const WhisperDetailPage()),
+    CustomGetPage(name: '/liveRoom', page: () => const LiveRoomPage()),
   ];
 }
 

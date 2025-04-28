@@ -470,14 +470,14 @@ class ChatCard extends StatelessWidget {
                             children: [
                               item.msgStatus == 1
                                   ? Text(
-                                      '  已撤回',
+                                      '已撤回',
                                       style: Theme.of(context)
                                           .textTheme
                                           .labelSmall!,
                                     )
                                   : const SizedBox()
                             ],
-                          )
+                          ),
                         ],
                       ),
                     ),

@@ -1,8 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dilidili/common/constants.dart';
 import 'package:dilidili/model/live/rcmd_item.dart';
+import 'package:dilidili/utils/string_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 
 // 视频卡片 - 垂直布局
 class LiveCardV extends StatelessWidget {
@@ -17,9 +19,13 @@ class LiveCardV extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String heroTag = StringUtils.makeHeroTag(liveItem.roomid);
     return InkWell(
       borderRadius: BorderRadius.circular(16),
-      onTap: () async {},
+      onTap: () async {
+        Get.toNamed('/liveRoom?roomid=${liveItem.roomid}',
+            arguments: {'liveItem': liveItem, 'heroTag': heroTag});
+      },
       child: Column(
         children: [
           ClipRRect(
