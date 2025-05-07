@@ -3,6 +3,7 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  isar_flutter_libs
   media_kit_libs_linux
   media_kit_video
   url_launcher_linux
