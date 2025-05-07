@@ -16,7 +16,7 @@ class DioInstance {
 
   static late CookieManager cookieManager;
 
-  static final Dio _dio = Dio();
+  static final Dio dio = Dio();
   static final _defaultTimeout = const Duration(seconds: 30);
   static initDio({
     String? httpMethod = HttpMethods.get,
@@ -27,7 +27,7 @@ class DioInstance {
     String? contentType,
   }) async {
     final String cookiePath = await FileUtils.getCookiePath();
-    _dio.options = BaseOptions(
+    dio.options = BaseOptions(
       method: httpMethod,
       connectTimeout: connectTimeout ?? _defaultTimeout,
       receiveTimeout: receiveTimeout ?? _defaultTimeout,
@@ -41,13 +41,13 @@ class DioInstance {
       storage: FileStorage(cookiePath),
     );
     cookieManager = CookieManager(cookieJar);
-    _dio.interceptors.add(cookieManager);
+    dio.interceptors.add(cookieManager);
     final List<Cookie> cookie = await cookieManager.cookieJar
         .loadForRequest(Uri.parse(ApiString.baseUrl));
     final String cookieString = cookie
         .map((Cookie cookie) => '${cookie.name}=${cookie.value}')
         .join('; ');
-    _dio.options.headers['cookie'] = cookieString;
+    dio.options.headers['cookie'] = cookieString;
     // _dio.interceptors.add(ResponseInterceptor());
     // _dio.interceptors.add(PrintLogInterceptor());
   }
@@ -71,7 +71,7 @@ class DioInstance {
       Options? options,
       CancelToken? cancelToken,
       extra}) async {
-    return _dio.get(
+    return dio.get(
       path,
       queryParameters: param,
       data: data,
@@ -100,7 +100,7 @@ class DioInstance {
     Options? options,
     CancelToken? cancelToken,
   }) async {
-    Response res = await _dio.get(
+    Response res = await dio.get(
       path,
       queryParameters: param,
       data: data,
@@ -127,7 +127,7 @@ class DioInstance {
     Options? options,
     CancelToken? cancelToken,
   }) async {
-    return _dio.post(
+    return dio.post(
       path,
       queryParameters: param,
       data: data,

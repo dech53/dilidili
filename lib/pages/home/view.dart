@@ -1,3 +1,4 @@
+import 'package:dilidili/common/widgets/network_img_layer.dart';
 import 'package:dilidili/pages/home/controller.dart';
 import 'package:dilidili/utils/string_utils.dart';
 import 'package:flutter/material.dart';
@@ -53,19 +54,24 @@ class _HomePageState extends State<HomePage>
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   //问候语
-                  Text(
-                    "${StringUtils.getTimeGreeting()},dech53",
-                    style: TextStyle(
-                      fontSize: 22.sp,
-                      fontWeight: FontWeight.w600,
+                  Obx(
+                    () => Text(
+                      "${StringUtils.getTimeGreeting()}${_homeController.userName.value == '' ? '' : ',${_homeController.userName.value}'}",
+                      style: TextStyle(
+                        fontSize: 22.sp,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                   //头像
-                  const CircleAvatar(
-                    backgroundImage: NetworkImage(
-                      "https://i1.hdslb.com/bfs/face/7cd9a2b4c9ce9a99443f8a22fe4e7cc3a0c10039.jpg@120w_120h_1c.avif",
+                  Obx(
+                    () => NetworkImgLayer(
+                      width: 40,
+                      height: 40,
+                      type: 'avatar',
+                      src: _homeController.userFace.value,
                     ),
-                  ),
+                  )
                 ],
               ),
             ),

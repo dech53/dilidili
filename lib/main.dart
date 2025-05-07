@@ -12,7 +12,7 @@ import 'app.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   MediaKit.ensureInitialized();
-  SPStorage.init();
+  await SPStorage.init();
   await DioInstance.initDio();
   runApp(
     GetMaterialApp(

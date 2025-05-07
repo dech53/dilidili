@@ -1,8 +1,7 @@
 import 'package:dilidili/pages/home/view.dart';
-import 'package:dilidili/pages/issue/issue_page.dart';
 import 'package:dilidili/pages/moments/moments_page.dart';
-import 'package:dilidili/pages/trend/trend_page.dart';
-import 'package:dilidili/pages/user/user_page.dart';
+import 'package:dilidili/pages/trend/view.dart';
+import 'package:dilidili/pages/user/view.dart';
 import 'package:flutter/material.dart';
 import 'package:lazy_load_indexed_stack/lazy_load_indexed_stack.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
