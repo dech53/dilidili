@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'package:dilidili/http/user.dart';
+import 'package:dilidili/model/user/stat.dart';
 import 'package:dilidili/utils/storage.dart';
 import 'package:dilidili/http/login.dart';
 import 'package:dilidili/utils/user.dart';
@@ -26,8 +28,9 @@ class UserPageController extends GetxController {
   late String qrcodeKey;
   RxBool userLogin = false.obs;
   Box userInfoCache = SPStorage.userInfo;
+  // 用户状态 动态、关注、粉丝
+  Rx<UserStat> userStat = UserStat().obs;
   Timer? validTimer;
-
 
   @override
   onInit() {
@@ -37,6 +40,7 @@ class UserPageController extends GetxController {
       userLogin.value = true;
     }
   }
+
   // 获取登录二维码
   Future getWebQrcode() async {
     var res = await LoginHttp.getWebQrcode();
@@ -63,8 +67,42 @@ class UserPageController extends GetxController {
     var res = await LoginHttp.queryWebQrcodeStatus(qrcodeKey);
     if (res['status']) {
       await UserUtils.confirmLogin();
+      userLogin.value = true;
       validTimer?.cancel();
       Get.back();
     }
+  }
+
+  Future queryUserInfo() async {
+    if (!userLogin.value) {
+      return {'status': false};
+    }
+    var res = await UserHttp.userInfo();
+    if (res['status']) {
+      if (res['data'].isLogin) {
+        userInfo.value = res['data'];
+        userInfoCache.put('userInfoCache', res['data']);
+        userLogin.value = true;
+      } else {
+        resetUserInfo();
+      }
+    }
+    await queryUserStatOwner();
+    return res;
+  }
+
+  Future queryUserStatOwner() async {
+    var res = await UserHttp.userStatOwner();
+    if (res['status']) {
+      userStat.value = res['data'];
+    }
+    return res;
+  }
+
+  Future resetUserInfo() async {
+    userInfo.value = UserInfoData();
+    userStat.value = UserStat();
+    userInfoCache.delete('userInfoCache');
+    userLogin.value = false;
   }
 }

@@ -93,4 +93,6 @@ class ApiString {
   // cid roomId
   // qn 80:流畅，150:高清，400:蓝光，10000:原画，20000:4K, 30000:杜比
   static const String liveRoomInfo = '/xlive/web-room/v2/index/getRoomPlayInfo';
+  // 获取当前用户状态
+  static const String userStatOwner = '/x/web-interface/nav/stat';
 }

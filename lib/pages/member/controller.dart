@@ -12,7 +12,7 @@ import 'package:get/get.dart';
 
 class MemberController extends GetxController with GetTickerProviderStateMixin {
   late int mid;
-
+  RxString face = ''.obs;
   Rx<MemberInfo> memberInfo = MemberInfo().obs;
   late RxList tabs = [].obs;
   late List tabsCtrList;
@@ -27,13 +27,14 @@ class MemberController extends GetxController with GetTickerProviderStateMixin {
   @override
   void onInit() async {
     super.onInit();
+    face.value = Get.arguments['face'] ?? '';
     tabs.value = memberTabs;
     tabsCtrList = memberTabs.map((e) => e['ctr']).toList();
     tabsPageList = memberTabs.map<Widget>((e) => e['page']).toList();
     mid = int.parse(Get.parameters['mid']!);
-    
+
     //获取当前登录用户的mid
-    ownerMid = int.parse(prefs.getString("DedeUserID")!);
+    ownerMid = SPStorage.userInfo.get('userInfoCache').mid;
     isOwner.value = mid == ownerMid;
     relationSearch();
   }
@@ -108,6 +109,4 @@ class MemberController extends GetxController with GetTickerProviderStateMixin {
     relationSearch();
     memberInfo.update((val) {});
   }
-
-  
 }

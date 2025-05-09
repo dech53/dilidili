@@ -1,5 +1,6 @@
 import 'package:dilidili/http/user.dart';
 import 'package:dilidili/pages/home/controller.dart';
+import 'package:dilidili/pages/user/controller.dart';
 import 'package:dilidili/utils/cookie.dart';
 import 'package:dilidili/utils/storage.dart';
 import 'package:flutter/cupertino.dart';
@@ -10,6 +11,17 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 
 class UserUtils {
+  static Future refreshLoginStatus(bool status) async {
+    try {
+      await Get.find<UserPageController>().resetUserInfo();
+      HomeController homeCtr = Get.find<HomeController>();
+      homeCtr.userFace.value = '';
+      homeCtr.userName.value = '';
+    } catch (e) {
+      SmartDialog.showToast('refreshLoginStatus error: ${e.toString()}');
+    }
+  }
+
   static confirmLogin() async {
     try {
       await SetCookie.set();
@@ -23,6 +35,9 @@ class UserUtils {
           }
           await userInfoCache.put('userInfoCache', result['data']);
           final HomeController homeCtr = Get.find<HomeController>();
+          final UserPageController userCtr = Get.find<UserPageController>();
+          userCtr.userInfo.value = result['data'];
+          userCtr.userInfo.refresh();
           homeCtr.userFace.value = result['data'].face;
           homeCtr.userName.value = result['data'].uname;
         } catch (e) {

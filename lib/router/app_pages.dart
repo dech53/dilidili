@@ -1,9 +1,11 @@
+import 'package:dilidili/pages/about/view.dart';
 import 'package:dilidili/pages/home/view.dart';
 import 'package:dilidili/pages/live_room/view.dart';
 import 'package:dilidili/pages/member/view.dart';
 import 'package:dilidili/pages/read/view.dart';
 import 'package:dilidili/pages/search/view.dart';
 import 'package:dilidili/pages/search_result/view.dart';
+import 'package:dilidili/pages/setting/view.dart';
 import 'package:dilidili/pages/video/detail/view.dart';
 import 'package:dilidili/pages/webview/view.dart';
 import 'package:dilidili/pages/whisper/view.dart';
@@ -24,6 +26,8 @@ class Routes {
     CustomGetPage(
         name: '/whisperDetail', page: () => const WhisperDetailPage()),
     CustomGetPage(name: '/liveRoom', page: () => const LiveRoomPage()),
+    CustomGetPage(name: '/setting', page: () => const SettingPage()),
+    CustomGetPage(name: '/about', page: () => const AboutPage()),
   ];
 }
 

@@ -49,21 +49,20 @@ class IntroDetail extends StatelessWidget {
               )
             ],
           ),
-          if(videoDetail?.desc != "")
-          const SizedBox(height: 4),
-          if(videoDetail?.desc != "")
-          SelectableRegion(
-            focusNode: FocusNode(),
-            selectionControls: MaterialTextSelectionControls(),
-            child: Text.rich(
-              style: const TextStyle(height: 1.4),
-              TextSpan(
-                children: [
-                  buildContent(context, videoDetail!),
-                ],
+          if (videoDetail?.desc != "") const SizedBox(height: 4),
+          if (videoDetail?.desc != "")
+            SelectableRegion(
+              focusNode: FocusNode(),
+              selectionControls: MaterialTextSelectionControls(),
+              child: Text.rich(
+                style: const TextStyle(height: 1.4),
+                TextSpan(
+                  children: [
+                    buildContent(context, videoDetail!),
+                  ],
+                ),
               ),
             ),
-          ),
         ],
       ),
     );
@@ -133,7 +132,9 @@ class IntroDetail extends StatelessWidget {
               ..onTap = () {
                 Get.toNamed(
                   '/member?mid=${currentDesc.bizId}',
-                  arguments: {'face': ''},
+                  arguments: {
+                    'face': videoDetail!.owner!.face!,
+                  },
                 );
               },
           );
