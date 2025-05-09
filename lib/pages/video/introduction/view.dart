@@ -129,14 +129,10 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     heroTag = widget.heroTag!;
-    videoIntroController = Get.put(VideoIntroController(bvid: widget.bvid));
+    videoIntroController =
+        Get.put(VideoIntroController(bvid: widget.bvid), tag: heroTag);
     videoDetailCtr = Get.find<VideoDetailController>(tag: heroTag);
     _expandableController = ExpandableController(initialExpanded: false);
-  }
-
-// 用户主页
-  onPushMember() {
-    Get.toNamed('/member?mid=${videoIntroController.mid}');
   }
 
   @override
@@ -165,7 +161,14 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
             Container(
               padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
               child: GestureDetector(
-                onTap: onPushMember,
+                onTap: () {
+                  Get.toNamed(
+                    '/member?mid=${videoIntroController.mid}',
+                    arguments: {
+                      'face': widget.videoDetail!.owner!.face,
+                    },
+                  );
+                },
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [

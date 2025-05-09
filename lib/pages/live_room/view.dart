@@ -152,7 +152,12 @@ class _LiveRoomPageState extends State<LiveRoomPage>
                           InkWell(
                             onTap: () {
                               Get.toNamed(
-                                  '/member?mid=${_liveRoomController.roomInfoH5.value.roomInfo?.uid}');
+                                '/member?mid=${_liveRoomController.roomInfoH5.value.roomInfo?.uid}',
+                                arguments: {
+                                  'face': _liveRoomController.roomInfoH5.value
+                                      .anchorInfo!.baseInfo!.face
+                                },
+                              );
                             },
                             child: NetworkImgLayer(
                               width: 34,

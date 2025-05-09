@@ -53,7 +53,6 @@ class _MemberPageState extends State<MemberPage>
   void dispose() {
     _extendNestCtr.removeListener(() {});
     appbarStream.close();
-    _memberController.dispose();
     super.dispose();
   }
 
