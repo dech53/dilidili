@@ -23,6 +23,8 @@ class SPStorage {
       },
     );
     prefs = await SharedPreferencesInstance.instance();
-    userID = prefs.getString('DedeUserID') ?? '';
+    if (userInfo.get('userInfoCache') != null) {
+      userID = userInfo.get('userInfoCache').mid.toString();
+    }
   }
 }
