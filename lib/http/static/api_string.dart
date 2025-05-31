@@ -95,4 +95,7 @@ class ApiString {
   static const String liveRoomInfo = '/xlive/web-room/v2/index/getRoomPlayInfo';
   // 获取当前用户状态
   static const String userStatOwner = '/x/web-interface/nav/stat';
+
+  /// 排行榜
+  static const String getRankApi = "/x/web-interface/ranking/v2";
 }

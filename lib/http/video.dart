@@ -1,5 +1,6 @@
 import 'package:dilidili/http/dio_instance.dart';
 import 'package:dilidili/http/static/api_string.dart';
+import 'package:dilidili/model/model_hot_video_item.dart';
 import 'package:dilidili/model/nav_user_info.dart';
 import 'package:dilidili/model/rcmd_video.dart';
 import 'package:dilidili/model/root_data.dart';
@@ -321,6 +322,25 @@ class VideoHttp {
         'code': res.data['code'],
         'msg': res.data['message'],
       };
+    }
+  }
+
+  // 视频排行
+  static Future getRankVideoList(int rid) async {
+    try {
+      var rankApi = "${ApiString.baseUrl}${ApiString.getRankApi}?rid=$rid&type=all";
+      var res = await DioInstance.instance().get(path: rankApi);
+      if (res.data['code'] == 0) {
+        List<HotVideoItemModel> list = [];
+        for (var i in res.data['data']['list']) {
+          list.add(HotVideoItemModel.fromJson(i));
+        }
+        return {'status': true, 'data': list};
+      } else {
+        return {'status': false, 'data': [], 'msg': res.data['message']};
+      }
+    } catch (err) {
+      return {'status': false, 'data': [], 'msg': err};
     }
   }
 }

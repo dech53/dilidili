@@ -4,6 +4,7 @@ import 'package:dilidili/pages/video/detail/view.dart';
 import 'package:dilidili/router/app_pages.dart';
 import 'package:dilidili/utils/storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:media_kit/media_kit.dart';
@@ -11,6 +12,7 @@ import 'app.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await ScreenUtil.ensureScreenSize();
   MediaKit.ensureInitialized();
   await SPStorage.init();
   await DioInstance.initDio();
