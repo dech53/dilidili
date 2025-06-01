@@ -1,5 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dilidili/common/constants.dart';
+import 'package:dilidili/common/widgets/badge.dart';
+import 'package:dilidili/utils/num_utils.dart';
 import 'package:dilidili/utils/string_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -34,59 +36,57 @@ class LiveItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     String heroTag = StringUtils.makeHeroTag(liveItem.roomid);
-    return Card(
-      elevation: 1,
-      clipBehavior: Clip.hardEdge,
-      margin: EdgeInsets.zero,
-      child: InkWell(
-        onTap: () async {
-          Get.toNamed('/liveRoom?roomid=${liveItem.roomid}',
-              arguments: {'liveItem': liveItem, 'heroTag': heroTag});
-        },
-        onLongPress: () => {},
-        child: Column(
-          children: [
-            ClipRRect(
-              borderRadius: const BorderRadius.all(StyleString.imgRadius),
-              child: AspectRatio(
-                aspectRatio: StyleString.aspectRatio,
-                child: LayoutBuilder(builder: (context, boxConstraints) {
-                  double maxWidth = boxConstraints.maxWidth;
-                  double maxHeight = boxConstraints.maxHeight;
-                  return Stack(
-                    children: [
-                      ClipRRect(
-                        clipBehavior: Clip.antiAlias,
-                        borderRadius: BorderRadius.circular(0.r),
-                        child: CachedNetworkImage(
-                          width: maxWidth,
-                          height: maxHeight,
-                          imageUrl: liveItem.cover.startsWith('//')
-                              ? 'https:${liveItem.cover}'
-                              : liveItem.cover,
-                        ),
+    return InkWell(
+      onTap: () async {
+        Get.toNamed('/liveRoom?roomid=${liveItem.roomid}',
+            arguments: {'liveItem': liveItem, 'heroTag': heroTag});
+      },
+      onLongPress: () => {},
+      child: Column(
+        children: [
+          ClipRRect(
+            borderRadius: const BorderRadius.all(StyleString.imgRadius),
+            child: AspectRatio(
+              aspectRatio: StyleString.aspectRatio,
+              child: LayoutBuilder(builder: (context, boxConstraints) {
+                double maxWidth = boxConstraints.maxWidth;
+                double maxHeight = boxConstraints.maxHeight;
+                return Stack(
+                  children: [
+                    ClipRRect(
+                      clipBehavior: Clip.antiAlias,
+                      borderRadius: BorderRadius.circular(5.r),
+                      child: CachedNetworkImage(
+                        fit: BoxFit.cover,
+                        width: maxWidth,
+                        height: maxHeight,
+                        imageUrl: liveItem.cover.startsWith('//')
+                            ? 'https:${liveItem.cover}'
+                            : liveItem.cover,
                       ),
-                      Positioned(
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        child: AnimatedOpacity(
-                          opacity: 1,
-                          duration: const Duration(milliseconds: 200),
-                          child: LiveStat(
-                            online: liveItem.online,
-                            cateName: liveItem.cateName,
-                          ),
-                        ),
-                      ),
-                    ],
-                  );
-                }),
-              ),
+                    ),
+                    PBadge(
+                      type: 'gray',
+                      left: 6,
+                      right: null,
+                      bottom: 6,
+                      text: liveItem.cateName,
+                    ),
+                    PBadge(
+                      type: 'gray',
+                      left: 6,
+                      right: null,
+                      top: 6,
+                      bottom: null,
+                      text: "${NumUtils.int2Num(liveItem.online)} 围观",
+                    ),
+                  ],
+                );
+              }),
             ),
-            LiveContent(liveItem: liveItem)
-          ],
-        ),
+          ),
+          LiveContent(liveItem: liveItem)
+        ],
       ),
     );
   }
@@ -135,46 +135,6 @@ class LiveContent extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class LiveStat extends StatelessWidget {
-  final int? online;
-  final String? cateName;
-
-  const LiveStat({Key? key, required this.online, this.cateName})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 45,
-      padding: const EdgeInsets.only(top: 22, left: 8, right: 8),
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: <Color>[
-            Colors.transparent,
-            Colors.black54,
-          ],
-          tileMode: TileMode.mirror,
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            cateName!,
-            style: const TextStyle(fontSize: 11, color: Colors.white),
-          ),
-          Text(
-            '围观:${online.toString()}',
-            style: const TextStyle(fontSize: 11, color: Colors.white),
-          )
-        ],
       ),
     );
   }

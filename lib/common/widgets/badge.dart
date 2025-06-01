@@ -27,11 +27,8 @@ class PBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ColorScheme t = Theme.of(context).colorScheme;
-    // 背景色
     Color bgColor = t.primary;
-    // 前景色
     Color color = t.onPrimary;
-    // 边框色
     Color borderColor = Colors.transparent;
     if (type == 'gray') {
       bgColor = Colors.black54.withOpacity(0.4);

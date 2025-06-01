@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:dilidili/pages/root/root_page.dart';
 import 'package:dilidili/pages/theme/dark_theme.dart';
 import 'package:dilidili/pages/theme/theme_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
@@ -20,7 +23,6 @@ Size get designSize {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-//适配屏幕尺寸
   @override
   Widget build(BuildContext context) {
     final themeController = Get.put(ThemeController());

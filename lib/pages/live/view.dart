@@ -41,12 +41,13 @@ class _LivePageState extends State<LivePage>
 
   @override
   void dispose() {
-    // scrollController.removeListener(() {});
+    scrollController.removeListener(() {});
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Container(
       clipBehavior: Clip.hardEdge,
       margin: const EdgeInsets.only(
@@ -115,17 +116,9 @@ class _LivePageState extends State<LivePage>
     int crossAxisCount = ctr.crossAxisCount.value;
     return SliverGrid(
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        // 行间距
         mainAxisSpacing: StyleString.safeSpace,
-        // 列间距
         crossAxisSpacing: StyleString.safeSpace,
-        // 列数
         crossAxisCount: crossAxisCount,
-        mainAxisExtent:
-            Get.size.width / crossAxisCount / StyleString.aspectRatio +
-                MediaQuery.textScalerOf(context).scale(
-                  (crossAxisCount == 1 ? 48 : 68),
-                ),
       ),
       delegate: SliverChildBuilderDelegate(
         (BuildContext context, int index) {
@@ -234,6 +227,7 @@ class LiveFollowingListView extends StatelessWidget {
             child: Column(
               children: [
                 InkWell(
+                  borderRadius: BorderRadius.circular(50),
                   onTap: () {
                     Get.toNamed(
                       '/liveRoom?roomid=${item.roomid}',
