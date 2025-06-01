@@ -29,7 +29,6 @@ class VideoDetailController extends GetxController
     BottomControlType.playOrPause,
     BottomControlType.time,
     BottomControlType.space,
-    BottomControlType.fit,
     BottomControlType.fullscreen,
   ].obs;
   RxInt cid = int.parse(Get.parameters['cid']!).obs;
@@ -137,6 +136,7 @@ class VideoDetailController extends GetxController
   Future playerInit({
     video,
     audio,
+    duration,
   }) async {
     await dPlayerController.setDataSource(
       DataSource(
@@ -149,6 +149,7 @@ class VideoDetailController extends GetxController
           'referer': ApiString.mainUrl
         },
       ),
+      duration: duration ?? Duration(milliseconds: data.timeLength ?? 0),
     );
     dPlayerController.headerControl = headerControl;
   }

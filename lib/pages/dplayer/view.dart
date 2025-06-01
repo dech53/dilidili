@@ -1,18 +1,38 @@
 import 'dart:async';
 
+import 'package:dilidili/component/common_btn.dart';
+import 'package:dilidili/model/bottom_control_type.dart';
 import 'package:dilidili/pages/dplayer/controller.dart';
+import 'package:dilidili/pages/dplayer/utils.dart';
 import 'package:dilidili/pages/dplayer/widgets/app_bar_ani.dart';
+import 'package:dilidili/pages/dplayer/widgets/bottom_control.dart';
 import 'package:dilidili/pages/dplayer/widgets/control_bar.dart';
+import 'package:dilidili/pages/video/widgets/play_pause_btn.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 
 class DPlayer extends StatefulWidget {
-  const DPlayer({super.key, required this.controller, this.headerControl});
+  const DPlayer({
+    super.key,
+    required this.controller,
+    this.headerControl,
+    this.bottomList,
+    this.customWidget,
+    this.customWidgets,
+    this.bottomControl,
+    this.alignment = Alignment.center,
+  });
   final DPlayerController controller;
   final PreferredSizeWidget? headerControl;
+  final PreferredSizeWidget? bottomControl;
+  final List<BottomControlType>? bottomList;
+  final Widget? customWidget;
+  final List<Widget>? customWidgets;
+  final Alignment? alignment;
   @override
   State<DPlayer> createState() => _DPlayerState();
 }
@@ -49,6 +69,73 @@ class _DPlayerState extends State<DPlayer> with TickerProviderStateMixin {
   void dispose() {
     animationController.dispose();
     super.dispose();
+  }
+
+  List<Widget> buildBottomControl() {
+    const TextStyle textStyle = TextStyle(
+      color: Colors.white,
+      fontSize: 12,
+    );
+    final DPlayerController _ = widget.controller;
+    Map<BottomControlType, Widget> videoProgressWidgets = {
+      BottomControlType.playOrPause: PlayOrPauseButton(
+        controller: _,
+      ),
+      BottomControlType.time: Row(
+        children: [
+          const SizedBox(width: 8),
+          Obx(() {
+            return Text(
+              _.durationSeconds.value >= 3600
+                  ? printDurationWithHours(
+                      Duration(seconds: _.positionSeconds.value))
+                  : printDuration(Duration(seconds: _.positionSeconds.value)),
+              style: textStyle,
+            );
+          }),
+          const SizedBox(width: 2),
+          const Text('/', style: textStyle),
+          const SizedBox(width: 2),
+          Obx(
+            () => Text(
+              _.durationSeconds.value >= 3600
+                  ? printDurationWithHours(
+                      Duration(seconds: _.durationSeconds.value))
+                  : printDuration(Duration(seconds: _.durationSeconds.value)),
+              style: textStyle,
+            ),
+          ),
+        ],
+      ),
+      BottomControlType.space: const Spacer(),
+      BottomControlType.fullscreen: ComBtn(
+        icon: Obx(
+          () => Icon(
+            _.isFullScreen.value
+                ? FontAwesomeIcons.compress
+                : FontAwesomeIcons.expand,
+            size: 15,
+            color: Colors.white,
+          ),
+        ),
+        fuc: () {
+          // _.triggerFullScreen(status: !_.isFullScreen.value);
+          // widget.fullScreenCb?.call(!_.isFullScreen.value);
+        },
+      ),
+    };
+    List<Widget> list = [];
+    List<BottomControlType> userSpecifyItem = widget.bottomList ??
+        [
+          BottomControlType.playOrPause,
+          BottomControlType.time,
+          BottomControlType.space,
+          BottomControlType.fullscreen,
+        ];
+    for (var i = 0; i < userSpecifyItem.length; i++) {
+      list.add(videoProgressWidgets[userSpecifyItem[i]]!);
+    }
+    return list;
   }
 
   Future<void> setBrightness(double value) async {
@@ -92,9 +179,19 @@ class _DPlayerState extends State<DPlayer> with TickerProviderStateMixin {
     return Stack(
       fit: StackFit.passthrough,
       children: <Widget>[
-        Video(
-          controls: NoVideoControls,
-          controller: widget.controller.videoController!,
+        Obx(
+          () => Video(
+            key: ValueKey(_.videoFit.value),
+            controls: NoVideoControls,
+            controller: widget.controller.videoController!,
+            resumeUponEnteringForegroundMode: true,
+            alignment: widget.alignment!,
+            subtitleViewConfiguration: const SubtitleViewConfiguration(
+              style: subTitleStyle,
+              padding: EdgeInsets.all(24.0),
+            ),
+            fit: _.videoFit.value,
+          ),
         ),
         Obx(
           () => Align(
@@ -123,7 +220,6 @@ class _DPlayerState extends State<DPlayer> with TickerProviderStateMixin {
             ),
           ),
         ),
-
         //亮度控制条展示
         Obx(
           () => ControlBar(
@@ -172,10 +268,11 @@ class _DPlayerState extends State<DPlayer> with TickerProviderStateMixin {
             },
           ),
         ),
-        if (widget.headerControl != null || _.headerControl != null)
-          Obx(
-            () => Column(
-              children: [
+        // 头部、底部控制条
+        Obx(
+          () => Column(
+            children: [
+              if (widget.headerControl != null || _.headerControl != null)
                 ClipRect(
                   child: AppBarAni(
                     position: 'top',
@@ -184,11 +281,23 @@ class _DPlayerState extends State<DPlayer> with TickerProviderStateMixin {
                     child: widget.headerControl ?? _.headerControl!,
                   ),
                 ),
-                const Spacer(),
-              ],
-            ),
+              const Spacer(),
+              ClipRRect(
+                child: AppBarAni(
+                  controller: animationController,
+                  visible: _.showControls.value,
+                  position: 'bottom',
+                  child: widget.bottomControl ??
+                      BottomControl(
+                        controller: widget.controller,
+                        // triggerFullScreen: _.triggerFullScreen,
+                        buildBottomControl: buildBottomControl(),
+                      ),
+                ),
+              ),
+            ],
           ),
-        //
+        ),
         Obx(() {
           if (_.dataStatus.loading) {
             return Center(

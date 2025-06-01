@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:dilidili/pages/dplayer/controller.dart';
 import 'package:dilidili/pages/dplayer/view.dart';
 import 'package:dilidili/pages/video/detail/controller.dart';
+import 'package:dilidili/pages/video/introduction/controller.dart';
 import 'package:dilidili/pages/video/introduction/view.dart';
 import 'package:dilidili/pages/video/related/view.dart';
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
@@ -45,6 +46,7 @@ class _VideoPageState extends State<VideoPage>
   @override
   void didPushNext() async {
     if (dPlayerController != null) {
+      vdCtr.defaultST = dPlayerController!.position.value;
       dPlayerController!.pause();
     }
     super.didPushNext();
@@ -54,6 +56,7 @@ class _VideoPageState extends State<VideoPage>
   void didPopNext() async {
     vdCtr.playerInit();
     await Future.delayed(const Duration(milliseconds: 300));
+    dPlayerController?.seekTo(vdCtr.defaultST);
     dPlayerController?.play();
     super.didPopNext();
   }
@@ -118,6 +121,7 @@ class _VideoPageState extends State<VideoPage>
       return DPlayer(
         controller: dPlayerController!,
         headerControl: vdCtr.headerControl,
+        bottomList: vdCtr.bottomList,
       );
     }
 

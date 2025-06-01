@@ -12,8 +12,32 @@ import 'package:media_kit_video/media_kit_video.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 
 class DPlayerController extends GetxController {
+  Timer? _timerForSeek;
   //头部控制栏
   PreferredSizeWidget? headerControl;
+
+  /// 视频比例
+  Rx<BoxFit> get videoFit => _videoFit;
+  final Rx<BoxFit> _videoFit = Rx(BoxFit.contain);
+
+  /// 视频时长
+  Rx<Duration> get duration => _duration;
+  final Rx<Duration> _duration = Rx(Duration.zero);
+  final RxInt durationSeconds = 0.obs;
+  final Rx<Duration> _buffered = Rx(Duration.zero);
+  final RxInt bufferedSeconds = 0.obs;
+// 播放位置
+  final Rx<Duration> _sliderPosition = Rx(Duration.zero);
+  final RxInt sliderPositionSeconds = 0.obs;
+
+  /// 全屏状态
+  final Rx<bool> _isFullScreen = false.obs;
+  Rx<bool> get isFullScreen => _isFullScreen;
+  // 播放位置
+  final Rx<Duration> _position = Rx(Duration.zero);
+  Rx<Duration> get position => _position;
+  Stream<Duration> get onPositionChanged => _position.stream;
+  final RxInt positionSeconds = 0.obs;
 
   final DPPlayerStatus playerStatus = DPPlayerStatus();
 
@@ -47,6 +71,9 @@ class DPlayerController extends GetxController {
 
   static DPlayerController? _instance;
 
+  Rx<bool> _isSliderMoving = false.obs;
+  Rx<bool> get isSliderMoving => _isSliderMoving;
+
   /// 亮度控制
   final Rx<double> _currentBrightness = 0.0.obs;
   Rx<double> get brightness => _currentBrightness;
@@ -57,6 +84,31 @@ class DPlayerController extends GetxController {
   //获取私有控制器
   Player? get videoPlayerController => _videoPlayerController;
   VideoController? get videoController => _videoController;
+
+  List<StreamSubscription> subscriptions = [];
+  final List<Function(Duration position)> _positionListeners = [];
+
+  /// 播放事件监听
+  void startListeners() {
+    subscriptions.addAll([
+      videoPlayerController!.stream.position.listen((event) {
+        _position.value = event;
+        updatePositionSecond();
+        if (!isSliderMoving.value) {
+          _sliderPosition.value = event;
+          updateSliderPositionSecond();
+        }
+        for (var element in _positionListeners) {
+          element(event);
+        }
+      }),
+    ]);
+  }
+
+  void addPositionListener(Function(Duration position) listener) =>
+      _positionListeners.add(listener);
+  void removePositionListener(Function(Duration position) listener) =>
+      _positionListeners.remove(listener);
 
   set controls(bool visible) {
     _showControls.value = visible;
@@ -75,6 +127,34 @@ class DPlayerController extends GetxController {
       controls = false;
       _timer = null;
     });
+  }
+
+  void updateSliderPositionSecond() {
+    int newSecond = _sliderPosition.value.inSeconds;
+    if (sliderPositionSeconds.value != newSecond) {
+      sliderPositionSeconds.value = newSecond;
+    }
+  }
+
+  void updatePositionSecond() {
+    int newSecond = _position.value.inSeconds;
+    if (positionSeconds.value != newSecond) {
+      positionSeconds.value = newSecond;
+    }
+  }
+
+  void updateDurationSecond() {
+    int newSecond = _duration.value.inSeconds;
+    if (durationSeconds.value != newSecond) {
+      durationSeconds.value = newSecond;
+    }
+  }
+
+  void updateBufferedSecond() {
+    int newSecond = _buffered.value.inSeconds;
+    if (bufferedSeconds.value != newSecond) {
+      bufferedSeconds.value = newSecond;
+    }
   }
 
   //构造函数
@@ -107,14 +187,21 @@ class DPlayerController extends GetxController {
     }
   }
 
-  Future<void> setDataSource(DataSource dataSource) async {
+  Future<void> setDataSource(
+    DataSource dataSource, {
+    Duration? duration,
+  }) async {
     if (_playerCount.value == 0) {
       return;
     }
     dataStatus.status.value = DataStatus.loading;
     _videoPlayerController = await _createVideoController(
         dataSource, PlaylistMode.none, true, Duration.zero);
+    _duration.value = duration ?? _videoPlayerController!.state.duration;
+    updateDurationSecond();
     dataStatus.status.value = DataStatus.loaded;
+    startListeners();
+    await play(duration: duration);
   }
 
   /// 设置倍速
@@ -133,6 +220,7 @@ class DPlayerController extends GetxController {
     bool enableHA,
     Duration seekTo,
   ) async {
+    _position.value = Duration.zero;
     Player player = _videoPlayerController ??
         Player(
           configuration: const PlayerConfiguration(
@@ -193,6 +281,13 @@ class DPlayerController extends GetxController {
     return player;
   }
 
+  /// 移除事件监听
+  void removeListeners() {
+    for (final s in subscriptions) {
+      s.cancel();
+    }
+  }
+
   Future<void> dispose({String type = 'single'}) async {
     if (type == 'single' && playerCount.value > 1) {
       _playerCount.value -= 1;
@@ -202,9 +297,11 @@ class DPlayerController extends GetxController {
     _playerCount.value = 0;
     try {
       _timer?.cancel();
+      _timerForSeek?.cancel();
       if (_videoPlayerController != null) {
         var pp = _videoPlayerController!.platform as NativePlayer;
         await pp.setProperty('audio-files', '');
+        removeListeners();
         await _videoPlayerController?.dispose();
         _videoPlayerController = null;
       }
@@ -230,8 +327,46 @@ class DPlayerController extends GetxController {
     playerStatus.status.value = DPlayerStatus.paused;
   }
 
-  Future<void> play() async {
+  Future<void> play(
+      {bool repeat = false, bool hideControls = true, dynamic duration}) async {
     await _videoPlayerController?.play();
     playerStatus.status.value = DPlayerStatus.playing;
+    if (duration != null) {
+      _duration.value = duration;
+      updateDurationSecond();
+    }
+  }
+
+  /// 跳转至指定位置
+  Future<void> seekTo(Duration position, {type = 'seek'}) async {
+    try {
+      if (position < Duration.zero) {
+        position = Duration.zero;
+      }
+      _position.value = position;
+      updatePositionSecond();
+      if (duration.value.inSeconds != 0) {
+        if (type != 'slider') {
+          await _videoPlayerController?.stream.buffer.first;
+        }
+        await _videoPlayerController?.seek(position);
+      } else {
+        _timerForSeek?.cancel();
+        _timerForSeek ??= _startSeekTimer(position);
+      }
+    } catch (err) {
+      print('Error while seeking: $err');
+    }
+  }
+
+  Timer? _startSeekTimer(Duration position) {
+    return Timer.periodic(const Duration(milliseconds: 200), (Timer t) async {
+      if (duration.value.inSeconds != 0) {
+        await _videoPlayerController!.stream.buffer.first;
+        await _videoPlayerController?.seek(position);
+        t.cancel();
+        _timerForSeek = null;
+      }
+    });
   }
 }
