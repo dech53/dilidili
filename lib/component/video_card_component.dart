@@ -44,18 +44,25 @@ class VideoCardComponent extends StatelessWidget {
                       ),
                       if (video.duration > 0) ...[
                         PBadge(
-                          bottom: 10,
-                          right: 10,
+                          bottom: 8,
+                          right: 8,
                           text: NumUtils.int2time(video.duration),
                           type: 'gray',
                         )
-                      ]
+                      ],
+                      if (video.rcmd_reason != null &&
+                          video.rcmd_reason!.content != null)
+                        PBadge(
+                          top: 8,
+                          left: 8,
+                          text: video.rcmd_reason!.content!,
+                        )
                     ],
                   );
                 },
               )),
           Padding(
-            padding: EdgeInsets.all(0.3),
+            padding:const EdgeInsets.all(0.3),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
@@ -109,46 +116,10 @@ class VideoCardComponent extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        if (video.rcmd_reason != null &&
-                            video.rcmd_reason!.content != null)
-                          Row(
-                            children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                    color: Colors.grey.shade300,
-                                    borderRadius: BorderRadius.circular(4)),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(1.5),
-                                  child: Text(
-                                    video.rcmd_reason!.content!,
-                                    style: TextStyle(
-                                        fontSize: 10.sp, color: Colors.black),
-                                  ),
-                                ),
-                              ),
-                              3.horizontalSpace,
-                            ],
-                          ),
-                        Text(
-                          video.owner.name,
-                          style:
-                              TextStyle(fontSize: 10.sp, color: Colors.black),
-                        ),
-                      ],
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Logutils.println("点击了${video.title}");
-                      },
-                      child: Icon(
-                        Icons.more_vert,
-                        size: 13.r,
-                        color: Colors.black,
-                      ),
+                    Text(
+                      video.owner.name,
+                      style:
+                          TextStyle(fontSize: 10.sp, color: Colors.black),
                     ),
                   ],
                 ),

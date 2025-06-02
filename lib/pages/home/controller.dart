@@ -1,3 +1,4 @@
+import 'package:dilidili/http/user.dart';
 import 'package:dilidili/model/tab_type.dart';
 import 'package:dilidili/utils/storage.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +7,7 @@ import 'package:hive/hive.dart';
 
 class HomeController extends GetxController with GetTickerProviderStateMixin {
   late TabController tabController;
+  RxInt unreadMsg = 0.obs;
   late RxList tabs = [].obs;
   late List tabsCtrList;
   late List<Widget> tabsPageList;
@@ -27,8 +29,15 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
     ctr().animateToTop();
   }
 
+  Future<void> getUnreadMsg() async {
+    var res = await UserHttp.getUnreadMsg();
+    if (res['status']) {
+      unreadMsg.value = res['data'].unfollow_unread;
+    }
+  }
+
   @override
-  void onInit() {
+  void onInit() async {
     super.onInit();
     tabs.value = tabsConfig;
     tabsCtrList = tabs.map((e) => e['ctr']).toList();
@@ -38,6 +47,7 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
       length: tabs.length,
       vsync: this,
     );
+    await getUnreadMsg();
     userInfo = userInfoCache.get('userInfoCache');
     userFace.value = userInfo != null ? userInfo.face : '';
     userName.value = userInfo != null ? userInfo.uname : '';

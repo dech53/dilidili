@@ -35,32 +35,34 @@ class LiveCardV extends StatelessWidget {
               aspectRatio: StyleString.aspectRatio,
               child: LayoutBuilder(
                 builder: (context, boxConstraints) {
+                  double maxWidth = boxConstraints.maxWidth;
+                  double maxHeight = boxConstraints.maxHeight;
                   return Stack(
                     children: [
                       if (liveItem.cover != "" && liveItem.cover != null)
-                        AspectRatio(
-                          aspectRatio: 16 / 9,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(5.r),
-                            child: CachedNetworkImage(
-                              fit: BoxFit.cover,
-                              imageUrl: liveItem.cover!
-                                  .replaceFirst("http://", "https://"),
-                            ),
+                        ClipRRect(
+                          clipBehavior: Clip.antiAlias,
+                          borderRadius: BorderRadius.circular(5.r),
+                          child: CachedNetworkImage(
+                            fit: BoxFit.cover,
+                            width: maxWidth,
+                            height: maxHeight,
+                            imageUrl: liveItem.cover!
+                                .replaceFirst("http://", "https://"),
                           ),
                         ),
                       if (crossAxisCount != 1) ...[
                         PBadge(
-                          top: 6,
+                          top: null,
                           right: null,
-                          bottom: null,
+                          bottom: 6,
                           left: 6,
                           text: liveItem.areaV2Name,
                         ),
                         PBadge(
-                          top: 6,
+                          top: null,
                           right: 6,
-                          bottom: null,
+                          bottom: 6,
                           left: null,
                           type: 'gray',
                           text: "${liveItem.watchedShow!.textSmall} 观看",

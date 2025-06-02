@@ -115,18 +115,25 @@ class _HomePageState extends State<HomePage>
                       ),
                     ),
                   ),
-                  Container(
-                    padding: EdgeInsets.only(left: 10.w),
-                    child: IconButton(
-                      padding: EdgeInsets.zero,
-                      onPressed: () => Get.toNamed('/whisper'),
-                      icon: Icon(
-                        Icons.notifications_outlined,
-                        size: 25.r,
-                        color: Theme.of(context).colorScheme.onSurface,
+                  Obx(
+                    () => Badge(
+                      offset: const Offset(-8, 5),
+                      label: Text(_homeController.unreadMsg.value.toString()),
+                      isLabelVisible: _homeController.unreadMsg.value > 0,
+                      child: IconButton(
+                        padding: EdgeInsets.zero,
+                        onPressed: () {
+                          _homeController.unreadMsg.value = 0;
+                          Get.toNamed('/whisper');
+                        },
+                        icon: Icon(
+                          Icons.notifications_outlined,
+                          size: 25.r,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
                       ),
                     ),
-                  ),
+                  )
                 ],
               ),
             ),

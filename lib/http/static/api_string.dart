@@ -104,4 +104,7 @@ class ApiString {
   // 我的订阅
   static const String bangumiFollow =
       '/x/space/bangumi/follow/list?type=1&follow_status=0&pn=1&ps=15&ts=1691544359969';
+
+  static const String whisper_unread =
+      '/session_svr/v1/session_svr/single_unread';
 }

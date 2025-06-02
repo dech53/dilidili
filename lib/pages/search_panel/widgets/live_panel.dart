@@ -66,7 +66,6 @@ class LiveItem extends StatelessWidget {
                       ),
                     ),
                     PBadge(
-                      type: 'gray',
                       left: 6,
                       right: null,
                       bottom: 6,
@@ -74,10 +73,10 @@ class LiveItem extends StatelessWidget {
                     ),
                     PBadge(
                       type: 'gray',
-                      left: 6,
-                      right: null,
-                      top: 6,
-                      bottom: null,
+                      left: null,
+                      right: 6,
+                      top: null,
+                      bottom: 6,
                       text: "${NumUtils.int2Num(liveItem.online)} 围观",
                     ),
                   ],

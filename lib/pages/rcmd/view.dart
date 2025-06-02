@@ -90,11 +90,13 @@ class _RcmdPageState extends State<RcmdPage>
                         return HttpError(
                           errMsg: data['msg'],
                           fn: () {
-                            setState(() {
-                              _rcmdController.isLoadingMore = true;
-                              _futureBuilderFuture =
-                                  _rcmdController.queryRcmdFeed('init');
-                            });
+                            setState(
+                              () {
+                                _rcmdController.isLoadingMore = true;
+                                _futureBuilderFuture =
+                                    _rcmdController.queryRcmdFeed('init');
+                              },
+                            );
                           },
                         );
                       }

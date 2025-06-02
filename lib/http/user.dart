@@ -1,5 +1,6 @@
 import 'package:dilidili/http/dio_instance.dart';
 import 'package:dilidili/http/static/api_string.dart';
+import 'package:dilidili/model/message/unread.dart';
 import 'package:dilidili/model/user/info.dart';
 import 'package:dilidili/model/user/stat.dart';
 
@@ -35,6 +36,18 @@ class UserHttp {
     );
     if (res.data['code'] == 0) {
       UserStat data = UserStat.fromJson(res.data['data']);
+      return {'status': true, 'data': data};
+    } else {
+      return {'status': false, 'data': [], 'msg': res.data['message']};
+    }
+  }
+
+  static Future<dynamic> getUnreadMsg() async {
+    var res = await DioInstance.instance().get(
+      path: ApiString.baseMsgUrl + ApiString.whisper_unread,
+    );
+    if (res.data['code'] == 0) {
+      UnreadMsgCount data = UnreadMsgCount.fromJson(res.data['data']);
       return {'status': true, 'data': data};
     } else {
       return {'status': false, 'data': [], 'msg': res.data['message']};
