@@ -121,6 +121,7 @@ Widget videoSeasonWidget(item, context, type, {floor = 1}) {
                             content.title,
                             maxLines: 3,
                             overflow: TextOverflow.ellipsis,
+                            style: TextStyle(fontSize: 13.sp),
                           ),
                           6.verticalSpace,
                           Row(

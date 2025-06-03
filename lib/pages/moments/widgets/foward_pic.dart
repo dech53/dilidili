@@ -1,43 +1,28 @@
 import 'package:dilidili/common/widgets/badge.dart';
 import 'package:dilidili/common/widgets/network_img_layer.dart';
 import 'package:dilidili/model/dynamics/result.dart';
-import 'package:dilidili/pages/moments/widgets/rich_node_panel.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class Content extends StatefulWidget {
+class FowardPic extends StatefulWidget {
+  FowardPic({super.key, this.item});
   dynamic item;
-  String? source;
-  Content({
-    super.key,
-    this.item,
-    this.source,
-  });
-
   @override
-  State<Content> createState() => _ContentState();
+  State<FowardPic> createState() => _FowardPicState();
 }
 
-class _ContentState extends State<Content> {
+class _FowardPicState extends State<FowardPic> {
   late bool hasPics;
-  late bool hasCovers;
   List<DynamicDrawItemModel> pics = [];
+
   @override
   void initState() {
     super.initState();
     hasPics = widget.item.modules.moduleDynamic.major != null &&
         widget.item.modules.moduleDynamic.major.draw != null &&
         widget.item.modules.moduleDynamic.major.draw.items.isNotEmpty;
-    hasCovers = widget.item.modules!.moduleDynamic!.major != null &&
-        widget.item.modules.moduleDynamic.major.type == 'MAJOR_TYPE_ARTICLE' &&
-        widget.item.modules.moduleDynamic.major.article.covers != null;
     if (hasPics) {
       pics = widget.item.modules.moduleDynamic.major.draw.items;
-    }
-    if (hasCovers) {
-      for (var i in widget.item.modules.moduleDynamic.major.article.covers) {
-        pics.add(DynamicDrawItemModel(src: i.toString()));
-      }
     }
   }
 
@@ -53,8 +38,8 @@ class _ContentState extends State<Content> {
         WidgetSpan(
           child: LayoutBuilder(
             builder: (context, BoxConstraints box) {
-              double maxWidth = box.maxWidth.truncateToDouble();
-              double maxHeight = box.maxWidth * 0.6;
+              double maxWidth = box.maxWidth;
+              double maxHeight = box.maxWidth;
               double height = maxWidth *
                   0.5 *
                   (pictureItem.height != null && pictureItem.width != null
@@ -167,33 +152,11 @@ class _ContentState extends State<Content> {
         TextStyle(color: Theme.of(context).colorScheme.primary);
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(12, 0, 12, 6),
+      padding: const EdgeInsets.fromLTRB(0, 0, 0, 6),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (widget.item.modules.moduleDynamic.topic != null) ...[
-            GestureDetector(
-              child: Text(
-                '#${widget.item.modules.moduleDynamic.topic.name}',
-                style: authorStyle,
-              ),
-            ),
-          ],
-          IgnorePointer(
-            ignoring: widget.source == 'detail' ? false : true,
-            child: SelectableRegion(
-              magnifierConfiguration: const TextMagnifierConfiguration(),
-              focusNode: FocusNode(),
-              selectionControls: MaterialTextSelectionControls(),
-              child: Text.rich(
-                style: const TextStyle(height: 0),
-                richNode(widget.item, context),
-                maxLines: widget.source == 'detail' ? 999 : 3,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ),
-          if (hasPics || hasCovers) ...[
+          if (hasPics) ...[
             Text.rich(picsNodes()),
           ],
         ],

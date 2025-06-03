@@ -4,6 +4,7 @@ import 'package:dilidili/pages/moments/widgets/author_panel.dart';
 import 'package:dilidili/pages/moments/widgets/content_panel.dart';
 import 'package:dilidili/pages/moments/widgets/forward_panel.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 class DynamicPanel extends StatelessWidget {
@@ -42,9 +43,12 @@ class DynamicPanel extends StatelessWidget {
               ),
               if (item.modules!.moduleDynamic!.desc != null ||
                   item.modules!.moduleDynamic!.major != null)
-                Content(item: item, source: source),
+                Content(
+                  item: item,
+                  source: source,
+                ),
               forWard(item, context, _momentsController, source),
-              const SizedBox(height: 2),
+              2.verticalSpace,
               if (source == null) ActionPanel(item: item),
             ],
           ),

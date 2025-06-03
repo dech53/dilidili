@@ -7,7 +7,7 @@ import 'package:get/get.dart';
 Widget picWidget(item, context, floor) {
   String type = item.modules.moduleDynamic.major.type;
   List pictures = [];
-  if (type == 'MAJOR_TYPE_DRAW' && floor != 1) {
+  if (type == 'MAJOR_TYPE_DRAW' && floor == 2) {
     pictures = item.modules.moduleDynamic.major.draw.items;
   }
   int len = pictures.length;
@@ -34,7 +34,7 @@ Widget picWidget(item, context, floor) {
                 height: box.maxWidth,
                 origAspectRatio: (type == 'MAJOR_TYPE_DRAW' && floor != 1)
                     ? pictures[i].width / pictures[i].height
-                    : box.maxWidth / box.maxWidth,
+                    : box.maxWidth / box.maxHeight,
               ),
             ),
           );
