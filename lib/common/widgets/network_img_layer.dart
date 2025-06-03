@@ -10,8 +10,9 @@ class NetworkImgLayer extends StatelessWidget {
     required this.height,
     this.type,
     this.quality,
+    this.origAspectRatio,
   });
-
+  final double? origAspectRatio;
   final String? src;
   final double width;
   final double height;
@@ -32,6 +33,19 @@ class NetworkImgLayer extends StatelessWidget {
           (height * MediaQuery.of(context).devicePixelRatio).round();
     } else if (aspectRatio < 1) {
       memCacheWidth = (width * MediaQuery.of(context).devicePixelRatio).round();
+    } else {
+      if (origAspectRatio != null && origAspectRatio! > 1) {
+        memCacheWidth =
+            (width * MediaQuery.of(context).devicePixelRatio).round();
+      } else if (origAspectRatio != null && origAspectRatio! < 1) {
+        memCacheHeight =
+            (height * MediaQuery.of(context).devicePixelRatio).round();
+      } else {
+        memCacheWidth =
+            (width * MediaQuery.of(context).devicePixelRatio).round();
+        memCacheHeight =
+            (height * MediaQuery.of(context).devicePixelRatio).round();
+      }
     }
     return src != '' && src != null
         ? ClipRRect(

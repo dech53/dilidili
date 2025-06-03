@@ -1,5 +1,5 @@
 import 'package:dilidili/pages/home/view.dart';
-import 'package:dilidili/pages/moments/moments_page.dart';
+import 'package:dilidili/pages/moments/view.dart';
 import 'package:dilidili/pages/trend/view.dart';
 import 'package:dilidili/pages/user/view.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +14,7 @@ class RootPage extends StatefulWidget {
 }
 
 class _RootPageState extends State<RootPage> {
-  int _index = 2;
+  int _index = 0;
 
   List rootApp = [
     {

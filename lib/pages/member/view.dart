@@ -2,13 +2,11 @@ import 'dart:async';
 
 import 'package:dilidili/common/widgets/network_img_layer.dart';
 import 'package:dilidili/model/member_tab_type.dart';
-import 'package:dilidili/pages/member/SliverHeaderDelegate.dart';
 import 'package:dilidili/pages/member/controller.dart';
 import 'package:dilidili/pages/member/widgets/profile.dart';
+import 'package:dilidili/utils/string_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 
@@ -21,15 +19,20 @@ class MemberPage extends StatefulWidget {
 
 class _MemberPageState extends State<MemberPage>
     with SingleTickerProviderStateMixin {
+  late String heroTag;
+
   late MemberController _memberController;
   late Future _futureBuilderFuture;
   late TabController _tabController;
   final ScrollController _extendNestCtr = ScrollController();
   final StreamController<bool> appbarStream =
       StreamController<bool>.broadcast();
+  late int mid;
   @override
   void initState() {
     super.initState();
+    mid = int.parse(Get.parameters['mid']!);
+    heroTag = Get.arguments['heroTag'] ?? StringUtils.makeHeroTag(mid);
     _memberController = Get.put(MemberController());
     _futureBuilderFuture = _memberController.getInfo();
     _tabController = TabController(

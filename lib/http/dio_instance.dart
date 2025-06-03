@@ -71,6 +71,8 @@ class DioInstance {
       Options? options,
       CancelToken? cancelToken,
       extra}) async {
+    print(path);
+    print(param);
     return dio.get(
       path,
       queryParameters: param,

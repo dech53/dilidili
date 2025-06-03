@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dilidili/common/widgets/action_item.dart';
 import 'package:dilidili/common/widgets/http_error.dart';
+import 'package:dilidili/common/widgets/network_img_layer.dart';
 import 'package:dilidili/model/nav_user_info.dart';
 import 'package:dilidili/model/video/video_basic_info.dart';
 import 'package:dilidili/pages/video/detail/controller.dart';
@@ -174,10 +175,11 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                   children: [
                     Row(
                       children: [
-                        CircleAvatar(
-                          backgroundImage: CachedNetworkImageProvider(
-                            widget.videoDetail!.owner!.face,
-                          ),
+                        NetworkImgLayer(
+                          type: 'avatar',
+                          src: widget.videoDetail!.owner!.face,
+                          width: 38,
+                          height: 38,
                         ),
                         10.horizontalSpace,
                         Column(

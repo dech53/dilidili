@@ -16,6 +16,7 @@ class MemberController extends GetxController with GetTickerProviderStateMixin {
   Rx<MemberInfo> memberInfo = MemberInfo().obs;
   late RxList tabs = [].obs;
   late List tabsCtrList;
+  String? heroTag;
   late List<Widget> tabsPageList;
 
   late Map userStat;
@@ -29,6 +30,7 @@ class MemberController extends GetxController with GetTickerProviderStateMixin {
     super.onInit();
     face.value = Get.arguments['face'] ?? '';
     tabs.value = memberTabs;
+    heroTag = Get.arguments['heroTag'] ?? '';
     tabsCtrList = memberTabs.map((e) => e['ctr']).toList();
     tabsPageList = memberTabs.map<Widget>((e) => e['page']).toList();
     mid = int.parse(Get.parameters['mid']!);
