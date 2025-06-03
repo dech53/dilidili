@@ -24,6 +24,29 @@ class MomentsController extends GetxController {
   Rx<FollowUpModel> upData = FollowUpModel().obs;
   RxList<DynamicItemModel> dynamicsList = <DynamicItemModel>[].obs;
   RxBool isLoadingDynamic = false.obs;
+  //过滤
+  List filterTypeList = [
+    {
+      'label': DynamicsType.all.labels,
+      'value': DynamicsType.all,
+      'enabled': true
+    },
+    {
+      'label': DynamicsType.video.labels,
+      'value': DynamicsType.video,
+      'enabled': true
+    },
+    {
+      'label': DynamicsType.pgc.labels,
+      'value': DynamicsType.pgc,
+      'enabled': true
+    },
+    {
+      'label': DynamicsType.article.labels,
+      'value': DynamicsType.article,
+      'enabled': true
+    },
+  ];
   Future queryFollowUp({type = 'init'}) async {
     if (!userLogin.value) {
       return {'status': false, 'msg': '账号未登录', 'code': -101};
@@ -132,6 +155,23 @@ class MomentsController extends GetxController {
           'articleType': 'read'
         });
         break;
+      case 'DYNAMIC_TYPE_FORWARD':
+        Get.toNamed('/momentsDetail',
+            arguments: {'item': item, 'floor': floor});
+        break;
+      case 'DYNAMIC_TYPE_DRAW':
+        Get.toNamed('/momentsDetail',
+            arguments: {'item': item, 'floor': floor});
+        break;
     }
+  }
+
+  onSelectType(value) async {
+    dynamicsType.value = filterTypeList[value]['value'];
+    dynamicsList.value = <DynamicItemModel>[];
+    page = 1;
+    initialValue.value = value;
+    await queryFollowDynamic();
+    scrollController.jumpTo(0);
   }
 }

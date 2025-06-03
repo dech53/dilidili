@@ -37,7 +37,8 @@ class ProfilePanel extends StatelessWidget {
                       memberInfo.liveRoom!.liveStatus == 1)
                     Positioned(
                       bottom: 0,
-                      left: 14,
+                      left: 10,
+                      right: 10,
                       child: GestureDetector(
                         onTap: () {
                           LiveItemModel liveItem = LiveItemModel.fromJson({
@@ -59,21 +60,23 @@ class ProfilePanel extends StatelessWidget {
                             borderRadius:
                                 const BorderRadius.all(Radius.circular(10)),
                           ),
-                          child: Row(children: [
-                            Image.asset(
-                              'assets/images/live.gif',
-                              height: 10,
-                            ),
-                            Text(
-                              ' 直播中',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: Theme.of(context)
-                                      .textTheme
-                                      .labelSmall!
-                                      .fontSize),
-                            )
-                          ]),
+                          child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Image.asset(
+                                  'assets/images/live.gif',
+                                  height: 10,
+                                ),
+                                Text(
+                                  ' 直播中',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: Theme.of(context)
+                                          .textTheme
+                                          .labelSmall!
+                                          .fontSize),
+                                )
+                              ]),
                         ),
                       ),
                     )
@@ -208,7 +211,19 @@ class ProfilePanel extends StatelessWidget {
                         ),
                       ],
                     )
-                  ]
+                  ],
+                  if (ctr.ownerMid == ctr.mid && ctr.ownerMid != -1) ...[
+                    TextButton(
+                      onPressed: () {},
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.only(left: 80, right: 80),
+                        foregroundColor:
+                            Theme.of(context).colorScheme.onPrimary,
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                      ),
+                      child: const Text('编辑资料'),
+                    )
+                  ],
                 ],
               ),
             ),

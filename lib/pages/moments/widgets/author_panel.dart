@@ -1,4 +1,5 @@
 import 'package:dilidili/common/widgets/network_img_layer.dart';
+import 'package:dilidili/utils/num_utils.dart';
 import 'package:dilidili/utils/string_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -61,7 +62,11 @@ class AuthorPanel extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  Text(item.modules.moduleAuthor.pubTime),
+                  if (item.modules.moduleAuthor.pubTime != '') ...[
+                    Text(item.modules.moduleAuthor.pubTime),
+                  ] else ...[
+                    Text(NumUtils.dateFormat(item.modules.moduleAuthor.pubTs)),
+                  ],
                   if (item.modules.moduleAuthor.pubTime != '' &&
                       item.modules.moduleAuthor.pubAction != '')
                     const Text(' '),

@@ -122,7 +122,7 @@ class _MomentsPageState extends State<MomentsPage>
                                 duration: const Duration(milliseconds: 300),
                                 curve: Curves.easeInOut,
                                 onValueChanged: (v) {
-                                  // _momentsController.onSelectType(v);
+                                  _momentsController.onSelectType(v);
                                 },
                               ),
                             ),

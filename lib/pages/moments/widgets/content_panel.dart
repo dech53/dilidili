@@ -1,6 +1,7 @@
 import 'package:dilidili/common/widgets/badge.dart';
 import 'package:dilidili/common/widgets/network_img_layer.dart';
 import 'package:dilidili/model/dynamics/result.dart';
+import 'package:dilidili/pages/moments/widgets/foward_pic.dart';
 import 'package:dilidili/pages/moments/widgets/rich_node_panel.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -194,7 +195,11 @@ class _ContentState extends State<Content> {
             ),
           ),
           if (hasPics || hasCovers) ...[
-            Text.rich(picsNodes()),
+            (widget.source != 'detail')
+                ? Text.rich(picsNodes())
+                : FowardPic(
+                    item: widget.item,
+                  )
           ],
         ],
       ),

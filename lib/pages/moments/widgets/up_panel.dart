@@ -140,32 +140,69 @@ class _UpPanelState extends State<UpPanel> {
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Badge(
-                smallSize: 8,
-                label: data.type == 'live' ? const Text('Live') : null,
-                textColor: Theme.of(context).colorScheme.onSecondaryContainer,
-                alignment: data.type == 'live'
-                    ? AlignmentDirectional.topCenter
-                    : AlignmentDirectional.topEnd,
-                padding: const EdgeInsets.only(left: 6, right: 6),
-                isLabelVisible: data.type == 'live' ||
-                    (data.type == 'up' && (data.hasUpdate ?? false)),
-                backgroundColor: data.type == 'live'
-                    ? Theme.of(context).colorScheme.secondaryContainer
-                    : Theme.of(context).colorScheme.primary,
-                child: data.face != ''
-                    ? NetworkImgLayer(
-                        width: 50,
-                        height: 50,
-                        src: data.face,
-                        type: 'avatar',
-                      )
-                    : const CircleAvatar(
-                        radius: 25,
-                        backgroundImage: AssetImage(
-                          'assets/images/noface.jpeg',
+              Stack(
+                children: [
+                  Badge(
+                    smallSize: 8,
+                    textColor:
+                        Theme.of(context).colorScheme.onSecondaryContainer,
+                    alignment: data.type == 'live'
+                        ? AlignmentDirectional.topCenter
+                        : AlignmentDirectional.topEnd,
+                    padding: const EdgeInsets.only(left: 6, right: 6),
+                    isLabelVisible:
+                        (data.type == 'up' && (data.hasUpdate ?? false)),
+                    backgroundColor: data.type == 'live'
+                        ? Theme.of(context).colorScheme.secondaryContainer
+                        : Theme.of(context).colorScheme.primary,
+                    child: data.face != ''
+                        ? NetworkImgLayer(
+                            width: 54,
+                            height: 54,
+                            src: data.face,
+                            type: 'avatar',
+                          )
+                        : const CircleAvatar(
+                            radius: 27,
+                            backgroundImage: AssetImage(
+                              'assets/images/noface.jpeg',
+                            ),
+                          ),
+                  ),
+                  if (data.type == 'live') ...[
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      left: 0,
+                      child: Container(
+                        padding: const EdgeInsets.fromLTRB(0, 1, 0, 1),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.primary,
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(10)),
                         ),
+                        child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Image.asset(
+                                'assets/images/live.gif',
+                                height: 10,
+                              ),
+                              Text(
+                                ' 直播中',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: Theme.of(context)
+                                      .textTheme
+                                      .labelSmall!
+                                      .fontSize,
+                                ),
+                              )
+                            ]),
                       ),
+                    )
+                  ],
+                ],
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 4),
