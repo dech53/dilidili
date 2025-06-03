@@ -7,6 +7,7 @@ import 'package:hive/hive.dart';
 
 class HomeController extends GetxController with GetTickerProviderStateMixin {
   late TabController tabController;
+  RxBool userLogin = false.obs;
   RxInt unreadMsg = 0.obs;
   late RxList tabs = [].obs;
   late List tabsCtrList;
@@ -49,6 +50,7 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
     );
     await getUnreadMsg();
     userInfo = userInfoCache.get('userInfoCache');
+    userLogin.value = userInfo != null;
     userFace.value = userInfo != null ? userInfo.face : '';
     userName.value = userInfo != null ? userInfo.uname : '';
     tabController.animation!.addListener(() {

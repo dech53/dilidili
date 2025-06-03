@@ -4,7 +4,7 @@ import 'package:dilidili/common/widgets/http_error.dart';
 import 'package:dilidili/common/widgets/no_data.dart';
 import 'package:dilidili/model/dynamics/result.dart';
 import 'package:dilidili/pages/moments/controller.dart';
-import 'package:dilidili/pages/moments/widgets/dynamic_panel.dart';
+import 'package:dilidili/pages/moments/widgets/moments_panel.dart';
 import 'package:dilidili/pages/moments/widgets/up_panel.dart';
 import 'package:dilidili/utils/storage.dart';
 import 'package:easy_debounce/easy_throttle.dart';
@@ -46,6 +46,14 @@ class _MomentsPageState extends State<MomentsPage>
         }
       },
     );
+    _momentsController.userLogin.listen((status) {
+      if (mounted) {
+        setState(() {
+          _futureBuilderFuture = _momentsController.queryFollowDynamic();
+          _futureBuilderFutureUp = _momentsController.queryFollowUp();
+        });
+      }
+    });
   }
 
   @override
@@ -67,6 +75,34 @@ class _MomentsPageState extends State<MomentsPage>
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  Obx(() {
+                    if (_momentsController.mid.value != -1 &&
+                        _momentsController.upInfo.value.uname != null) {
+                      return SizedBox(
+                        height: 36,
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 300),
+                          transitionBuilder:
+                              (Widget child, Animation<double> animation) {
+                            return ScaleTransition(
+                                scale: animation, child: child);
+                          },
+                          child: Text(
+                              '${_momentsController.upInfo.value.uname!}的动态',
+                              key: ValueKey<String>(
+                                  _momentsController.upInfo.value.uname!),
+                              style: TextStyle(
+                                fontSize: Theme.of(context)
+                                    .textTheme
+                                    .labelLarge!
+                                    .fontSize,
+                              )),
+                        ),
+                      );
+                    } else {
+                      return const SizedBox();
+                    }
+                  }),
                   Obx(
                     () => _momentsController.userLogin.value
                         ? Visibility(
@@ -193,7 +229,10 @@ class _MomentsPageState extends State<MomentsPage>
                           return SliverList(
                             delegate: SliverChildBuilderDelegate(
                               (context, index) {
-                                return DynamicPanel(item: list[index]);
+                                return MomentsPanel(
+                                  item: list[index],
+                                  floor: 1,
+                                );
                               },
                               childCount: list.length,
                             ),
@@ -204,18 +243,13 @@ class _MomentsPageState extends State<MomentsPage>
                   } else {
                     return HttpError(
                       errMsg: data?['msg'] ?? '请求异常',
-                      btnText: data?['code'] == -101 ? '去登录' : null,
                       fn: () {
-                        if (data?['code'] == -101) {
-                          // RoutePush.loginRedirectPush();
-                        } else {
-                          setState(() {
-                            _futureBuilderFuture =
-                                _momentsController.queryFollowDynamic();
-                            _futureBuilderFutureUp =
-                                _momentsController.queryFollowUp();
-                          });
-                        }
+                        setState(() {
+                          _futureBuilderFuture =
+                              _momentsController.queryFollowDynamic();
+                          _futureBuilderFutureUp =
+                              _momentsController.queryFollowUp();
+                        });
                       },
                     );
                   }

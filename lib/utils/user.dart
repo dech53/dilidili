@@ -1,5 +1,7 @@
 import 'package:dilidili/http/user.dart';
+import 'package:dilidili/model/dynamics/up.dart';
 import 'package:dilidili/pages/home/controller.dart';
+import 'package:dilidili/pages/moments/controller.dart';
 import 'package:dilidili/pages/user/controller.dart';
 import 'package:dilidili/utils/cookie.dart';
 import 'package:dilidili/utils/storage.dart';
@@ -15,7 +17,10 @@ class UserUtils {
     try {
       await Get.find<UserPageController>().resetUserInfo();
       HomeController homeCtr = Get.find<HomeController>();
+      final MomentsController momentsCtr = Get.find<MomentsController>();
+      momentsCtr.userLogin.value = status;
       homeCtr.userFace.value = '';
+      homeCtr.userLogin.value = status;
       homeCtr.userName.value = '';
     } catch (e) {
       SmartDialog.showToast('refreshLoginStatus error: ${e.toString()}');
@@ -36,10 +41,15 @@ class UserUtils {
           await userInfoCache.put('userInfoCache', result['data']);
           final HomeController homeCtr = Get.find<HomeController>();
           final UserPageController userCtr = Get.find<UserPageController>();
+          final MomentsController momentsCtr = Get.find<MomentsController>();
+          momentsCtr.userLogin.value = true;
+          momentsCtr.userInfo = result['data'];
           userCtr.userInfo.value = result['data'];
           userCtr.userInfo.refresh();
           homeCtr.userFace.value = result['data'].face;
+          homeCtr.userLogin.value = true;
           homeCtr.userName.value = result['data'].uname;
+          SPStorage.userID = result['data'].mid.toString();
         } catch (e) {
           SmartDialog.show(
             builder: (BuildContext context) {

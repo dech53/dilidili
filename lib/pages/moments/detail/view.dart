@@ -1,8 +1,9 @@
 import 'dart:async';
 
+import 'package:dilidili/model/dynamics/result.dart';
 import 'package:dilidili/pages/moments/detail/controller.dart';
 import 'package:dilidili/pages/moments/widgets/author_panel.dart';
-import 'package:dilidili/pages/moments/widgets/dynamic_panel.dart';
+import 'package:dilidili/pages/moments/widgets/moments_panel.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -33,9 +34,16 @@ class _MomentsDetailState extends State<MomentsDetail>
     replyType = (commentType == 0) ? 11 : commentType;
     if (floor == 1) {
       oid = int.parse(args['item'].basic!['comment_id_str']);
+    } else {
+      try {
+        ModuleDynamicModel moduleDynamic = args['item'].modules.moduleDynamic;
+        oid = moduleDynamic.major!.draw!.id!;
+      } catch (_) {}
     }
-    _momentsDetailController =
-        Get.put(MomentsDetailController(oid, replyType), tag: oid.toString());
+    _momentsDetailController = Get.put(
+      MomentsDetailController(oid, replyType),
+      tag: oid.toString(),
+    );
     fabAnimationCtr = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 300),
@@ -88,9 +96,10 @@ class _MomentsDetailState extends State<MomentsDetail>
           controller: scrollController,
           slivers: [
             SliverToBoxAdapter(
-              child: DynamicPanel(
+              child: MomentsPanel(
                 item: _momentsDetailController.item,
                 source: 'detail',
+                floor: Get.arguments['floor'],
               ),
             )
           ],

@@ -1,3 +1,4 @@
+import 'package:dilidili/model/dynamics/result.dart';
 import 'package:dilidili/pages/moments/controller.dart';
 import 'package:dilidili/pages/moments/widgets/action_panel.dart';
 import 'package:dilidili/pages/moments/widgets/author_panel.dart';
@@ -7,11 +8,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
-class DynamicPanel extends StatelessWidget {
-  DynamicPanel({super.key, required this.item, this.source});
-  final MomentsController _momentsController = Get.put(MomentsController());
+class MomentsPanel extends StatelessWidget {
+  MomentsPanel({super.key, required this.item, this.source, this.floor});
   final dynamic item;
+  dynamic floor;
   final String? source;
+
+  final MomentsController _momentsController = Get.put(MomentsController());
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -49,7 +53,10 @@ class DynamicPanel extends StatelessWidget {
                 ),
               forWard(item, context, _momentsController, source),
               2.verticalSpace,
-              if (source == null) ActionPanel(item: item),
+              if (source == null || floor == 1)
+                ActionPanel(
+                  item: item,
+                ),
             ],
           ),
         ),

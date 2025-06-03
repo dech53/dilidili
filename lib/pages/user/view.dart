@@ -2,10 +2,8 @@ import 'package:dilidili/common/constants.dart';
 import 'package:dilidili/common/widgets/network_img_layer.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import '../../model/user/info.dart';
 import 'controller.dart';
 
 class UserPage extends StatefulWidget {

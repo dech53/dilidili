@@ -1,8 +1,10 @@
 import 'package:dilidili/common/widgets/network_img_layer.dart';
+import 'package:dilidili/http/dynamics.dart';
 import 'package:dilidili/model/dynamics/result.dart';
 import 'package:dilidili/pages/moments/widgets/rich_node_panel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 
@@ -18,18 +20,16 @@ class _ActionPanelState extends State<ActionPanel>
   double defaultHeight = 260;
   late ModuleStatModel stat;
   RxBool isExpand = false.obs;
-  RxDouble height = 0.0.obs;
+  RxDouble height = 260.0.obs;
   TextEditingController _inputController = TextEditingController();
   FocusNode myFocusNode = FocusNode();
   String _inputText = '';
-  late double statusHeight;
   @override
   void initState() {
     super.initState();
     stat = widget.item.modules!.moduleStat!;
   }
 
-// 转发动态预览
   Widget dynamicPreview() {
     ItemModulesModel? modules = widget.item.modules;
     final String type = widget.item.type!;
@@ -134,6 +134,18 @@ class _ActionPanelState extends State<ActionPanel>
     );
   }
 
+  togglePanelState(status) {
+    if (!status) {
+      Get.back();
+      height.value = defaultHeight;
+      _inputText = '';
+      _inputController.clear();
+    } else {
+      height.value = Get.size.height;
+    }
+    isExpand.value = !(isExpand.value);
+  }
+
   // 动态转发
   void forwardHandler() async {
     showModalBottomSheet(
@@ -156,7 +168,7 @@ class _ActionPanelState extends State<ActionPanel>
               children: [
                 AnimatedContainer(
                   duration: Durations.medium1,
-                  height: isExpand.value ? statusHeight : 0,
+                  height: isExpand.value ? 34 : 0,
                 ),
                 Padding(
                   padding: EdgeInsets.fromLTRB(
@@ -170,7 +182,7 @@ class _ActionPanelState extends State<ActionPanel>
                     children: [
                       if (isExpand.value) ...[
                         IconButton(
-                          onPressed: () {},
+                          onPressed: () => togglePanelState(false),
                           icon: const Icon(Icons.close),
                         ),
                         Text(
@@ -200,7 +212,7 @@ class _ActionPanelState extends State<ActionPanel>
                 ),
                 if (!isExpand.value) ...[
                   GestureDetector(
-                    onTap: () {},
+                    onTap: () => togglePanelState(true),
                     behavior: HitTestBehavior.translucent,
                     child: Container(
                       width: double.infinity,
@@ -256,11 +268,37 @@ class _ActionPanelState extends State<ActionPanel>
     );
   }
 
+  Future onLikeDynamic() async {
+    var item = widget.item!;
+    String dynamicId = item.idStr!;
+    Like like = item.modules!.moduleStat!.like!;
+    int count = like.count == '点赞' ? 0 : int.parse(like.count ?? '0');
+    bool status = like.status!;
+    int up = status ? 2 : 1;
+    var res = await DynamicsHttp.likeDynamic(dynamicId: dynamicId, up: up);
+    if (res['status']) {
+      SmartDialog.showToast(!status ? '点赞成功' : '取消赞');
+      if (up == 1) {
+        item.modules!.moduleStat!.like!.count = (count + 1).toString();
+        item.modules!.moduleStat!.like!.status = true;
+      } else {
+        if (count == 1) {
+          item.modules!.moduleStat!.like!.count = '点赞';
+        } else {
+          item.modules!.moduleStat!.like!.count = (count - 1).toString();
+        }
+        item.modules!.moduleStat!.like!.status = false;
+      }
+      setState(() {});
+    } else {
+      SmartDialog.showToast(res['msg']);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     var color = Theme.of(context).colorScheme.outline;
     var primary = Theme.of(context).colorScheme.primary;
-    height.value = defaultHeight;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
@@ -297,7 +335,9 @@ class _ActionPanelState extends State<ActionPanel>
         Expanded(
           flex: 1,
           child: TextButton.icon(
-            onPressed: () {},
+            onPressed: () {
+              onLikeDynamic();
+            },
             icon: Icon(
               stat.like!.status!
                   ? FontAwesomeIcons.solidThumbsUp

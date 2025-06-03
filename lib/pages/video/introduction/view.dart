@@ -8,6 +8,7 @@ import 'package:dilidili/pages/video/detail/controller.dart';
 import 'package:dilidili/pages/video/introduction/controller.dart';
 import 'package:dilidili/pages/video/introduction/widgets/intro_detail.dart';
 import 'package:dilidili/utils/num_utils.dart';
+import 'package:dilidili/utils/string_utils.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -167,6 +168,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                     '/member?mid=${videoIntroController.mid}',
                     arguments: {
                       'face': widget.videoDetail!.owner!.face,
+                      'heroTag': widget.heroTag,
                     },
                   );
                 },
@@ -357,19 +359,6 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
             ),
             //点赞、投币、收藏、转发
             Material(child: actionGrid(context, videoIntroController)),
-            // if (widget.videoDetail!.ugcSeason != null) ...[
-            //   ListTile(
-            //     onTap: () {},
-            //     dense: false,
-            //     leading: Image.asset(
-            //       'assets/images/live.gif',
-            //       color: Theme.of(context).colorScheme.primary,
-            //       height: 12,
-            //     ),
-            //     title: Text(widget.videoDetail!.ugcSeason!.title!),
-            //   )
-            // ],
-            //分割线
             Divider(
               color: Colors.grey.shade300,
               indent: 8,

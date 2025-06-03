@@ -66,7 +66,9 @@ Widget forWard(item, context, ctr, source, {floor = 1}) {
       return articlePanel(item, context, floor: floor);
     case 'DYNAMIC_TYPE_FORWARD':
       return InkWell(
-        onTap: () => ctr.pushDetail(item.orig, floor + 1),
+        onTap: () {
+          ctr.pushDetail(item.orig, floor + 1);
+        },
         child: Container(
           padding:
               const EdgeInsets.only(left: 15, top: 10, right: 15, bottom: 8),

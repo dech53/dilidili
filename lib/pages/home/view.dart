@@ -3,6 +3,7 @@ import 'package:dilidili/pages/home/controller.dart';
 import 'package:dilidili/utils/string_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 
 class HomePage extends StatefulWidget {
@@ -123,8 +124,12 @@ class _HomePageState extends State<HomePage>
                       child: IconButton(
                         padding: EdgeInsets.zero,
                         onPressed: () {
-                          _homeController.unreadMsg.value = 0;
-                          Get.toNamed('/whisper');
+                          if (_homeController.userLogin.value) {
+                            _homeController.unreadMsg.value = 0;
+                            Get.toNamed('/whisper');
+                          } else {
+                            SmartDialog.showToast("用户未登录");
+                          }
                         },
                         icon: Icon(
                           Icons.notifications_outlined,

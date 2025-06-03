@@ -156,11 +156,11 @@ class MomentsController extends GetxController {
         });
         break;
       case 'DYNAMIC_TYPE_FORWARD':
-        Get.toNamed('/momentsDetail',
+        Get.toNamed('/momentsDetail?type=forward',
             arguments: {'item': item, 'floor': floor});
         break;
       case 'DYNAMIC_TYPE_DRAW':
-        Get.toNamed('/momentsDetail',
+        Get.toNamed('/momentsDetail?type=draw',
             arguments: {'item': item, 'floor': floor});
         break;
     }

@@ -65,4 +65,31 @@ class DynamicsHttp {
       };
     }
   }
+
+  // 动态点赞
+  static Future likeDynamic({
+    required String? dynamicId,
+    required int? up,
+  }) async {
+    var res = await DioInstance.instance().post(
+      path: ApiString.baseMsgUrl + ApiString.likeDynamic,
+      param: {
+        'dynamic_id': dynamicId,
+        'up': up,
+        'csrf': await DioInstance.instance().getCsrf(),
+      },
+    );
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': res.data['data'],
+      };
+    } else {
+      return {
+        'status': false,
+        'data': [],
+        'msg': res.data['message'],
+      };
+    }
+  }
 }

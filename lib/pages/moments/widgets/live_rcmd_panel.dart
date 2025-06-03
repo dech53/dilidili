@@ -2,7 +2,6 @@ import 'package:dilidili/common/constants.dart';
 import 'package:dilidili/common/widgets/badge.dart';
 import 'package:dilidili/common/widgets/network_img_layer.dart';
 import 'package:dilidili/model/dynamics/result.dart';
-import 'package:dilidili/pages/moments/controller.dart';
 import 'package:dilidili/utils/num_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -10,7 +9,6 @@ import 'package:get/get.dart';
 
 import 'rich_node_panel.dart';
 
-final MomentsController _momentsController = Get.put(MomentsController());
 Widget liveRcmdPanel(item, context, {floor = 1}) {
   TextStyle authorStyle =
       TextStyle(color: Theme.of(context).colorScheme.primary);

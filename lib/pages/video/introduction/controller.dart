@@ -15,7 +15,7 @@ import 'package:share_plus/share_plus.dart';
 
 class VideoIntroController extends GetxController {
   VideoIntroController({required this.bvid});
-   SharedPreferencesInstance prefs = SPStorage.prefs;
+  SharedPreferencesInstance prefs = SPStorage.prefs;
   String bvid;
   // 在线人数
   RxString total = '1'.obs;

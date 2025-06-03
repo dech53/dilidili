@@ -23,22 +23,21 @@ class LiveController extends GetxController {
           .where((FollowingLiveItem item) =>
               item.liveStatus == 1 && item.recordLiveTime == 0)
           .toList();
+    } else {
+      liveFollowingList.clear();
     }
     return res;
   }
 
-// 下拉刷新
   Future onRefresh() async {
     queryLiveList('init');
     fetchLiveFollowing();
   }
 
-  // 上拉加载
   Future onLoad() async {
     queryLiveList('onLoad');
   }
 
-// 获取推荐
   Future queryLiveList(type) async {
     var res = await LiveHttp.liveList();
     if (res['status']) {
@@ -51,7 +50,6 @@ class LiveController extends GetxController {
     return res;
   }
 
-  // 返回顶部
   void animateToTop() async {
     if (scrollController.offset >=
         MediaQuery.of(Get.context!).size.height * 5) {
