@@ -12,6 +12,10 @@ import 'package:hive/hive.dart';
 
 class MomentsController extends GetxController {
   RxBool userLogin = false.obs;
+  final List<String> commentOptions = ['允许评论', '关闭评论', '精选评论'];
+  RxInt optionIndex = 0.obs;
+  RxInt option = 1.obs;
+  RxString optionText = '允许评论'.obs;
   Rx<UpItem> upInfo = UpItem().obs;
   RxInt initialValue = 0.obs;
   Rx<DynamicsType> dynamicsType = DynamicsType.values[0].obs;
@@ -173,5 +177,17 @@ class MomentsController extends GetxController {
     initialValue.value = value;
     await queryFollowDynamic();
     scrollController.jumpTo(0);
+  }
+
+  toggleOption(value) {
+    if (value) {
+      optionIndex.value = (optionIndex.value + 1) % 3;
+      optionText.value = commentOptions[optionIndex.value];
+      option.value = optionIndex.value + 1;
+    } else {
+      optionIndex.value = 0;
+      option.value = 1;
+      optionText.value = '允许评论';
+    }
   }
 }

@@ -114,39 +114,29 @@ class _ContentState extends State<Content> {
                   (pics[i].height != null && pics[i].width != null
                       ? pics[i].height! / pics[i].width!
                       : 9 / 16);
-              bool isLong = height > Get.size.height * 0.9;
               return Hero(
                 tag: picList[i],
                 child: GestureDetector(
                   onTap: () {},
                   child: Stack(
                     children: [
-                      if (isLong) ...[
-                        Positioned.fill(
-                          child: NetworkImgLayer(
-                            src: pics[i].src,
-                            width: maxWidth / 2,
-                            height: height,
-                            origAspectRatio:
-                                pics[i].width != null && pics[i].height != null
-                                    ? pics[i].width! / pics[i].height!
-                                    : 1.0,
-                          ),
-                        ),
-                        const PBadge(
-                          text: '长图',
-                          right: 8,
-                          bottom: 8,
-                        ),
-                      ] else ...[
-                        NetworkImgLayer(
+                      Positioned.fill(
+                        child: NetworkImgLayer(
                           src: pics[i].src,
                           width: maxWidth,
-                          height: maxWidth,
+                          height: height,
                           origAspectRatio:
                               pics[i].width!.toInt() / pics[i].height!.toInt(),
                         ),
-                      ],
+                      ),
+                      if (pics[i].height!.toInt() / pics[i].width!.toInt() > 2)
+                        const PBadge(
+                          text: '长图',
+                          top: null,
+                          right: 6.0,
+                          bottom: 6.0,
+                          left: null,
+                        )
                     ],
                   ),
                 ),
@@ -222,13 +212,7 @@ class _ContentState extends State<Content> {
               ),
             ),
           ),
-          if (hasPics || hasCovers) ...[
-            (widget.source != 'detail')
-                ? Text.rich(picsNodes())
-                : FowardPic(
-                    item: widget.item,
-                  )
-          ],
+          if (hasPics || hasCovers) ...[Text.rich(picsNodes())],
         ],
       ),
     );

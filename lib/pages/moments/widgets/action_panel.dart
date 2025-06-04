@@ -1,6 +1,7 @@
 import 'package:dilidili/common/widgets/network_img_layer.dart';
 import 'package:dilidili/http/dynamics.dart';
 import 'package:dilidili/model/dynamics/result.dart';
+import 'package:dilidili/pages/moments/controller.dart';
 import 'package:dilidili/pages/moments/widgets/rich_node_panel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -17,6 +18,7 @@ class ActionPanel extends StatefulWidget {
 
 class _ActionPanelState extends State<ActionPanel>
     with TickerProviderStateMixin {
+  final MomentsController _momentsController = Get.put(MomentsController());
   double defaultHeight = 260;
   late ModuleStatModel stat;
   RxBool isExpand = false.obs;
@@ -134,7 +136,7 @@ class _ActionPanelState extends State<ActionPanel>
     );
   }
 
-  togglePanelState(status) {
+  togglePanelState(status, type) {
     if (!status) {
       Get.back();
       height.value = defaultHeight;
@@ -143,7 +145,21 @@ class _ActionPanelState extends State<ActionPanel>
     } else {
       height.value = Get.size.height;
     }
-    isExpand.value = !(isExpand.value);
+    if (type != 'fast_forward') isExpand.value = !(isExpand.value);
+  }
+
+  momentForward(String type) async {
+    String dynamicId = widget.item.idStr!;
+    var res = await DynamicsHttp.dynamicCreate(
+      dynIdStr: dynamicId,
+      mid: _momentsController.userInfo.mid,
+      rawText: _inputText,
+      scene: 4,
+    );
+    if (res['status']) {
+      SmartDialog.showToast(type == 'forward' ? '转发成功' : '发布成功');
+      togglePanelState(false, type);
+    }
   }
 
   // 动态转发
@@ -182,7 +198,7 @@ class _ActionPanelState extends State<ActionPanel>
                     children: [
                       if (isExpand.value) ...[
                         IconButton(
-                          onPressed: () => togglePanelState(false),
+                          onPressed: () => togglePanelState(false, ''),
                           icon: const Icon(Icons.close),
                         ),
                         Text(
@@ -200,11 +216,11 @@ class _ActionPanelState extends State<ActionPanel>
                       ],
                       isExpand.value
                           ? FilledButton(
-                              onPressed: () {},
+                              onPressed: () => momentForward('forward'),
                               child: const Text('转发'),
                             )
                           : TextButton(
-                              onPressed: () {},
+                              onPressed: () => momentForward('fast_forward'),
                               child: const Text('立即转发'),
                             )
                     ],
@@ -212,7 +228,7 @@ class _ActionPanelState extends State<ActionPanel>
                 ),
                 if (!isExpand.value) ...[
                   GestureDetector(
-                    onTap: () => togglePanelState(true),
+                    onTap: () => togglePanelState(true, ''),
                     behavior: HitTestBehavior.translucent,
                     child: Container(
                       width: double.infinity,

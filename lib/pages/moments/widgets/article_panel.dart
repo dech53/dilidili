@@ -33,7 +33,7 @@ Widget articlePanel(item, context, {floor = 1}) {
           ),
           const SizedBox(height: 8),
         ],
-        picWidget(item, context,floor)
+        picWidget(item, context, floor)
       ],
     ),
   );

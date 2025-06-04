@@ -112,6 +112,8 @@ class ApiString {
   // 正在直播的up & 关注的up
   static const String followUp = '/x/polymer/web-dynamic/v1/portal';
   // 动态点赞
-  static const String likeDynamic =
-      '/dynamic_like/v1/dynamic_like/thumb';
+  static const String likeDynamic = '/dynamic_like/v1/dynamic_like/thumb';
+  // 发布复杂动态
+  static const String createDynamic = '/x/dynamic/feed/create/dyn';
+  
 }

@@ -5,6 +5,7 @@ import 'package:dilidili/pages/moments/widgets/article_panel.dart';
 import 'package:dilidili/pages/moments/widgets/foward_pic.dart';
 import 'package:dilidili/pages/moments/widgets/live_panel.dart';
 import 'package:dilidili/pages/moments/widgets/live_rcmd_panel.dart';
+import 'package:dilidili/pages/moments/widgets/pic_panel.dart';
 import 'package:dilidili/pages/moments/widgets/rich_node_panel.dart';
 import 'package:dilidili/pages/moments/widgets/video_panel.dart';
 import 'package:dilidili/utils/num_utils.dart';
@@ -53,9 +54,7 @@ Widget forWard(item, context, ctr, source, {floor = 1}) {
               padding: floor == 2
                   ? EdgeInsets.zero
                   : const EdgeInsets.only(left: 12, right: 12),
-              child: FowardPic(
-                item: item,
-              ),
+              child: picWidget(item, context, floor),
             ),
           ],
         ],

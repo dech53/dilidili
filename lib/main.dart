@@ -4,6 +4,7 @@ import 'package:dilidili/http/dio_instance.dart';
 import 'package:dilidili/pages/search/view.dart';
 import 'package:dilidili/pages/video/detail/view.dart';
 import 'package:dilidili/router/app_pages.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:dilidili/utils/storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
@@ -41,6 +42,14 @@ void main() async {
       navigatorObservers: [
         VideoPage.routeObserver,
         SearchPage.routeObserver,
+      ],
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('zh', 'CN'),
       ],
     ),
   );

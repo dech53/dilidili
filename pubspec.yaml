@@ -80,6 +80,9 @@ dependencies:
   flutter_displaymode: ^0.6.0
   audio_video_progress_bar: ^2.0.3
   custom_sliding_segmented_control: ^1.8.5
+  flutter_localization: ^0.3.2
+  saver_gallery: ^4.0.1
+  permission_handler: ^12.0.0+1
   
 dev_dependencies:
   flutter_test:
