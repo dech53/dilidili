@@ -110,16 +110,44 @@ class _ContentState extends State<Content> {
           LayoutBuilder(
             builder: (context, BoxConstraints box) {
               double maxWidth = box.maxWidth.truncateToDouble();
+              double height = maxWidth *
+                  (pics[i].height != null && pics[i].width != null
+                      ? pics[i].height! / pics[i].width!
+                      : 9 / 16);
+              bool isLong = height > Get.size.height * 0.9;
               return Hero(
                 tag: picList[i],
                 child: GestureDetector(
                   onTap: () {},
-                  child: NetworkImgLayer(
-                    src: pics[i].src,
-                    width: maxWidth,
-                    height: maxWidth,
-                    origAspectRatio:
-                        pics[i].width!.toInt() / pics[i].height!.toInt(),
+                  child: Stack(
+                    children: [
+                      if (isLong) ...[
+                        Positioned.fill(
+                          child: NetworkImgLayer(
+                            src: pics[i].src,
+                            width: maxWidth / 2,
+                            height: height,
+                            origAspectRatio:
+                                pics[i].width != null && pics[i].height != null
+                                    ? pics[i].width! / pics[i].height!
+                                    : 1.0,
+                          ),
+                        ),
+                        const PBadge(
+                          text: '长图',
+                          right: 8,
+                          bottom: 8,
+                        ),
+                      ] else ...[
+                        NetworkImgLayer(
+                          src: pics[i].src,
+                          width: maxWidth,
+                          height: maxWidth,
+                          origAspectRatio:
+                              pics[i].width!.toInt() / pics[i].height!.toInt(),
+                        ),
+                      ],
+                    ],
                   ),
                 ),
               );
