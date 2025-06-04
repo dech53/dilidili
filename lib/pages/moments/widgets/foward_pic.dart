@@ -1,6 +1,8 @@
 import 'package:dilidili/common/widgets/badge.dart';
 import 'package:dilidili/common/widgets/network_img_layer.dart';
 import 'package:dilidili/model/dynamics/result.dart';
+import 'package:dilidili/pages/gallery/gallery_viewer.dart';
+import 'package:dilidili/pages/gallery/hero_route.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -24,6 +26,18 @@ class _FowardPicState extends State<FowardPic> {
     if (hasPics) {
       pics = widget.item.modules.moduleDynamic.major.draw.items;
     }
+  }
+
+  void onPreviewImg(picList, initIndex, context) {
+    Navigator.of(context).push(
+      HeroRoute<void>(
+        builder: (BuildContext context) => GalleryViewer(
+          sources: picList,
+          initIndex: initIndex,
+          onPageChanged: (int pageIndex) {},
+        ),
+      ),
+    );
   }
 
   InlineSpan picsNodes() {
@@ -52,7 +66,7 @@ class _FowardPicState extends State<FowardPic> {
                   return child;
                 },
                 child: GestureDetector(
-                  onTap: () {},
+                  onTap: () => onPreviewImg(picList, 1, context),
                   child: Container(
                     padding: const EdgeInsets.only(top: 4),
                     constraints: BoxConstraints(maxHeight: maxHeight),
@@ -102,7 +116,7 @@ class _FowardPicState extends State<FowardPic> {
               return Hero(
                 tag: picList[i],
                 child: GestureDetector(
-                  onTap: () {},
+                  onTap: () => onPreviewImg(picList, i, context),
                   child: Stack(
                     children: [
                       if (isLong) ...[

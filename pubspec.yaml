@@ -83,6 +83,8 @@ dependencies:
   flutter_localization: ^0.3.2
   saver_gallery: ^4.0.1
   permission_handler: ^12.0.0+1
+  status_bar_control: ^3.2.1
+  device_info_plus: ^11.3.0
   
 dev_dependencies:
   flutter_test:

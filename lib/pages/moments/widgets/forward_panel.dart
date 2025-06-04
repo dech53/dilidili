@@ -54,7 +54,9 @@ Widget forWard(item, context, ctr, source, {floor = 1}) {
               padding: floor == 2
                   ? EdgeInsets.zero
                   : const EdgeInsets.only(left: 12, right: 12),
-              child: picWidget(item, context, floor),
+              child: FowardPic(
+                item: item,
+              ),
             ),
           ],
         ],
