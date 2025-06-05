@@ -1,10 +1,8 @@
-import 'dart:io';
-
 import 'package:dilidili/pages/root/root_page.dart';
 import 'package:dilidili/pages/theme/dark_theme.dart';
 import 'package:dilidili/pages/theme/theme_provider.dart';
+import 'package:dilidili/utils/storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
@@ -25,6 +23,8 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
+    double statusBarHeight = MediaQuery.of(context).padding.top;
+    SPStorage.statusBarHeight = statusBarHeight;
     final themeController = Get.put(ThemeController());
     return ScreenUtilInit(
       designSize: designSize,

@@ -115,5 +115,5 @@ class ApiString {
   static const String likeDynamic = '/dynamic_like/v1/dynamic_like/thumb';
   // 发布复杂动态
   static const String createDynamic = '/x/dynamic/feed/create/dyn';
-  
+  static const String webDanmaku = '/x/v2/dm/web/seg.so';
 }

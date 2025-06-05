@@ -9,6 +9,7 @@ class SPStorage {
   static late final String userID;
   static late final Box<dynamic> userInfo;
   static late final SharedPreferencesInstance prefs;
+  static late double statusBarHeight;
 
   static Future<void> init() async {
     final dir = await getApplicationDocumentsDirectory();

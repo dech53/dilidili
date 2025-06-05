@@ -885,6 +885,15 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.0.0"
+  ns_danmaku:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: master
+      resolved-ref: d1cb3f0190ca67ec4d7fd372dac96f4f17a81a1a
+      url: "https://github.com/guozhigq/flutter_ns_danmaku.git"
+    source: git
+    version: "0.0.5"
   octo_image:
     dependency: transitive
     description:
@@ -1069,6 +1078,14 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "6.0.2"
+  protobuf:
+    dependency: "direct main"
+    description:
+      name: protobuf
+      sha256: "579fe5557eae58e3adca2e999e38f02441d8aa908703854a9e0a0f47fa857731"
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "4.1.0"
   provider:
     dependency: "direct main"
     description:

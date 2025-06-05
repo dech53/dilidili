@@ -21,6 +21,7 @@ class DPlayer extends StatefulWidget {
     required this.controller,
     this.headerControl,
     this.bottomList,
+    this.danmuWidget,
     this.customWidget,
     this.customWidgets,
     this.bottomControl,
@@ -31,6 +32,7 @@ class DPlayer extends StatefulWidget {
   final PreferredSizeWidget? bottomControl;
   final List<BottomControlType>? bottomList;
   final Widget? customWidget;
+  final Widget? danmuWidget;
   final List<Widget>? customWidgets;
   final Alignment? alignment;
   @override
@@ -48,6 +50,7 @@ class _DPlayerState extends State<DPlayer> with TickerProviderStateMixin {
     super.initState();
     screenWidth = Get.size.width;
     widget.controller.headerControl = widget.headerControl;
+    widget.controller.danmuWidget = widget.danmuWidget;
     animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 150),
@@ -232,6 +235,11 @@ class _DPlayerState extends State<DPlayer> with TickerProviderStateMixin {
             value: _brightnessValue.value,
           ),
         ),
+
+        /// 弹幕面板
+        if (widget.danmuWidget != null)
+          Positioned.fill(top: 4, child: widget.danmuWidget!),
+
         Positioned.fill(
           left: 16,
           top: 25,

@@ -1,12 +1,16 @@
 import 'dart:async';
+import 'package:dilidili/pages/damuku/view.dart';
 import 'package:dilidili/pages/dplayer/controller.dart';
+import 'package:dilidili/pages/dplayer/models/play_status.dart';
 import 'package:dilidili/pages/dplayer/view.dart';
 import 'package:dilidili/pages/video/detail/controller.dart';
-import 'package:dilidili/pages/video/introduction/controller.dart';
+import 'package:dilidili/pages/video/detail/widgets/app_bar.dart';
 import 'package:dilidili/pages/video/introduction/view.dart';
 import 'package:dilidili/pages/video/related/view.dart';
+import 'package:dilidili/utils/storage.dart';
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
@@ -23,22 +27,20 @@ class _VideoPageState extends State<VideoPage>
     with SingleTickerProviderStateMixin, RouteAware, WidgetsBindingObserver {
   late VideoDetailController vdCtr;
   late double statusBarHeight;
+  Rx<DPlayerStatus> playerStatus = DPlayerStatus.playing.obs;
   DPlayerController? dPlayerController;
+  late StreamController<double> appbarStream;
   final ScrollController _extendNestCtr = ScrollController();
   final double videoHeight = Get.size.width * 9 / 16;
   late String bvid;
   // late int cid;
   late String heroTag;
   late int mid;
-  late TabController _tabController;
   late Future _futureBuilderFuture;
 
   @override
   void dispose() {
-    if (dPlayerController != null) {
-      // dPlayerController!.dispose();
-      // print("界面内部实例数量${dPlayerController!.playerCount.value.toString()}");
-    }
+    if (dPlayerController != null) {}
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -77,9 +79,27 @@ class _VideoPageState extends State<VideoPage>
     mid = int.parse(Get.parameters['mid']!);
     vdCtr = Get.put(VideoDetailController(), tag: heroTag);
     _futureBuilderFuture = vdCtr.queryVideoUrl();
-    _tabController = TabController(length: vdCtr.tabs.length, vsync: this);
     dPlayerController = vdCtr.dPlayerController;
+    dPlayerController!.addStatusLister(playerListener);
+    statusBarHeight = SPStorage.statusBarHeight;
+    appbarStreamListen();
     WidgetsBinding.instance.addObserver(this);
+  }
+
+  void playerListener(DPlayerStatus status) async {
+    playerStatus.value = status;
+  }
+
+  appbarStreamListen() {
+    appbarStream = StreamController<double>.broadcast();
+    _extendNestCtr.addListener(
+      () {
+        final double offset = _extendNestCtr.position.pixels;
+        vdCtr.sheetHeight.value =
+            Get.size.height - videoHeight - statusBarHeight + offset;
+        appbarStream.add(offset);
+      },
+    );
   }
 
   @override
@@ -87,6 +107,8 @@ class _VideoPageState extends State<VideoPage>
     final sizeContext = MediaQuery.sizeOf(context);
     late double defaultVideoHeight = sizeContext.width * 9 / 16;
     late RxDouble videoHeight = defaultVideoHeight.obs;
+    final double pinnedHeaderHeight =
+        statusBarHeight + kToolbarHeight + videoHeight.value;
     Widget buildLoadingWidget() {
       return Center(child: Lottie.asset('assets/loading.json', width: 200));
     }
@@ -118,10 +140,17 @@ class _VideoPageState extends State<VideoPage>
     }
 
     Widget buildVideoPlayerWidget(AsyncSnapshot snapshot) {
-      return DPlayer(
-        controller: dPlayerController!,
-        headerControl: vdCtr.headerControl,
-        bottomList: vdCtr.bottomList,
+      return Obx(
+        () => DPlayer(
+          controller: dPlayerController!,
+          headerControl: vdCtr.headerControl,
+          bottomList: vdCtr.bottomList,
+          danmuWidget: Danmuku(
+            key: Key(vdCtr.danmakuCid.value.toString()),
+            cid: vdCtr.danmakuCid.value,
+            playerController: dPlayerController!,
+          ),
+        ),
       );
     }
 
@@ -144,6 +173,106 @@ class _VideoPageState extends State<VideoPage>
       );
     }
 
+    Widget tabbarBuild() {
+      return Container(
+        width: double.infinity,
+        height: 45,
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: BorderSide(
+              width: 1,
+              color: Theme.of(context).dividerColor.withOpacity(0.1),
+            ),
+          ),
+        ),
+        child: Material(
+          child: Row(
+            children: [
+              Expanded(
+                child: Obx(
+                  () => TabBar(
+                    padding: EdgeInsets.zero,
+                    controller: vdCtr.tabCtr,
+                    labelStyle: const TextStyle(fontSize: 13),
+                    labelPadding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    dividerColor: Colors.transparent,
+                    tabs: vdCtr.tabs
+                        .map((String name) => Tab(text: name))
+                        .toList(),
+                    onTap: (index) {},
+                  ),
+                ),
+              ),
+              Flexible(
+                flex: 1,
+                child: Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      const SizedBox(width: 8),
+                      SizedBox(
+                        height: 32,
+                        child: TextButton(
+                          style: ButtonStyle(
+                            padding: MaterialStateProperty.all(EdgeInsets.zero),
+                          ),
+                          onPressed: () {},
+                          child:
+                              const Text('发弹幕', style: TextStyle(fontSize: 12)),
+                        ),
+                      ),
+                      SizedBox(
+                        width: 38,
+                        height: 38,
+                        child: Obx(
+                          () => !vdCtr.isShowCover.value
+                              ? IconButton(
+                                  onPressed: () {
+                                    dPlayerController?.isOpenDanmu.value =
+                                        !(dPlayerController
+                                                ?.isOpenDanmu.value ??
+                                            false);
+                                  },
+                                  icon:
+                                      !(dPlayerController?.isOpenDanmu.value ??
+                                              false)
+                                          ? SvgPicture.asset(
+                                              'assets/images/video/danmu_close.svg',
+                                              // ignore: deprecated_member_use
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .outline,
+                                            )
+                                          : SvgPicture.asset(
+                                              'assets/images/video/danmu_open.svg',
+                                              // ignore: deprecated_member_use
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .primary,
+                                            ),
+                                )
+                              : IconButton(
+                                  icon: SvgPicture.asset(
+                                    'assets/images/video/danmu_close.svg',
+                                    // ignore: deprecated_member_use
+                                    color:
+                                        Theme.of(context).colorScheme.outline,
+                                  ),
+                                  onPressed: () {},
+                                ),
+                        ),
+                      ),
+                      const SizedBox(width: 18),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return SafeArea(
       top: false,
       bottom: false,
@@ -155,10 +284,21 @@ class _VideoPageState extends State<VideoPage>
             resizeToAvoidBottomInset: false,
             appBar: PreferredSize(
               preferredSize: const Size.fromHeight(0),
-              child: AppBar(
-                backgroundColor: Colors.black,
-                elevation: 0,
-                scrolledUnderElevation: 0,
+              child: StreamBuilder(
+                stream: appbarStream.stream.distinct(),
+                initialData: 0,
+                builder: ((context, snapshot) {
+                  return AppBar(
+                    backgroundColor: Colors.black,
+                    elevation: 0,
+                    scrolledUnderElevation: 0,
+                    systemOverlayStyle: Get.isDarkMode
+                        ? SystemUiOverlayStyle.light
+                        : snapshot.data!.toDouble() > kToolbarHeight
+                            ? SystemUiOverlayStyle.dark
+                            : SystemUiOverlayStyle.light,
+                  );
+                }),
               ),
             ),
             body: ExtendedNestedScrollView(
@@ -181,7 +321,6 @@ class _VideoPageState extends State<VideoPage>
                               BoxConstraints constraints) {
                             return Stack(
                               children: <Widget>[
-                                //播放器界面
                                 buildVideoPlayerPanel(),
                               ],
                             );
@@ -193,92 +332,17 @@ class _VideoPageState extends State<VideoPage>
                 ];
               },
               pinnedHeaderSliverHeightBuilder: () {
-                return MediaQuery.sizeOf(context).height;
+                return playerStatus.value != DPlayerStatus.playing
+                    ? kToolbarHeight
+                    : pinnedHeaderHeight;
               },
               onlyOneScrollInBody: true,
               body: Column(
-                mainAxisSize: MainAxisSize.max,
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    width: double.infinity,
-                    height: 45,
-                    decoration: BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(
-                          width: 1,
-                          color: Theme.of(context)
-                              .dividerColor
-                              // ignore: deprecated_member_use
-                              .withOpacity(0.1),
-                        ),
-                      ),
-                    ),
-                    child: Material(
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: TabBar(
-                              controller: _tabController,
-                              padding: EdgeInsets.zero,
-                              labelStyle: const TextStyle(fontSize: 13),
-                              labelPadding:
-                                  const EdgeInsets.symmetric(horizontal: 10.0),
-                              dividerColor: Colors.transparent,
-                              tabs: vdCtr.tabs
-                                  .map((e) => Tab(
-                                        text: e,
-                                      ))
-                                  .toList(),
-                              onTap: (index) {},
-                            ),
-                          ),
-                          Flexible(
-                            flex: 1,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                const Icon(
-                                  Icons.drag_handle_rounded,
-                                  size: 20,
-                                  color: Colors.grey,
-                                ),
-                                const SizedBox(width: 8),
-                                SizedBox(
-                                  height: 32,
-                                  child: TextButton(
-                                    style: ButtonStyle(
-                                      padding: WidgetStateProperty.all(
-                                          EdgeInsets.zero),
-                                    ),
-                                    onPressed: () {},
-                                    child: const Text('发弹幕',
-                                        style: TextStyle(fontSize: 12)),
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: 38,
-                                  height: 38,
-                                  child: IconButton(
-                                    icon: SvgPicture.asset(
-                                      'assets/images/video/danmu_close.svg',
-                                      colorFilter: const ColorFilter.mode(
-                                          Colors.grey, BlendMode.srcIn),
-                                    ),
-                                    onPressed: () {},
-                                  ),
-                                ),
-                                const SizedBox(width: 18),
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
+                  tabbarBuild(),
                   Expanded(
                     child: TabBarView(
-                      controller: _tabController,
+                      controller: vdCtr.tabCtr,
                       children: <Widget>[
                         Builder(
                           builder: (BuildContext context) {
@@ -298,8 +362,26 @@ class _VideoPageState extends State<VideoPage>
               ),
             ),
           ),
+          StreamBuilder(
+            stream: appbarStream.stream.distinct(),
+            initialData: 0,
+            builder: ((context, snapshot) {
+              return ScrollAppBar(
+                snapshot.data!.toDouble(),
+                () => continuePlay(),
+                playerStatus.value,
+                null,
+              );
+            }),
+          ),
         ],
       ),
     );
+  }
+
+  void continuePlay() async {
+    await _extendNestCtr.animateTo(0,
+        duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
+    dPlayerController!.play();
   }
 }

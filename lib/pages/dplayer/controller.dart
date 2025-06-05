@@ -9,12 +9,20 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
+import 'package:ns_danmaku/danmaku_controller.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 
 class DPlayerController extends GetxController {
   Timer? _timerForSeek;
   //头部控制栏
   PreferredSizeWidget? headerControl;
+  String videoType = 'archive';
+  //弹幕组件
+  Widget? danmuWidget;
+
+  /// 弹幕开关
+  Rx<bool> isOpenDanmu = true.obs;
+  DanmakuController? danmakuController;
 
   /// 视频比例
   Rx<BoxFit> get videoFit => _videoFit;
@@ -79,7 +87,7 @@ class DPlayerController extends GetxController {
   Rx<double> get brightness => _currentBrightness;
 
   //私有构造函数
-  DPlayerController._internal();
+  DPlayerController._internal(this.videoType) {}
 
   //获取私有控制器
   Player? get videoPlayerController => _videoPlayerController;
@@ -87,6 +95,7 @@ class DPlayerController extends GetxController {
 
   List<StreamSubscription> subscriptions = [];
   final List<Function(Duration position)> _positionListeners = [];
+  final List<Function(DPlayerStatus status)> _statusListeners = [];
 
   /// 播放事件监听
   void startListeners() {
@@ -102,6 +111,39 @@ class DPlayerController extends GetxController {
           element(event);
         }
       }),
+      videoPlayerController!.stream.playing.listen(
+        (event) {
+          if (event) {
+            playerStatus.status.value = DPlayerStatus.playing;
+          } else {
+            playerStatus.status.value = DPlayerStatus.paused;
+          }
+
+          /// 触发回调事件
+          for (var element in _statusListeners) {
+            element(event ? DPlayerStatus.playing : DPlayerStatus.paused);
+          }
+        },
+      ),
+      videoPlayerController!.stream.completed.listen((event) {
+        if (event) {
+          playerStatus.status.value = DPlayerStatus.completed;
+
+          /// 触发回调事件
+          for (var element in _statusListeners) {
+            element(DPlayerStatus.completed);
+          }
+        }
+      }),
+      videoPlayerController!.stream.duration.listen((event) {
+        if (event > Duration.zero) {
+          duration.value = event;
+        }
+      }),
+      videoPlayerController!.stream.buffer.listen((event) {
+        _buffered.value = event;
+        updateBufferedSecond();
+      }),
     ]);
   }
 
@@ -109,6 +151,10 @@ class DPlayerController extends GetxController {
       _positionListeners.add(listener);
   void removePositionListener(Function(Duration position) listener) =>
       _positionListeners.remove(listener);
+  void addStatusLister(Function(DPlayerStatus status) listener) =>
+      _statusListeners.add(listener);
+  void removeStatusLister(Function(DPlayerStatus status) listener) =>
+      _statusListeners.remove(listener);
 
   set controls(bool visible) {
     _showControls.value = visible;
@@ -161,7 +207,7 @@ class DPlayerController extends GetxController {
   factory DPlayerController({
     String videoType = 'archive',
   }) {
-    _instance ??= DPlayerController._internal();
+    _instance ??= DPlayerController._internal(videoType);
     if (videoType != 'none') {
       _instance!._playerCount.value += 1;
       _videoType.value = videoType;
@@ -313,6 +359,9 @@ class DPlayerController extends GetxController {
   }
 
   void setDoubleSpeedStatus(bool status) {
+    if (videoType == 'live') {
+      return;
+    }
     _doubleSpeedStatus.value = status;
     if (status) {
       setPlaybackSpeed(playbackSpeed * 2);

@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dilidili/common/widgets/action_item.dart';
 import 'package:dilidili/common/widgets/http_error.dart';
 import 'package:dilidili/common/widgets/network_img_layer.dart';
@@ -8,7 +7,6 @@ import 'package:dilidili/pages/video/detail/controller.dart';
 import 'package:dilidili/pages/video/introduction/controller.dart';
 import 'package:dilidili/pages/video/introduction/widgets/intro_detail.dart';
 import 'package:dilidili/utils/num_utils.dart';
-import 'package:dilidili/utils/string_utils.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

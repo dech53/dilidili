@@ -2,7 +2,6 @@ import 'package:dilidili/component/common_btn.dart';
 import 'package:dilidili/http/static/api_string.dart';
 import 'package:dilidili/http/video.dart';
 import 'package:dilidili/model/bottom_control_type.dart';
-import 'package:dilidili/model/play_status.dart';
 import 'package:dilidili/model/video/quality.dart';
 import 'package:dilidili/model/video/url.dart';
 import 'package:dilidili/pages/dplayer/controller.dart';
@@ -21,6 +20,8 @@ class VideoDetailController extends GetxController
   late VideoQuality currentVideoQa;
   RxString archiveSourceType = 'dash'.obs;
   RxBool enableHA = false.obs;
+  RxBool isShowCover = true.obs;
+  RxDouble sheetHeight = 0.0.obs;
   late VideoItem firstVideo;
   late AudioItem firstAudio;
   late Duration defaultST;
@@ -32,7 +33,6 @@ class VideoDetailController extends GetxController
     BottomControlType.fullscreen,
   ].obs;
   RxInt cid = int.parse(Get.parameters['cid']!).obs;
-  Rx<PlayerStatus> playerStatus = PlayerStatus.playing.obs;
   RxInt danmakuCid = 0.obs;
   RxInt oid = 0.obs;
   late PlayUrlModel data;
@@ -104,6 +104,7 @@ class VideoDetailController extends GetxController
         defaultST = Duration.zero;
         firstVideo = VideoItem();
         await playerInit();
+        isShowCover.value = false;
         return result;
       }
       if (data.durl != null) {
@@ -114,6 +115,7 @@ class VideoDetailController extends GetxController
         firstVideo = VideoItem();
         currentVideoQa = VideoQualityCode.fromCode(data.quality!)!;
         await playerInit();
+        isShowCover.value = false;
         return result;
       }
       final List<VideoItem> allVideosList = data.dash!.video!;
@@ -127,7 +129,11 @@ class VideoDetailController extends GetxController
       firstAudio = audiosList.first;
       audioUrl = firstAudio.baseUrl!;
       await playerInit();
+      isShowCover.value = false;
     } else {
+      if (result['code'] == -404) {
+        isShowCover.value = false;
+      }
       SmartDialog.showToast(result['msg'].toString());
     }
     return result;

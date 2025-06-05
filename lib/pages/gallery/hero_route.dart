@@ -25,7 +25,7 @@ class HeroRoute<T> extends PageRoute<T> {
 
   @override
   Duration get transitionDuration => const Duration(milliseconds: 300);
-  
+
   //Page过渡动画
   @override
   Widget buildTransitions(
