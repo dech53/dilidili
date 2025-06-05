@@ -276,6 +276,7 @@ class _MomentsPageState extends State<MomentsPage>
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
+        forceMaterialTransparency: true,
         scrolledUnderElevation: 0,
         title: SizedBox(
           height: 34,
@@ -285,36 +286,7 @@ class _MomentsPageState extends State<MomentsPage>
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Obx(
-                    () {
-                      if (_momentsController.mid.value != -1 &&
-                          _momentsController.upInfo.value.uname != null) {
-                        return SizedBox(
-                          height: 36,
-                          child: AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 300),
-                            transitionBuilder:
-                                (Widget child, Animation<double> animation) {
-                              return ScaleTransition(
-                                  scale: animation, child: child);
-                            },
-                            child: Text(
-                                '${_momentsController.upInfo.value.uname!}的动态',
-                                key: ValueKey<String>(
-                                    _momentsController.upInfo.value.uname!),
-                                style: TextStyle(
-                                  fontSize: Theme.of(context)
-                                      .textTheme
-                                      .labelLarge!
-                                      .fontSize,
-                                )),
-                          ),
-                        );
-                      } else {
-                        return const SizedBox();
-                      }
-                    },
-                  ),
+                  
                   Obx(
                     () => _momentsController.userLogin.value
                         ? Visibility(

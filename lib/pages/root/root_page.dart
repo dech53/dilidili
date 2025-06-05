@@ -45,6 +45,7 @@ class _RootPageState extends State<RootPage> {
       appBar: AppBar(
         elevation: 0,
         toolbarHeight: 0,
+        scrolledUnderElevation: 0,
         backgroundColor: Theme.of(context).colorScheme.surface,
       ),
       backgroundColor: Theme.of(context).colorScheme.surface,
