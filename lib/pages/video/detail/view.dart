@@ -49,6 +49,7 @@ class _VideoPageState extends State<VideoPage>
   void didPushNext() async {
     if (dPlayerController != null) {
       vdCtr.defaultST = dPlayerController!.position.value;
+      dPlayerController!.removeStatusLister(playerListener);
       dPlayerController!.pause();
     }
     super.didPushNext();
@@ -60,6 +61,8 @@ class _VideoPageState extends State<VideoPage>
     await Future.delayed(const Duration(milliseconds: 300));
     dPlayerController?.seekTo(vdCtr.defaultST);
     dPlayerController?.play();
+    dPlayerController?.addStatusLister(playerListener);
+    appbarStream.add(0);
     super.didPopNext();
   }
 
