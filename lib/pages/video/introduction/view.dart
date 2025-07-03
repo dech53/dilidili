@@ -357,12 +357,6 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
             ),
             //点赞、投币、收藏、转发
             Material(child: actionGrid(context, videoIntroController)),
-            Divider(
-              color: Colors.grey.shade300,
-              indent: 8,
-              endIndent: 8,
-              thickness: 1.5,
-            ),
           ],
         ),
       ),

@@ -1,12 +1,15 @@
 import 'dart:async';
+import 'package:dilidili/model/search_type.dart';
 import 'package:dilidili/pages/damuku/view.dart';
 import 'package:dilidili/pages/dplayer/controller.dart';
 import 'package:dilidili/pages/dplayer/models/play_status.dart';
 import 'package:dilidili/pages/dplayer/view.dart';
 import 'package:dilidili/pages/video/detail/controller.dart';
 import 'package:dilidili/pages/video/detail/widgets/app_bar.dart';
+import 'package:dilidili/pages/video/introduction/controller.dart';
 import 'package:dilidili/pages/video/introduction/view.dart';
 import 'package:dilidili/pages/video/related/view.dart';
+import 'package:dilidili/pages/video/reply/view.dart';
 import 'package:dilidili/utils/storage.dart';
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:flutter/material.dart';
@@ -28,6 +31,7 @@ class _VideoPageState extends State<VideoPage>
   late VideoDetailController vdCtr;
   late double statusBarHeight;
   Rx<DPlayerStatus> playerStatus = DPlayerStatus.playing.obs;
+  late VideoIntroController videoIntroCtr;
   DPlayerController? dPlayerController;
   late StreamController<double> appbarStream;
   final ScrollController _extendNestCtr = ScrollController();
@@ -351,13 +355,30 @@ class _VideoPageState extends State<VideoPage>
                           builder: (BuildContext context) {
                             return CustomScrollView(
                               slivers: <Widget>[
-                                VideoIntroPanel(bvid: bvid),
+                                if (vdCtr.videoType == SearchType.video) ...[
+                                  VideoIntroPanel(bvid: vdCtr.bvid),
+                                ],
+                                SliverToBoxAdapter(
+                                  child: Divider(
+                                    indent: 12,
+                                    endIndent: 12,
+                                    color: Theme.of(context)
+                                        .dividerColor
+                                        .withOpacity(0.06),
+                                  ),
+                                ),
                                 const RelatedVideoPanel(),
                               ],
                             );
                           },
                         ),
-                        const Center(child: Text('评论功能待实现')),
+                        Obx(
+                          () => VideoReplyPanel(
+                            bvid: vdCtr.bvid,
+                            oid: vdCtr.oid.value,
+                            onControllerCreated: vdCtr.onControllerCreated,
+                          ),
+                        ),
                       ],
                     ),
                   ),

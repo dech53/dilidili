@@ -20,6 +20,7 @@ class VideoIntroController extends GetxController {
   // 在线人数
   RxString total = '1'.obs;
   Timer? timer;
+  bool isPaused = false;
   // 是否关注
   RxMap followStatus = {}.obs;
   Rx<FavFolderData> favFolderData = FavFolderData().obs;
@@ -58,7 +59,9 @@ class VideoIntroController extends GetxController {
   void startTimer() {
     const duration = Duration(seconds: 30);
     timer = Timer.periodic(duration, (Timer timer) {
-      queryOnlineTotal();
+      if (!isPaused) {
+        queryOnlineTotal();
+      }
     });
   }
 

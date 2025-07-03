@@ -2,6 +2,7 @@ import 'package:dilidili/component/common_btn.dart';
 import 'package:dilidili/http/static/api_string.dart';
 import 'package:dilidili/http/video.dart';
 import 'package:dilidili/model/bottom_control_type.dart';
+import 'package:dilidili/model/search_type.dart';
 import 'package:dilidili/model/video/quality.dart';
 import 'package:dilidili/model/video/url.dart';
 import 'package:dilidili/pages/dplayer/controller.dart';
@@ -22,6 +23,7 @@ class VideoDetailController extends GetxController
   RxBool enableHA = false.obs;
   RxBool isShowCover = true.obs;
   RxDouble sheetHeight = 0.0.obs;
+  ScrollController? replyScrollController;
   late VideoItem firstVideo;
   late AudioItem firstAudio;
   late Duration defaultST;
@@ -40,6 +42,8 @@ class VideoDetailController extends GetxController
   RxList<String> tabs = <String>['简介', '评论'].obs;
   late String videoUrl;
   late String audioUrl;
+  // 视频类型 默认投稿视频
+  SearchType videoType = Get.arguments['videoType'] ?? SearchType.video;
   @override
   void onInit() {
     super.onInit();
@@ -87,6 +91,10 @@ class VideoDetailController extends GetxController
         ],
       ),
     );
+  }
+
+  void onControllerCreated(ScrollController controller) {
+    replyScrollController = controller;
   }
 
 // 视频链接

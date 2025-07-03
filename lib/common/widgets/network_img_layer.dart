@@ -55,7 +55,7 @@ class NetworkImgLayer extends StatelessWidget {
                   ? 50
                   : type == 'emote'
                       ? 0
-                      : StyleString.imgRadius.x,
+                      :const Radius.circular(8).x,
             ),
             child: CachedNetworkImage(
               imageUrl: imageUrl,
