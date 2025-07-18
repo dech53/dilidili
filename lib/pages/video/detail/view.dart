@@ -3,6 +3,7 @@ import 'package:dilidili/model/search_type.dart';
 import 'package:dilidili/pages/damuku/view.dart';
 import 'package:dilidili/pages/dplayer/controller.dart';
 import 'package:dilidili/pages/dplayer/models/play_status.dart';
+import 'package:dilidili/pages/dplayer/utils/fullscreen.dart';
 import 'package:dilidili/pages/dplayer/view.dart';
 import 'package:dilidili/pages/video/detail/controller.dart';
 import 'package:dilidili/pages/video/detail/widgets/app_bar.dart';
@@ -39,6 +40,7 @@ class _VideoPageState extends State<VideoPage>
   late String bvid;
   // late int cid;
   late String heroTag;
+  RxBool isShowing = true.obs;
   late int mid;
   late Future _futureBuilderFuture;
 
@@ -53,15 +55,19 @@ class _VideoPageState extends State<VideoPage>
   void didPushNext() async {
     if (dPlayerController != null) {
       vdCtr.defaultST = dPlayerController!.position.value;
+      videoIntroCtr.isPaused = true;
       dPlayerController!.removeStatusLister(playerListener);
       dPlayerController!.pause();
     }
+    isShowing.value = false;
     super.didPushNext();
   }
 
   @override
   void didPopNext() async {
+    isShowing.value = true;
     vdCtr.playerInit();
+    videoIntroCtr.isPaused = false;
     await Future.delayed(const Duration(milliseconds: 300));
     dPlayerController?.seekTo(vdCtr.defaultST);
     dPlayerController?.play();
@@ -85,6 +91,8 @@ class _VideoPageState extends State<VideoPage>
     // cid = int.parse(Get.parameters['cid']!);
     mid = int.parse(Get.parameters['mid']!);
     vdCtr = Get.put(VideoDetailController(), tag: heroTag);
+    videoIntroCtr = Get.put(VideoIntroController(bvid: Get.parameters['bvid']!),
+        tag: heroTag);
     _futureBuilderFuture = vdCtr.queryVideoUrl();
     dPlayerController = vdCtr.dPlayerController;
     dPlayerController!.addStatusLister(playerListener);
@@ -112,10 +120,26 @@ class _VideoPageState extends State<VideoPage>
   @override
   Widget build(BuildContext context) {
     final sizeContext = MediaQuery.sizeOf(context);
+    final _context = MediaQuery.of(context);
     late double defaultVideoHeight = sizeContext.width * 9 / 16;
     late RxDouble videoHeight = defaultVideoHeight.obs;
     final double pinnedHeaderHeight =
         statusBarHeight + kToolbarHeight + videoHeight.value;
+
+    // 竖屏
+    final bool isPortrait = _context.orientation == Orientation.portrait;
+    // 横屏
+    final bool isLandscape = _context.orientation == Orientation.landscape;
+    final Rx<bool> isFullScreen = dPlayerController?.isFullScreen ?? false.obs;
+    // 全屏时高度撑满
+    if (isLandscape || isFullScreen.value == true) {
+      videoHeight.value = Get.size.height;
+      enterFullScreen();
+    } else {
+      videoHeight.value = defaultVideoHeight;
+      exitFullScreen();
+    }
+
     Widget buildLoadingWidget() {
       return Center(child: Lottie.asset('assets/loading.json', width: 200));
     }
@@ -157,6 +181,9 @@ class _VideoPageState extends State<VideoPage>
             cid: vdCtr.danmakuCid.value,
             playerController: dPlayerController!,
           ),
+          fullScreenCb: (bool status) {
+            videoHeight.value = status ? Get.size.height : defaultVideoHeight;
+          },
         ),
       );
     }
@@ -281,8 +308,10 @@ class _VideoPageState extends State<VideoPage>
     }
 
     return SafeArea(
-      top: false,
-      bottom: false,
+      top: MediaQuery.of(context).orientation == Orientation.portrait &&
+          dPlayerController?.isFullScreen.value == true,
+      bottom: MediaQuery.of(context).orientation == Orientation.portrait &&
+          dPlayerController?.isFullScreen.value == true,
       left: false,
       right: false,
       child: Stack(
@@ -313,28 +342,66 @@ class _VideoPageState extends State<VideoPage>
               headerSliverBuilder:
                   (BuildContext context2, bool innerBoxIsScrolled) {
                 return <Widget>[
-                  SliverAppBar(
-                    automaticallyImplyLeading: false,
-                    pinned: true,
-                    elevation: 0,
-                    scrolledUnderElevation: 0,
-                    forceElevated: innerBoxIsScrolled,
-                    expandedHeight: videoHeight.value,
-                    backgroundColor: Colors.black,
-                    flexibleSpace: FlexibleSpaceBar(
-                      background: PopScope(
-                        child: LayoutBuilder(
-                          builder: (BuildContext context,
-                              BoxConstraints constraints) {
-                            return Stack(
-                              children: <Widget>[
-                                buildVideoPlayerPanel(),
-                              ],
-                            );
-                          },
+                  Obx(
+                    () {
+                      final Orientation orientation =
+                          MediaQuery.of(context).orientation;
+                      final bool isFullScreen =
+                          dPlayerController?.isFullScreen.value == true;
+                      final double expandedHeight =
+                          orientation == Orientation.landscape || isFullScreen
+                              ? (MediaQuery.sizeOf(context).height -
+                                  (orientation == Orientation.landscape
+                                      ? 0
+                                      : MediaQuery.of(context).padding.top))
+                              : videoHeight.value;
+                      if (orientation == Orientation.landscape ||
+                          isFullScreen) {
+                        enterFullScreen();
+                      } else {
+                        exitFullScreen();
+                      }
+                      return SliverAppBar(
+                        automaticallyImplyLeading: false,
+                        pinned: true,
+                        elevation: 0,
+                        scrolledUnderElevation: 0,
+                        forceElevated: innerBoxIsScrolled,
+                        expandedHeight: expandedHeight,
+                        backgroundColor: Colors.black,
+                        flexibleSpace: FlexibleSpaceBar(
+                          background: PopScope(
+                            canPop:
+                                dPlayerController?.isFullScreen.value != true,
+                            onPopInvokedWithResult: (didPop, result) {
+                              if (dPlayerController?.isFullScreen.value ==
+                                  true) {
+                                dPlayerController!
+                                    .triggerFullScreen(status: false);
+                              }
+                              if (MediaQuery.of(context).orientation ==
+                                  Orientation.landscape) {
+                                verticalScreen();
+                              }
+                            },
+                            child: LayoutBuilder(
+                              builder: (BuildContext context,
+                                  BoxConstraints constraints) {
+                                return Stack(
+                                  children: <Widget>[
+                                    Obx(
+                                      () => isShowing.value
+                                          ? buildVideoPlayerPanel()
+                                          : const SizedBox(),
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
+                      );
+                    },
                   ),
                 ];
               },

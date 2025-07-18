@@ -3,7 +3,9 @@ import 'dart:io';
 
 import 'package:dilidili/pages/dplayer/models/data_source.dart';
 import 'package:dilidili/pages/dplayer/models/data_status.dart';
+import 'package:dilidili/pages/dplayer/models/fullscreen_mode.dart';
 import 'package:dilidili/pages/dplayer/models/play_status.dart';
+import 'package:dilidili/pages/dplayer/utils/fullscreen.dart';
 import 'package:dilidili/pages/video/detail/play/ao_output.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -11,6 +13,7 @@ import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:ns_danmaku/danmaku_controller.dart';
 import 'package:screen_brightness/screen_brightness.dart';
+import 'package:status_bar_control/status_bar_control.dart';
 
 class DPlayerController extends GetxController {
   Timer? _timerForSeek;
@@ -85,6 +88,10 @@ class DPlayerController extends GetxController {
   /// 亮度控制
   final Rx<double> _currentBrightness = 0.0.obs;
   Rx<double> get brightness => _currentBrightness;
+
+  /// 全屏方向
+  final Rx<String> _direction = 'horizontal'.obs;
+  Rx<String> get direction => _direction;
 
   //私有构造函数
   DPlayerController._internal(this.videoType) {}
@@ -236,11 +243,13 @@ class DPlayerController extends GetxController {
   Future<void> setDataSource(
     DataSource dataSource, {
     Duration? duration,
+    String? direction,
   }) async {
     if (_playerCount.value == 0) {
       return;
     }
     dataStatus.status.value = DataStatus.loading;
+    _direction.value = direction ?? 'horizontal';
     _videoPlayerController = await _createVideoController(
         dataSource, PlaylistMode.none, true, Duration.zero);
     _duration.value = duration ?? _videoPlayerController!.state.duration;
@@ -417,5 +426,33 @@ class DPlayerController extends GetxController {
         _timerForSeek = null;
       }
     });
+  }
+
+  void toggleFullScreen(bool val) {
+    _isFullScreen.value = val;
+  }
+
+  // 全屏
+  Future<void> triggerFullScreen({bool status = true}) async {
+    FullScreenMode mode = FullScreenModeCode.fromCode(0)!;
+    await StatusBarControl.setHidden(true, animation: StatusBarAnimation.FADE);
+    if (!isFullScreen.value && status) {
+      /// 按照视频宽高比决定全屏方向
+      toggleFullScreen(true);
+
+      /// 进入全屏
+      await enterFullScreen();
+      if (mode == FullScreenMode.vertical ||
+          (mode == FullScreenMode.auto && direction.value == 'vertical')) {
+        await verticalScreen();
+      } else {
+        await landScape();
+      }
+    } else if (isFullScreen.value && !status) {
+      StatusBarControl.setHidden(false, animation: StatusBarAnimation.FADE);
+      await exitFullScreen();
+      await verticalScreen();
+      toggleFullScreen(false);
+    }
   }
 }

@@ -25,6 +25,7 @@ class DPlayer extends StatefulWidget {
     this.customWidget,
     this.customWidgets,
     this.bottomControl,
+    this.fullScreenCb,
     this.alignment = Alignment.center,
   });
   final DPlayerController controller;
@@ -35,6 +36,7 @@ class DPlayer extends StatefulWidget {
   final Widget? danmuWidget;
   final List<Widget>? customWidgets;
   final Alignment? alignment;
+  final Function? fullScreenCb;
   @override
   State<DPlayer> createState() => _DPlayerState();
 }
@@ -122,8 +124,8 @@ class _DPlayerState extends State<DPlayer> with TickerProviderStateMixin {
           ),
         ),
         fuc: () {
-          // _.triggerFullScreen(status: !_.isFullScreen.value);
-          // widget.fullScreenCb?.call(!_.isFullScreen.value);
+          _.triggerFullScreen(status: !_.isFullScreen.value);
+          widget.fullScreenCb?.call(!_.isFullScreen.value);
         },
       ),
     };
@@ -298,7 +300,7 @@ class _DPlayerState extends State<DPlayer> with TickerProviderStateMixin {
                   child: widget.bottomControl ??
                       BottomControl(
                         controller: widget.controller,
-                        // triggerFullScreen: _.triggerFullScreen,
+                        triggerFullScreen: _.triggerFullScreen,
                         buildBottomControl: buildBottomControl(),
                       ),
                 ),

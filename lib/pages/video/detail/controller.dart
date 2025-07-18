@@ -7,6 +7,7 @@ import 'package:dilidili/model/video/quality.dart';
 import 'package:dilidili/model/video/url.dart';
 import 'package:dilidili/pages/dplayer/controller.dart';
 import 'package:dilidili/pages/dplayer/models/data_source.dart';
+import 'package:dilidili/pages/video/detail/widgets/header_control.dart';
 import 'package:dilidili/utils/id_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
@@ -51,45 +52,11 @@ class VideoDetailController extends GetxController
     danmakuCid.value = cid.value;
     oid.value = IdUtils.bv2av(Get.parameters['bvid']!);
 
-    headerControl = AppBar(
-      backgroundColor: Colors.transparent,
-      foregroundColor: Colors.white,
-      elevation: 0,
-      scrolledUnderElevation: 0,
-      primary: false,
-      centerTitle: false,
-      automaticallyImplyLeading: false,
-      titleSpacing: 14,
-      title: Row(
-        children: [
-          ComBtn(
-            icon: const Icon(
-              FontAwesomeIcons.arrowLeft,
-              size: 15,
-              color: Colors.white,
-            ),
-            fuc: () => Get.back(),
-          ),
-          const Spacer(),
-          ComBtn(
-            icon: const Icon(
-              Icons.cast,
-              size: 19,
-              color: Colors.white,
-            ),
-            fuc: () async {},
-          ),
-          ComBtn(
-            icon: const Icon(
-              Icons.closed_caption_off,
-              size: 22,
-              color: Colors.white,
-            ),
-            fuc: () {},
-          ),
-          const SizedBox(width: 8),
-        ],
-      ),
+    headerControl = HeaderControl(
+      controller: dPlayerController,
+      videoDetailCtr: this,
+      bvid: bvid,
+      videoType: videoType,
     );
   }
 

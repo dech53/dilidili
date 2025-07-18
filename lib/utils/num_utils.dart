@@ -1,27 +1,58 @@
 class NumUtils {
-  static String int2time(int duration) {
-    int hours = duration ~/ 3600;
-    int remainingSeconds = duration % 3600;
-    int minutes = remainingSeconds ~/ 60;
-    int seconds = remainingSeconds % 60;
-
-    List<String> parts = [];
-    if (hours > 0) {
-      parts.add(hours.toString().padLeft(2, '0'));
+  static String int2time(dynamic time) {
+    // 1小时内
+    if (time is String && time.contains(':')) {
+      return time;
     }
-    parts.add(minutes.toString().padLeft(2, '0'));
-    parts.add(seconds.toString().padLeft(2, '0'));
-
-    return parts.join(":");
+    if (time < 3600) {
+      if (time == 0) {
+        return '00:00';
+      }
+      final int minute = time ~/ 60;
+      final double res = time / 60;
+      if (minute != res) {
+        return '${minute < 10 ? '0$minute' : minute}:${(time - minute * 60) < 10 ? '0${(time - minute * 60)}' : (time - minute * 60)}';
+      } else {
+        return '$minute:00';
+      }
+    } else {
+      final int hour = time ~/ 3600;
+      final String hourStr = hour < 10 ? '0$hour' : hour.toString();
+      var a = int2time(time - hour * 3600);
+      return '$hourStr:$a';
+    }
   }
 
-  static String int2Num(int num) {
-    if (num >= 100000000) {
-      double value = num / 100000000;
-      return '${value.toStringAsFixed(1)}亿';
-    } else if (num >= 10000) {
-      double value = num / 10000;
-      return '${value.toStringAsFixed(1)}万';
+  // 完全相对时间显示
+  static String formatTimestampToRelativeTime(timeStamp) {
+    var difference = DateTime.now()
+        .difference(DateTime.fromMillisecondsSinceEpoch(timeStamp * 1000));
+
+    if (difference.inDays > 365) {
+      return '${difference.inDays ~/ 365}年前';
+    } else if (difference.inDays > 30) {
+      return '${difference.inDays ~/ 30}个月前';
+    } else if (difference.inDays > 0) {
+      return '${difference.inDays}天前';
+    } else if (difference.inHours > 0) {
+      return '${difference.inHours}小时前';
+    } else if (difference.inMinutes > 0) {
+      return '${difference.inMinutes}分钟前';
+    } else {
+      return '刚刚';
+    }
+  }
+
+  static String int2Num(dynamic num) {
+    if (num == null) {
+      return '0';
+    }
+    if (num is String) {
+      return num;
+    }
+    final String res = (num / 10000).toString();
+    if (int.parse(res.split('.')[0]) >= 1) {
+      return '${(num / 10000).toStringAsFixed(1)}万';
     } else {
       return num.toString();
     }
@@ -45,7 +76,6 @@ class NumUtils {
       return '$days天前';
     }
   }
-
 
   static String dateFormat(timeStamp, {formatType = 'list'}) {
     if (timeStamp == 0 || timeStamp == null || timeStamp == '') {
@@ -87,10 +117,7 @@ class NumUtils {
   }
 
   static String CustomStamp_str(
-      {int? timestamp,
-      String? date, 
-      bool toInt = true,
-      String? formatType}) {
+      {int? timestamp, String? date, bool toInt = true, String? formatType}) {
     timestamp ??= (DateTime.now().millisecondsSinceEpoch / 1000).round();
     String timeStr =
         (DateTime.fromMillisecondsSinceEpoch(timestamp * 1000)).toString();

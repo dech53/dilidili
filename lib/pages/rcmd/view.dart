@@ -46,68 +46,67 @@ class _RcmdPageState extends State<RcmdPage>
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15),
-      child: Container(
-        clipBehavior: Clip.hardEdge,
-        margin: const EdgeInsets.only(left: 4, right: 4),
-        decoration: const BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(3)),
-        ),
-        child: RefreshIndicator(
-          onRefresh: () async {
-            await _rcmdController.onRefresh();
-            await Future.delayed(const Duration(milliseconds: 300));
-          },
-          child: CustomScrollView(
-            controller: _rcmdController.scrollController,
-            physics: const AlwaysScrollableScrollPhysics(),
-            slivers: [
-              SliverPadding(
-                padding:
-                    const EdgeInsets.fromLTRB(0, StyleString.safeSpace, 0, 0),
-                sliver: FutureBuilder(
-                  future: _futureBuilderFuture,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.done) {
-                      Map data = snapshot.data as Map;
-                      if (data['status']) {
-                        return Obx(
-                          () {
-                            if (_rcmdController.isLoadingMore &&
-                                _rcmdController.videoList.isEmpty) {
-                              return contentGrid(_rcmdController, []);
-                            } else {
-                              // 显示视频列表
-                              return contentGrid(
-                                _rcmdController,
-                                _rcmdController.videoList,
-                              );
-                            }
-                          },
-                        );
-                      } else {
-                        return HttpError(
-                          errMsg: data['msg'],
-                          fn: () {
-                            setState(
-                              () {
-                                _rcmdController.isLoadingMore = true;
-                                _futureBuilderFuture =
-                                    _rcmdController.queryRcmdFeed('init');
-                              },
+    super.build(context);
+    return Container(
+      clipBehavior: Clip.hardEdge,
+      margin: const EdgeInsets.only(
+          left: StyleString.safeSpace, right: StyleString.safeSpace),
+      decoration: const BoxDecoration(
+        borderRadius: BorderRadius.all(StyleString.imgRadius),
+      ),
+      child: RefreshIndicator(
+        onRefresh: () async {
+          await _rcmdController.onRefresh();
+          await Future.delayed(const Duration(milliseconds: 300));
+        },
+        child: CustomScrollView(
+          controller: _rcmdController.scrollController,
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            SliverPadding(
+              padding:
+                  const EdgeInsets.fromLTRB(0, StyleString.safeSpace, 0, 0),
+              sliver: FutureBuilder(
+                future: _futureBuilderFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    Map data = snapshot.data as Map;
+                    if (data['status']) {
+                      return Obx(
+                        () {
+                          if (_rcmdController.isLoadingMore &&
+                              _rcmdController.videoList.isEmpty) {
+                            return contentGrid(_rcmdController, []);
+                          } else {
+                            // 显示视频列表
+                            return contentGrid(
+                              _rcmdController,
+                              _rcmdController.videoList,
                             );
-                          },
-                        );
-                      }
+                          }
+                        },
+                      );
                     } else {
-                      return contentGrid(_rcmdController, []);
+                      return HttpError(
+                        errMsg: data['msg'],
+                        fn: () {
+                          setState(
+                            () {
+                              _rcmdController.isLoadingMore = true;
+                              _futureBuilderFuture =
+                                  _rcmdController.queryRcmdFeed('init');
+                            },
+                          );
+                        },
+                      );
                     }
-                  },
-                ),
-              )
-            ],
-          ),
+                  } else {
+                    return contentGrid(_rcmdController, []);
+                  }
+                },
+              ),
+            )
+          ],
         ),
       ),
     );
@@ -118,9 +117,10 @@ class _RcmdPageState extends State<RcmdPage>
     double mainAxisExtent = (Get.size.width /
             crossAxisCount /
             StyleString.aspectRatio) +
-        (crossAxisCount == 1 ? 68 : MediaQuery.textScalerOf(context).scale(60));
+        (crossAxisCount == 1 ? 68 : MediaQuery.textScalerOf(context).scale(80));
     return SliverGrid(
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        mainAxisSpacing: StyleString.safeSpace,
         crossAxisSpacing: StyleString.safeSpace,
         crossAxisCount: crossAxisCount,
         mainAxisExtent: mainAxisExtent,
@@ -130,14 +130,6 @@ class _RcmdPageState extends State<RcmdPage>
           return videoList!.isNotEmpty
               ? VideoCardComponent(
                   video: videoList[index],
-                  itemTap: (video) {
-                    Get.toNamed(
-                      '/video?bvid=${video.bvid}&cid=${video.cid}&mid=${video.owner.mid}',
-                      arguments: {
-                        'heroTag': StringUtils.makeHeroTag(videoList[index].id)
-                      },
-                    );
-                  },
                 )
               : const VideoCardVSkeleton();
         },

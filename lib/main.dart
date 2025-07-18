@@ -4,6 +4,7 @@ import 'package:dilidili/http/dio_instance.dart';
 import 'package:dilidili/pages/search/view.dart';
 import 'package:dilidili/pages/video/detail/view.dart';
 import 'package:dilidili/router/app_pages.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:dilidili/utils/storage.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await ScreenUtil.ensureScreenSize();
   MediaKit.ensureInitialized();
+  await SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
   await SPStorage.init();
   await DioInstance.initDio();
   if (Platform.isAndroid) {

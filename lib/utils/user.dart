@@ -1,11 +1,9 @@
 import 'package:dilidili/http/user.dart';
-import 'package:dilidili/model/dynamics/up.dart';
 import 'package:dilidili/pages/home/controller.dart';
 import 'package:dilidili/pages/moments/controller.dart';
 import 'package:dilidili/pages/user/controller.dart';
 import 'package:dilidili/utils/cookie.dart';
 import 'package:dilidili/utils/storage.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
@@ -45,7 +43,6 @@ class UserUtils {
           momentsCtr.userLogin.value = true;
           momentsCtr.userInfo = result['data'];
           userCtr.userInfo.value = result['data'];
-          userCtr.userInfo.refresh();
           homeCtr.userFace.value = result['data'].face;
           homeCtr.userLogin.value = true;
           homeCtr.userName.value = result['data'].uname;
