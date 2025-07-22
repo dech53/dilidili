@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:dilidili/common/widgets/network_img_layer.dart';
 import 'package:dilidili/pages/home/controller.dart';
 import 'package:dilidili/utils/string_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
@@ -35,128 +38,144 @@ class _HomePageState extends State<HomePage>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      extendBody: true,
+      extendBodyBehindAppBar: true,
+      backgroundColor: Colors.transparent,
+      appBar: AppBar(
+        toolbarHeight: 0,
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        systemOverlayStyle: Platform.isAndroid
+            ? SystemUiOverlayStyle(
+                statusBarIconBrightness:
+                    Theme.of(context).brightness == Brightness.dark
+                        ? Brightness.light
+                        : Brightness.dark,
+              )
+            : Theme.of(context).brightness == Brightness.dark
+                ? SystemUiOverlayStyle.light
+                : SystemUiOverlayStyle.dark,
+      ),
       body: _getBodyUI(),
     );
   }
 
   Widget _getBodyUI() {
-    return SafeArea(
-      child: Column(
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          10.verticalSpace,
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15),
-            child: SizedBox(
-              height: ScreenUtil().screenHeight * 0.05,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  //问候语
-                  Obx(
-                    () => Text(
-                      "${StringUtils.getTimeGreeting()}${_homeController.userName.value == '' ? '' : ',${_homeController.userName.value}'}",
-                      style: TextStyle(
-                        fontSize: 22.sp,
-                        fontWeight: FontWeight.w600,
-                      ),
+    return Column(
+      mainAxisSize: MainAxisSize.max,
+      children: [
+        10.verticalSpace,
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15),
+          child: SizedBox(
+            height: ScreenUtil().screenHeight * 0.05,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                //问候语
+                Obx(
+                  () => Text(
+                    "${StringUtils.getTimeGreeting()}${_homeController.userName.value == '' ? '' : ',${_homeController.userName.value}'}",
+                    style: TextStyle(
+                      fontSize: 22.sp,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                  //头像
-                  Obx(
-                    () => NetworkImgLayer(
-                      width: 40,
-                      height: 40,
-                      type: 'avatar',
-                      src: _homeController.userFace.value,
-                    ),
-                  )
-                ],
-              ),
+                ),
+                //头像
+                Obx(
+                  () => NetworkImgLayer(
+                    width: 40,
+                    height: 40,
+                    type: 'avatar',
+                    src: _homeController.userFace.value,
+                  ),
+                )
+              ],
             ),
           ),
-          15.verticalSpace,
-          //搜索
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15),
-            child: SizedBox(
-              height: ScreenUtil().screenHeight * 0.05,
-              child: Row(
-                children: [
-                  //搜索框
-                  Expanded(
-                    child: InkWell(
-                      onTap: () => Get.toNamed('/search'),
-                      child: Container(
-                        padding: EdgeInsets.only(left: 12.w),
-                        alignment: Alignment.centerLeft,
-                        height: 40.h,
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.surfaceContainer,
-                          borderRadius: BorderRadius.circular(12.r),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.search_outlined,
-                              size: 25.r,
+        ),
+        15.verticalSpace,
+        //搜索
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15),
+          child: SizedBox(
+            height: ScreenUtil().screenHeight * 0.05,
+            child: Row(
+              children: [
+                //搜索框
+                Expanded(
+                  child: InkWell(
+                    onTap: () => Get.toNamed('/search'),
+                    child: Container(
+                      padding: EdgeInsets.only(left: 12.w),
+                      alignment: Alignment.centerLeft,
+                      height: 40.h,
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surfaceContainer,
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.search_outlined,
+                            size: 25.r,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                          5.horizontalSpace,
+                          Text(
+                            "搜索...",
+                            style: TextStyle(
                               color: Theme.of(context).colorScheme.onSurface,
                             ),
-                            5.horizontalSpace,
-                            Text(
-                              "搜索...",
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurface,
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                  Obx(
-                    () => Badge(
-                      offset: const Offset(-8, 5),
-                      label: Text(_homeController.unreadMsg.value.toString()),
-                      isLabelVisible: _homeController.unreadMsg.value > 0,
-                      child: IconButton(
-                        padding: EdgeInsets.zero,
-                        onPressed: () {
-                          if (_homeController.userLogin.value) {
-                            _homeController.unreadMsg.value = 0;
-                            Get.toNamed('/whisper');
-                          } else {
-                            SmartDialog.showToast("用户未登录");
-                          }
-                        },
-                        icon: Icon(
-                          Icons.notifications_outlined,
-                          size: 25.r,
-                          color: Theme.of(context).colorScheme.onSurface,
-                        ),
+                ),
+                Obx(
+                  () => Badge(
+                    offset: const Offset(-8, 5),
+                    label: Text(_homeController.unreadMsg.value.toString()),
+                    isLabelVisible: _homeController.unreadMsg.value > 0,
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      onPressed: () {
+                        if (_homeController.userLogin.value) {
+                          _homeController.unreadMsg.value = 0;
+                          Get.toNamed('/whisper');
+                        } else {
+                          SmartDialog.showToast("用户未登录");
+                        }
+                      },
+                      icon: Icon(
+                        Icons.notifications_outlined,
+                        size: 25.r,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
-                  )
-                ],
-              ),
+                  ),
+                )
+              ],
             ),
           ),
-          //Expanded + tabbar
-          //视频列表
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 15),
-            child: CustomTabs(),
+        ),
+        //Expanded + tabbar
+        //视频列表
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 15),
+          child: CustomTabs(),
+        ),
+        Expanded(
+          child: TabBarView(
+            controller: _homeController.tabController,
+            children: _homeController.tabsPageList,
           ),
-          Expanded(
-            child: TabBarView(
-              controller: _homeController.tabController,
-              children: _homeController.tabsPageList,
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
