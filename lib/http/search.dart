@@ -81,7 +81,6 @@ class SearchHttp {
       param: await WbiUtils.getWbi(
         {
           'keyword': keyword,
-          'web_location': 333.999,
         },
       ),
     );

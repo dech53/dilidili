@@ -22,6 +22,7 @@ void main() async {
   await SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
   await SPStorage.init();
+  await DioInstance.instance().getBuvid();
   await DioInstance.initDio();
   if (Platform.isAndroid) {
     try {

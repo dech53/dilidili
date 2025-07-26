@@ -19,6 +19,7 @@ class DPlayerController extends GetxController {
   Timer? _timerForSeek;
   //头部控制栏
   PreferredSizeWidget? headerControl;
+  PreferredSizeWidget? bottomControl;
   String videoType = 'archive';
   //弹幕组件
   Widget? danmuWidget;

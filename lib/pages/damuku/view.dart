@@ -16,10 +16,12 @@ class Danmuku extends StatefulWidget {
     required this.cid,
     required this.playerController,
     this.type = 'video',
+    this.createdController,
   });
   final int cid;
   final DPlayerController playerController;
   final String type;
+  final Function(DanmakuController)? createdController;
   @override
   State<Danmuku> createState() => _DanmukuState();
 }
@@ -102,6 +104,7 @@ class _DanmukuState extends State<Danmuku> {
             child: DanmakuView(
               createdController: (DanmakuController e) async {
                 playerController.danmakuController = _controller = e;
+                widget.createdController?.call(e);
               },
               option: DanmakuOption(
                 strokeWidth: 1.5,

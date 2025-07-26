@@ -92,6 +92,8 @@ dependencies:
       ref: master
   protobuf: ^4.1.0
   auto_orientation: ^2.3.1
+  web_socket_channel: ^3.0.3
+  brotli: ^0.6.0
   
 dev_dependencies:
   flutter_test:

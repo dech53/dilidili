@@ -9,6 +9,7 @@ import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 
 class DioInstance {
   static DioInstance? _instance;
+  static String? buvid;
   DioInstance._();
   static DioInstance instance() {
     return _instance ??= DioInstance._();
@@ -44,9 +45,15 @@ class DioInstance {
     dio.interceptors.add(cookieManager);
     final List<Cookie> cookie = await cookieManager.cookieJar
         .loadForRequest(Uri.parse(ApiString.baseUrl));
+    cookie.add(Cookie('buvid3', buvid ?? '')
+      ..httpOnly = true
+      ..domain = '.bilibili.com'
+      ..path = '/'
+      ..expires = DateTime.now().add(const Duration(days: 365)));
     final String cookieString = cookie
         .map((Cookie cookie) => '${cookie.name}=${cookie.value}')
         .join('; ');
+    print("Cookie: $cookieString");
     dio.options.headers['cookie'] = cookieString;
     // _dio.interceptors.add(ResponseInterceptor());
     // _dio.interceptors.add(PrintLogInterceptor());
@@ -61,6 +68,25 @@ class DioInstance {
       token = cookies.firstWhere((e) => e.name == 'bili_jct').value;
     }
     return token;
+  }
+
+  Future<String> getBuvid() async {
+    if (buvid != null) {
+      return buvid!;
+    }
+    if (buvid == null) {
+      try {
+        var result = await DioInstance.instance().get(
+          path: "${ApiString.baseUrl}/x/frontend/finger/spi",
+        );
+        buvid = result.data["data"]["b_3"].toString();
+      } catch (e) {
+        // 处理请求错误
+        buvid = '';
+        print("Error fetching buvid: $e");
+      }
+    }
+    return buvid!;
   }
 
   //get请求

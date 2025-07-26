@@ -121,4 +121,14 @@ class ApiString {
   static const String replyList = '/x/v2/reply';
   // 评论点赞
   static const String likeReply = '/x/v2/reply/action';
+
+  /// 直播间弹幕信息
+  static const String getDanmuInfo = '/xlive/web-room/v1/index/getDanmuInfo';
+
+  /// 直播间记录
+  static const String liveRoomEntry =
+      '/xlive/web-room/v1/index/roomEntryAction';
+
+  /// 直播间发送弹幕
+  static const String sendLiveMsg = '/msg/send';
 }
