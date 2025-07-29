@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dilidili/common/constants.dart';
 import 'package:dilidili/common/widgets/badge.dart';
 import 'package:dilidili/common/widgets/network_img_layer.dart';

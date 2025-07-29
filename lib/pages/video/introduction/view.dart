@@ -1,3 +1,4 @@
+import 'package:dilidili/common/skeleton/video_info_skeleton.dart';
 import 'package:dilidili/common/widgets/action_item.dart';
 import 'package:dilidili/common/widgets/http_error.dart';
 import 'package:dilidili/common/widgets/network_img_layer.dart';
@@ -90,17 +91,7 @@ class _VideoIntroPanelState extends State<VideoIntroPanel>
             );
           }
         } else {
-          return SliverToBoxAdapter(
-            child: SizedBox(
-              height: 100,
-              child: Center(
-                child: Lottie.asset(
-                  'assets/loading.json',
-                  width: 200,
-                ),
-              ),
-            ),
-          );
+          return VideoInfoSkeleton();
         }
       },
     );

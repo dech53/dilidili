@@ -273,6 +273,7 @@ class _MomentsPageState extends State<MomentsPage>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -286,7 +287,6 @@ class _MomentsPageState extends State<MomentsPage>
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  
                   Obx(
                     () => _momentsController.userLogin.value
                         ? Visibility(
