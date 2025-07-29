@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dilidili/model/video/hot_video.dart';
 import 'package:json_annotation/json_annotation.dart';
 part 'video_basic_info.g.dart';
@@ -116,7 +118,6 @@ class Dimension {
   Map<String, dynamic> toJson() => _$DimensionToJson(this);
 }
 
-@JsonSerializable(fieldRename: FieldRename.snake)
 class Part {
   int? cid;
   int? page;
@@ -141,8 +142,39 @@ class Part {
     this.firstFrame,
     this.cover,
   });
-  factory Part.fromJson(Map<String, dynamic> json) => _$PartFromJson(json);
-  Map<String, dynamic> toJson() => _$PartToJson(this);
+
+  fromRawJson(String str) => Part.fromJson(json.decode(str));
+
+  String toRawJson() => json.encode(toJson());
+
+  Part.fromJson(Map<String, dynamic> json) {
+    cid = json["cid"];
+    page = json["page"];
+    from = json["from"];
+    pagePart = json["part"];
+    duration = json["duration"];
+    vid = json["vid"];
+    weblink = json["weblink"];
+    dimension = json["dimension"] == null
+        ? null
+        : Dimension.fromJson(json["dimension"]);
+    firstFrame = json["first_frame"] ?? '';
+    cover = json["first_frame"] ?? '';
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data["cid"] = cid;
+    data["page"] = page;
+    data["from"] = from;
+    data["part"] = pagePart;
+    data["duration"] = duration;
+    data["vid"] = vid;
+    data["weblink"] = weblink;
+    data["dimension"] = dimension?.toJson();
+    data["first_frame"] = firstFrame;
+    return data;
+  }
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake)
@@ -330,6 +362,7 @@ class ArgueInfo {
       _$ArgueInfoFromJson(json);
   Map<String, dynamic> toJson() => _$ArgueInfoToJson(this);
 }
+
 @JsonSerializable()
 class Owner {
   int mid;

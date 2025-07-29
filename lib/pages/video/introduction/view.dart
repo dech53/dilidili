@@ -1,11 +1,14 @@
 import 'package:dilidili/common/widgets/action_item.dart';
 import 'package:dilidili/common/widgets/http_error.dart';
 import 'package:dilidili/common/widgets/network_img_layer.dart';
+import 'package:dilidili/common/widgets/page_panel.dart';
 import 'package:dilidili/model/nav_user_info.dart';
 import 'package:dilidili/model/video/video_basic_info.dart';
+import 'package:dilidili/model/video/video_tag.dart';
 import 'package:dilidili/pages/video/detail/controller.dart';
 import 'package:dilidili/pages/video/introduction/controller.dart';
 import 'package:dilidili/pages/video/introduction/widgets/intro_detail.dart';
+import 'package:dilidili/pages/video/introduction/widgets/season_panel.dart';
 import 'package:dilidili/utils/num_utils.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
@@ -56,6 +59,7 @@ class _VideoIntroPanelState extends State<VideoIntroPanel>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return FutureBuilder(
       future: _futureBuilderFuture,
       builder: (context, snapshot) {
@@ -69,6 +73,7 @@ class _VideoIntroPanelState extends State<VideoIntroPanel>
               () => VideoInfo(
                 bvid: widget.bvid,
                 videoDetail: videoIntroController.videoDetail.value,
+                videoTags: videoIntroController.videoTags.value,
                 userInfo: videoIntroController.userInfo.value,
                 heroTag: heroTag,
               ),
@@ -104,6 +109,7 @@ class _VideoIntroPanelState extends State<VideoIntroPanel>
 
 class VideoInfo extends StatefulWidget {
   final VideoDetailData? videoDetail;
+  final List<VideoTag>? videoTags;
   final String bvid;
   final String? heroTag;
   final UserCardInfo? userInfo;
@@ -111,6 +117,7 @@ class VideoInfo extends StatefulWidget {
     Key? key,
     this.videoDetail,
     this.heroTag,
+    this.videoTags,
     required this.bvid,
     this.userInfo,
   }) : super(key: key);
@@ -163,7 +170,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
               child: GestureDetector(
                 onTap: () {
                   Get.toNamed(
-                    '/member?mid=${videoIntroController.mid}',
+                    '/member?mid=${widget.videoDetail!.owner!.mid}',
                     arguments: {
                       'face': widget.videoDetail!.owner!.face,
                       'heroTag': widget.heroTag,
@@ -346,6 +353,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
               collapsed: const SizedBox(height: 0),
               expanded: IntroDetail(
                 videoDetail: widget.videoDetail,
+                videoTags: widget.videoTags,
               ),
               theme: const ExpandableThemeData(
                 animationDuration: Duration(milliseconds: 300),
@@ -355,6 +363,44 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                 sizeCurve: Curves.linear,
               ),
             ),
+            if (widget.videoDetail!.ugcSeason != null) ...[
+              Obx(
+                () => SeasonPanel(
+                  ugcSeason: widget.videoDetail!.ugcSeason!,
+                  cid: videoIntroController.lastPlayCid.value != 0
+                      ? videoIntroController.lastPlayCid.value
+                      : widget.videoDetail!.pages!.first.cid,
+                  sheetHeight: videoDetailCtr.sheetHeight.value,
+                  changeFuc: (bvid, cid, aid, cover) =>
+                      videoIntroController.changeSeasonOrbangu(
+                    bvid,
+                    cid,
+                    aid,
+                    cover,
+                  ),
+                  videoIntroController: videoIntroController,
+                ),
+              )
+            ],
+            // 合集 videoEpisode
+            if (widget.videoDetail!.pages != null &&
+                widget.videoDetail!.pages!.length > 1) ...[
+              Obx(
+                () => PagesPanel(
+                  pages: widget.videoDetail!.pages!,
+                  cid: videoIntroController.lastPlayCid.value,
+                  sheetHeight: videoDetailCtr.sheetHeight.value,
+                  changeFuc: (cid, cover) =>
+                      videoIntroController.changeSeasonOrbangu(
+                    videoIntroController.bvid,
+                    cid,
+                    null,
+                    cover,
+                  ),
+                  videoIntroCtr: videoIntroController,
+                ),
+              )
+            ],
             //点赞、投币、收藏、转发
             Material(child: actionGrid(context, videoIntroController)),
           ],
@@ -372,15 +418,6 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
           onTap: videoIntroController.actionLikeVideo,
           selectStatus: videoIntroController.hasLike.value,
           text: NumUtils.int2Num(widget.videoDetail!.stat!.like!),
-        ),
-      ),
-      'dislike': Obx(
-        () => ActionItem(
-          icon: const Icon(FontAwesomeIcons.thumbsDown),
-          selectIcon: const Icon(FontAwesomeIcons.solidThumbsDown),
-          onTap: () {},
-          selectStatus: videoIntroController.hasDisLike.value,
-          text: '不喜欢',
         ),
       ),
       'coin': Obx(
@@ -403,7 +440,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
         ),
       ),
       'share': ActionItem(
-        icon: const Icon(FontAwesomeIcons.shareFromSquare),
+        icon: const Icon(FontAwesomeIcons.share),
         onTap: () => videoIntroController.actionShareVideo(),
         selectStatus: false,
         text: NumUtils.int2Num(widget.videoDetail!.stat!.share!),
@@ -415,10 +452,12 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
       builder: (BuildContext context, BoxConstraints constraints) {
         return Container(
           margin: const EdgeInsets.only(top: 6, bottom: 4),
-          height: constraints.maxWidth / 5,
-          child: ListView(
+          height: constraints.maxWidth / 11,
+          child: ListView.separated(
             scrollDirection: Axis.horizontal,
-            children: list,
+            itemCount: list.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 8),
+            itemBuilder: (_, index) => list[index],
           ),
         );
       },

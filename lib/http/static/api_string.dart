@@ -131,4 +131,7 @@ class ApiString {
 
   /// 直播间发送弹幕
   static const String sendLiveMsg = '/msg/send';
+
+  /// 视频相关tag
+  static const String videoTag = '/x/web-interface/view/detail/tag';
 }

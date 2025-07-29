@@ -28,8 +28,15 @@ Widget addWidget(item, context, type, {floor = 1}) {
             String cover = dynamicProperty[type].cover;
             try {
               int cid = await SearchHttp.ab2c(bvid: bvid);
-              Get.toNamed('/video?bvid=$bvid&cid=$cid',
-                  arguments: {'pic': cover, 'heroTag': bvid});
+              Get.toNamed(
+                '/video?bvid=$bvid&cid=$cid',preventDuplicates: false,
+                arguments: {
+                  'pic': cover,
+                  'heroTag': bvid,
+                  'bvid': bvid,
+                  'cid': cid.toString()
+                },
+              );
             } catch (err) {
               SmartDialog.showToast(err.toString());
             }

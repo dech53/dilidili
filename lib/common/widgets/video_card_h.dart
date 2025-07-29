@@ -37,8 +37,14 @@ class VideoCardH extends StatelessWidget {
           final int cid =
               videoItem.cid ?? await SearchHttp.ab2c(aid: aid, bvid: bvid);
           Get.toNamed(
-              '/video?bvid=${videoItem.bvid}&cid=${cid}&mid=${videoItem.owner.mid}',
-              arguments: {'heroTag': StringUtils.makeHeroTag(videoItem.aid)});
+            '/video?bvid=${videoItem.bvid}&cid=${cid}',
+            preventDuplicates: false,
+            arguments: {
+              'heroTag': StringUtils.makeHeroTag(videoItem.aid),
+              'bvid': videoItem.bvid,
+              'cid': cid.toString(),
+            },
+          );
         }
       },
       child: Padding(

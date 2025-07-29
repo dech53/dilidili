@@ -1,3 +1,4 @@
+import 'package:dilidili/model/video/video_tag.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,8 +9,10 @@ class IntroDetail extends StatelessWidget {
   const IntroDetail({
     super.key,
     this.videoDetail,
+    this.videoTags,
   });
   final dynamic videoDetail;
+  final List<VideoTag>? videoTags;
 
   @override
   Widget build(BuildContext context) {
@@ -49,8 +52,8 @@ class IntroDetail extends StatelessWidget {
               )
             ],
           ),
-          if (videoDetail?.desc != "") const SizedBox(height: 4),
-          if (videoDetail?.desc != "")
+          if (videoDetail?.desc != "") ...[
+            const SizedBox(height: 4),
             SelectableRegion(
               focusNode: FocusNode(),
               selectionControls: MaterialTextSelectionControls(),
@@ -63,6 +66,41 @@ class IntroDetail extends StatelessWidget {
                 ),
               ),
             ),
+          ],
+          // 视频标签展示
+          if (videoTags != null && videoTags!.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: videoTags!.map((tag) {
+                return InkWell(
+                  borderRadius: BorderRadius.circular(6),
+                  onTap: () {
+                    Get.toNamed('/searchResult',
+                        parameters: {'keyword': tag.tagName!});
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).disabledColor.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      tag.tagName ?? '',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Theme.of(context).textTheme.bodySmall?.color,
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ]
         ],
       ),
     );

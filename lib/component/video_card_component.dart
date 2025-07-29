@@ -22,8 +22,12 @@ class VideoCardComponent extends StatelessWidget {
     switch (goto) {
       case 'av':
         Get.toNamed(
-          '/video?bvid=${video.bvid}&cid=${video.cid}&mid=${video.owner.mid}',
-          arguments: {'heroTag': StringUtils.makeHeroTag(video.id)},
+          '/video?bvid=${video.bvid}&cid=${video.cid}',preventDuplicates: false,
+          arguments: {
+            'heroTag': StringUtils.makeHeroTag(video.id),
+            'bvid': video.bvid,
+            'cid': video.cid.toString(),
+          },
         );
         break;
       // 动态

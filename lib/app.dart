@@ -5,6 +5,7 @@ import 'package:dilidili/utils/storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 
 Size get designSize {
   final firstView = WidgetsBinding.instance.platformDispatcher.views.first;
@@ -24,6 +25,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double statusBarHeight = MediaQuery.of(context).padding.top;
+    Box localCache = SPStorage.localCache;
+    double sheetHeight = MediaQuery.sizeOf(context).height -
+        MediaQuery.of(context).padding.top -
+        MediaQuery.sizeOf(context).width * 9 / 16;
+    localCache.put('sheetHeight', sheetHeight);
     SPStorage.statusBarHeight = statusBarHeight;
     final themeController = Get.put(ThemeController());
     return ScreenUtilInit(

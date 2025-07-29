@@ -31,7 +31,7 @@ class LiveHttp {
   static Future liveDanmakuInfo({roomId}) async {
     var res = await DioInstance.instance().get(
       path:
-          'https://api.live.bilibili.com/xlive/web-room/v1/index/getDanmuInfo',
+          ApiString.live_base + ApiString.getDanmuInfo,
       param: await WbiUtils.getWbi(
         {
           'id': roomId,

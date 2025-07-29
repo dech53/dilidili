@@ -11,14 +11,13 @@ import 'package:dilidili/pages/video/detail/widgets/header_control.dart';
 import 'package:dilidili/utils/id_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 
 class VideoDetailController extends GetxController
     with GetSingleTickerProviderStateMixin {
   DPlayerController dPlayerController = DPlayerController();
   // 路由传参
-  String bvid = Get.parameters['bvid']!;
+  String bvid = Get.arguments['bvid']!;
   late VideoQuality currentVideoQa;
   RxString archiveSourceType = 'dash'.obs;
   RxBool enableHA = false.obs;
@@ -35,7 +34,7 @@ class VideoDetailController extends GetxController
     BottomControlType.space,
     BottomControlType.fullscreen,
   ].obs;
-  RxInt cid = int.parse(Get.parameters['cid']!).obs;
+  RxInt cid = int.parse(Get.arguments['cid']!).obs;
   RxInt danmakuCid = 0.obs;
   RxInt oid = 0.obs;
   late PlayUrlModel data;
@@ -50,7 +49,7 @@ class VideoDetailController extends GetxController
     super.onInit();
     tabCtr = TabController(length: 2, vsync: this);
     danmakuCid.value = cid.value;
-    oid.value = IdUtils.bv2av(Get.parameters['bvid']!);
+    oid.value = IdUtils.bv2av(Get.arguments['bvid']!);
 
     headerControl = HeaderControl(
       controller: dPlayerController,

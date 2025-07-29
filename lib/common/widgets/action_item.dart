@@ -1,6 +1,4 @@
-import 'package:dilidili/common/constants.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 class ActionItem extends StatelessWidget {
   final dynamic icon;
@@ -22,51 +20,51 @@ class ActionItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Color bgColor = selectStatus
+        ? Theme.of(context).colorScheme.primary.withOpacity(0.05)
+        : Colors.grey.withOpacity(0.2);
+    final Color contentColor =
+        selectStatus ? Theme.of(context).colorScheme.primary.withOpacity(0.8) : Colors.black.withOpacity(0.7);
     return InkWell(
       onTap: () => {
         onTap!(),
       },
       onLongPress: () => {
-        if (onLongPress != null) {onLongPress!()}
+        if (onLongPress != null)
+          {
+            onLongPress!(),
+          }
       },
-      borderRadius: StyleString.mdRadius,
-      child: SizedBox(
-        width: (Get.size.width - 24) / 5,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+      borderRadius: BorderRadius.circular(20.0),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(20.0),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const SizedBox(height: 4),
-            AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
-              transitionBuilder: (Widget child, Animation<double> animation) {
-                return ScaleTransition(scale: animation, child: child);
-              },
-              child: icon is Icon
-                  ? Icon(
-                      selectStatus
-                          ? selectIcon!.icon ?? icon!.icon
-                          : icon!.icon,
-                      color: selectStatus
-                          ? Theme.of(context).colorScheme.primary
-                          : Theme.of(context).colorScheme.outline,
-                      size: 20,
-                    )
-                  : Image.asset(
-                      key: ValueKey<bool>(selectStatus),
-                      'assets/images/coin.png',
-                      width: const IconThemeData.fallback().size,
-                      color: selectStatus
-                          ? Theme.of(context).colorScheme.primary
-                          : Theme.of(context).colorScheme.outline,
-                    ),
-            ),
-            const SizedBox(height: 6),
+            icon is Icon
+                ? Icon(
+                    selectStatus
+                        ? (selectIcon?.icon ?? (icon as Icon).icon)
+                        : (icon as Icon).icon,
+                    color: contentColor,
+                    size: 14,
+                  )
+                : Image.asset(
+                    'assets/images/coin.png',
+                    width: IconTheme.of(context).size,
+                    color: contentColor,
+                  ),
+            const SizedBox(width: 6),
             Text(
               text ?? '',
               style: TextStyle(
-                color:
-                    selectStatus ? Theme.of(context).colorScheme.primary : null,
-                fontSize: Theme.of(context).textTheme.labelSmall!.fontSize,
+                color: contentColor,
+                fontSize: Theme.of(context).textTheme.labelMedium?.fontSize,
               ),
             ),
           ],

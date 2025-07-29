@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 
 class ReleatedVideoController extends GetxController {
 
-  String bvid = Get.parameters['bvid'] ?? "";
+  String bvid = Get.arguments['bvid'] ?? "";
 
   RxList relatedVideoList = <RelatedVideoItem>[].obs;
   

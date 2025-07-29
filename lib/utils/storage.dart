@@ -10,7 +10,7 @@ class SPStorage {
   static late final Box<dynamic> userInfo;
   static late final SharedPreferencesInstance prefs;
   static late double statusBarHeight;
-
+  static late final Box<dynamic> localCache;
   static Future<void> init() async {
     final dir = await getApplicationDocumentsDirectory();
     await Hive.initFlutter('${dir.path}/hive');
@@ -21,6 +21,13 @@ class SPStorage {
       'userInfo',
       compactionStrategy: (int entries, int deletedEntries) {
         return deletedEntries > 2;
+      },
+    );
+    // 本地缓存
+    localCache = await Hive.openBox(
+      'localCache',
+      compactionStrategy: (int entries, int deletedEntries) {
+        return deletedEntries > 4;
       },
     );
     prefs = await SharedPreferencesInstance.instance();

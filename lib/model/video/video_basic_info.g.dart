@@ -134,34 +134,6 @@ Map<String, dynamic> _$DimensionToJson(Dimension instance) => <String, dynamic>{
       'rotate': instance.rotate,
     };
 
-Part _$PartFromJson(Map<String, dynamic> json) => Part(
-      cid: (json['cid'] as num?)?.toInt(),
-      page: (json['page'] as num?)?.toInt(),
-      from: json['from'] as String?,
-      pagePart: json['page_part'] as String?,
-      duration: (json['duration'] as num?)?.toInt(),
-      vid: json['vid'] as String?,
-      weblink: json['weblink'] as String?,
-      dimension: json['dimension'] == null
-          ? null
-          : Dimension.fromJson(json['dimension'] as Map<String, dynamic>),
-      firstFrame: json['first_frame'] as String?,
-      cover: json['cover'] as String?,
-    );
-
-Map<String, dynamic> _$PartToJson(Part instance) => <String, dynamic>{
-      'cid': instance.cid,
-      'page': instance.page,
-      'from': instance.from,
-      'page_part': instance.pagePart,
-      'duration': instance.duration,
-      'vid': instance.vid,
-      'weblink': instance.weblink,
-      'dimension': instance.dimension,
-      'first_frame': instance.firstFrame,
-      'cover': instance.cover,
-    };
-
 Subtitle _$SubtitleFromJson(Map<String, dynamic> json) => Subtitle(
       allowSubmit: json['allow_submit'] as bool?,
       list: json['list'] as List<dynamic>?,

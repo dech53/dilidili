@@ -17,6 +17,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 import 'package:lottie/lottie.dart';
 
 class VideoPage extends StatefulWidget {
@@ -32,6 +33,7 @@ class _VideoPageState extends State<VideoPage>
   late VideoDetailController vdCtr;
   late double statusBarHeight;
   Rx<DPlayerStatus> playerStatus = DPlayerStatus.playing.obs;
+  final Box<dynamic> localCache = SPStorage.localCache;
   late VideoIntroController videoIntroCtr;
   DPlayerController? dPlayerController;
   late StreamController<double> appbarStream;
@@ -41,7 +43,7 @@ class _VideoPageState extends State<VideoPage>
   // late int cid;
   late String heroTag;
   RxBool isShowing = true.obs;
-  late int mid;
+  // late int mid;
   late Future _futureBuilderFuture;
 
   @override
@@ -87,11 +89,12 @@ class _VideoPageState extends State<VideoPage>
   void initState() {
     super.initState();
     heroTag = Get.arguments['heroTag'];
-    bvid = Get.parameters['bvid']!;
+    bvid = Get.arguments['bvid']!;
     // cid = int.parse(Get.parameters['cid']!);
-    mid = int.parse(Get.parameters['mid']!);
+    // mid = int.parse(Get.arguments['mid']!);
     vdCtr = Get.put(VideoDetailController(), tag: heroTag);
-    videoIntroCtr = Get.put(VideoIntroController(bvid: Get.parameters['bvid']!),
+    vdCtr.sheetHeight.value = localCache.get('sheetHeight');
+    videoIntroCtr = Get.put(VideoIntroController(bvid: Get.arguments['bvid']!),
         tag: heroTag);
     _futureBuilderFuture = vdCtr.queryVideoUrl();
     dPlayerController = vdCtr.dPlayerController;

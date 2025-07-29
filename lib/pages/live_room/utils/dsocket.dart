@@ -43,7 +43,7 @@ class DSocket {
   // 建立连接
   Future connect() async {
     // 连接之前关闭上次连接
-    // onClose();
+    onClose();
     try {
       channel = IOWebSocketChannel.connect(
         url,

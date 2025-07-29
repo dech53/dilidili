@@ -9,6 +9,7 @@ import 'package:dilidili/model/video/hot_video.dart';
 import 'package:dilidili/model/video/related_video.dart';
 import 'package:dilidili/model/video/url.dart';
 import 'package:dilidili/model/video/video_basic_info.dart';
+import 'package:dilidili/model/video/video_tag.dart';
 import 'package:dilidili/utils/wbi_utils.dart';
 
 class VideoHttp {
@@ -35,6 +36,30 @@ class VideoHttp {
     if (res.data['code'] == 0) {
       var result = Rootdata.fromJson(
           res.data, (dynamic data) => VideoDetailData.fromJson(data));
+      return {'status': true, 'data': result.data};
+    } else {
+      return {
+        'status': false,
+        'data': null,
+        'code': res.data['code'],
+        'msg': res.data['message'],
+      };
+    }
+  }
+
+  static Future videoTag({required String bvid}) async {
+    var res = await DioInstance.instance().get(
+      path: ApiString.baseUrl + ApiString.videoTag,
+      param: {
+        'bvid': bvid,
+      },
+    );
+    if (res.data['code'] == 0) {
+      var result = Rootdata.fromJson(
+        res.data,
+        (dynamic data) =>
+            (data as List).map((e) => VideoTag.fromJson(e)).toList(),
+      );
       return {'status': true, 'data': result.data};
     } else {
       return {
@@ -328,7 +353,8 @@ class VideoHttp {
   // 视频排行
   static Future getRankVideoList(int rid) async {
     try {
-      var rankApi = "${ApiString.baseUrl}${ApiString.getRankApi}?rid=$rid&type=all";
+      var rankApi =
+          "${ApiString.baseUrl}${ApiString.getRankApi}?rid=$rid&type=all";
       var res = await DioInstance.instance().get(path: rankApi);
       if (res.data['code'] == 0) {
         List<HotVideoItemModel> list = [];

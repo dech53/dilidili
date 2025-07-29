@@ -69,6 +69,7 @@ class _SearchPanelState extends State<SearchPanel>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return RefreshIndicator(
       onRefresh: () async {
         await _searchPanelController.onRefresh();

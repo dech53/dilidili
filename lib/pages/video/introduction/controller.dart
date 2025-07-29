@@ -6,6 +6,7 @@ import 'package:dilidili/http/video.dart';
 import 'package:dilidili/model/nav_user_info.dart';
 import 'package:dilidili/model/user/fav_folder.dart';
 import 'package:dilidili/model/video/video_basic_info.dart';
+import 'package:dilidili/model/video/video_tag.dart';
 import 'package:dilidili/utils/id_utils.dart';
 import 'package:dilidili/utils/storage.dart';
 import 'package:flutter/material.dart';
@@ -30,12 +31,14 @@ class VideoIntroController extends GetxController {
   RxBool hasDisLike = false.obs;
   // 是否投币
   RxBool hasCoin = false.obs;
+  PersistentBottomSheetController? bottomSheetController;
   // 是否收藏
   RxBool hasFav = false.obs;
   // up mid
-  int mid = int.parse(Get.parameters['mid']!);
+  // int mid = int.parse(Get.arguments['mid']!);
   Rx<UserCardInfo> userInfo = UserCardInfo().obs;
   Rx<VideoDetailData> videoDetail = VideoDetailData().obs;
+  RxList<VideoTag> videoTags = <VideoTag>[].obs;
   // 最近播放集数
   RxInt lastPlayCid = 0.obs;
   @override
@@ -44,7 +47,7 @@ class VideoIntroController extends GetxController {
     // 定时更新在线人数
     queryOnlineTotal();
     startTimer();
-    lastPlayCid.value = int.parse(Get.parameters['cid']!);
+    lastPlayCid.value = int.parse(Get.arguments['cid']!);
   }
 
   @override
@@ -65,6 +68,14 @@ class VideoIntroController extends GetxController {
     });
   }
 
+  // 修改分P或番剧分集
+  Future changeSeasonOrbangu(
+    String bvid,
+    int cid,
+    int? aid,
+    String? cover,
+  ) async {}
+
   // 查看同时在看人数
   Future queryOnlineTotal() async {
     var result = await VideoHttp.onlineTotal(
@@ -79,16 +90,21 @@ class VideoIntroController extends GetxController {
 
   //查询视频信息
   Future queryVideoIntro() async {
+    var tagResult = await VideoHttp.videoTag(bvid: bvid);
+    if (tagResult['status']) {
+      videoTags.value = tagResult['data'];
+    }
     var result = await VideoHttp.videoIntro(bvid: bvid);
     if (result['status']) {
       videoDetail.value = result['data'];
     }
+
     await queryUserInfo();
     queryFollowStatus();
     queryHasLikeVideo();
     queryHasCoinVideo();
     queryHasFavVideo();
-    return result;
+    return tagResult;
   }
 
   //获取用户所有收藏夹信息
@@ -108,7 +124,7 @@ class VideoIntroController extends GetxController {
     if (videoDetail.value.owner == null) {
       return;
     }
-    var result = await VideoHttp.hasFollow(mid);
+    var result = await VideoHttp.hasFollow(videoDetail.value.owner!.mid);
     if (result['status']) {
       followStatus.value = result['data'];
     }
@@ -219,7 +235,7 @@ class VideoIntroController extends GetxController {
         break;
     }
     var result = await VideoHttp.relationMod(
-      mid: mid,
+      mid: videoDetail.value.owner!.mid,
       act: actionStatus,
       reSrc: 14,
     );
@@ -265,7 +281,7 @@ class VideoIntroController extends GetxController {
 
   // 获取up信息
   Future queryUserInfo() async {
-    var result = await VideoHttp.userInfo(mid: mid);
+    var result = await VideoHttp.userInfo(mid: videoDetail.value.owner!.mid);
     if (result['status']) {
       userInfo.value = result['data'];
     }

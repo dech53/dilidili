@@ -225,8 +225,12 @@ InlineSpan richNode(item, context) {
                 onTap: () async {
                   try {
                     int cid = await SearchHttp.ab2c(bvid: i.rid);
-                    Get.toNamed('/video?bvid=${i.rid}&cid=$cid',
-                        arguments: {'pic': null, 'heroTag': i.rid});
+                    Get.toNamed('/video?bvid=${i.rid}&cid=$cid',preventDuplicates: false, arguments: {
+                      'pic': null,
+                      'heroTag': i.rid,
+                      'bvid': i.rid,
+                      'cid': cid.toString()
+                    });
                   } catch (err) {
                     SmartDialog.showToast(err.toString());
                   }
