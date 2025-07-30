@@ -22,7 +22,7 @@ class VideoCardComponent extends StatelessWidget {
     switch (goto) {
       case 'av':
         Get.toNamed(
-          '/video?bvid=${video.bvid}&cid=${video.cid}',preventDuplicates: false,
+          '/video/bvid=${video.bvid}', 
           arguments: {
             'heroTag': StringUtils.makeHeroTag(video.id),
             'bvid': video.bvid,

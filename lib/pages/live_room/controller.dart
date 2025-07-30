@@ -97,6 +97,19 @@ class LiveRoomController extends GetxController {
     }
   }
 
+  // 修改画质
+  void changeQn(int qn) async {
+    tempCurrentQn = currentQn;
+    if (currentQn == qn) {
+      return;
+    }
+    currentQn = qn;
+    currentQnDesc.value = LiveQuality.values
+        .firstWhere((element) => element.code == currentQn)
+        .description;
+    await queryLiveInfo();
+  }
+
   playerInit(source) async {
     await dPlayerController.setDataSource(
       DataSource(

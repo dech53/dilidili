@@ -1,5 +1,6 @@
 import 'package:dilidili/common/skeleton/video_info_skeleton.dart';
 import 'package:dilidili/common/widgets/action_item.dart';
+import 'package:dilidili/common/widgets/badge.dart';
 import 'package:dilidili/common/widgets/http_error.dart';
 import 'package:dilidili/common/widgets/network_img_layer.dart';
 import 'package:dilidili/common/widgets/page_panel.dart';
@@ -265,23 +266,64 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
               },
               child: ExpandablePanel(
                 controller: _expandableController,
-                collapsed: Text(
-                  widget.videoDetail!.title!,
-                  softWrap: true,
+                collapsed: RichText(
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
+                  text: TextSpan(
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black, // 按你主题调整
+                    ),
+                    children: [
+                      // 徽章作为行内 widget
+                      if (widget.videoDetail!.copyright == 2)
+                        const WidgetSpan(
+                          alignment: PlaceholderAlignment.middle,
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 4),
+                            child: PBadge(
+                              text: '转载',
+                              stack: 'normal',
+                              size: 'medium',
+                              type: 'color',
+                              fs: 11,
+                            ),
+                          ),
+                        ),
+                      // 标题文字
+                      TextSpan(text: widget.videoDetail!.title),
+                    ],
                   ),
                 ),
-                expanded: Text(
-                  widget.videoDetail!.title!,
-                  softWrap: true,
+                expanded: RichText(
                   maxLines: 10,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
+                  overflow: TextOverflow.ellipsis,
+                  text: TextSpan(
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black, // 按你主题调整
+                    ),
+                    children: [
+                      // 徽章作为行内 widget
+                      if (widget.videoDetail!.copyright == 2)
+                        const WidgetSpan(
+                          alignment: PlaceholderAlignment.middle,
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 4),
+                            child: PBadge(
+                              text: '转载',
+                              stack: 'normal',
+                              size: 'medium',
+                              type: 'color',
+                              fs: 11,
+                            ),
+                          ),
+                        ),
+                      // 标题文字
+                      TextSpan(text: widget.videoDetail!.title),
+                    ],
                   ),
                 ),
                 theme: const ExpandableThemeData(

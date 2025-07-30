@@ -142,7 +142,7 @@ class _PagesPanelState extends State<PagesPanel> {
                 width: 150,
                 margin: const EdgeInsets.only(right: 10),
                 child: Material(
-                  color: Theme.of(context).colorScheme.onInverseSurface,
+                  color: Theme.of(context).colorScheme.onInverseSurface.withOpacity(0.8),
                   borderRadius: BorderRadius.circular(6),
                   clipBehavior: Clip.hardEdge,
                   child: InkWell(

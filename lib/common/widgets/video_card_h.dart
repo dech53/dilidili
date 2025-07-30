@@ -36,8 +36,7 @@ class VideoCardH extends StatelessWidget {
           final int cid =
               videoItem.cid ?? await SearchHttp.ab2c(aid: aid, bvid: bvid);
           Get.toNamed(
-            '/video?bvid=${videoItem.bvid}&cid=${cid}',
-            preventDuplicates: false,
+            '/video/bvid=${videoItem.bvid}',
             arguments: {
               'heroTag': StringUtils.makeHeroTag(videoItem.aid),
               'bvid': videoItem.bvid,
@@ -145,24 +144,32 @@ class VideoContent extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const Icon(
+                Icon(
                   Icons.play_circle_outline_rounded,
                   size: 13,
+                  color: Theme.of(context).colorScheme.outline,
                 ),
                 1.horizontalSpace,
                 Text(
                   NumUtils.int2Num(videoItem.stat.view as int),
-                  style: const TextStyle(fontSize: 9, color: Colors.black),
+                  style: TextStyle(
+                    fontSize: 9,
+                    color: Theme.of(context).colorScheme.outline,
+                  ),
                 ),
                 8.horizontalSpace,
-                const Icon(
+                Icon(
                   Icons.subtitles_outlined,
                   size: 13,
+                  color: Theme.of(context).colorScheme.outline,
                 ),
                 1.horizontalSpace,
                 Text(
                   NumUtils.int2Num(videoItem.stat.danmaku as int),
-                  style: const TextStyle(fontSize: 9, color: Colors.black),
+                  style: TextStyle(
+                    fontSize: 9,
+                    color: Theme.of(context).colorScheme.outline,
+                  ),
                 ),
               ],
             )

@@ -1,4 +1,5 @@
 import 'package:dilidili/model/video/video_tag.dart';
+import 'package:dilidili/utils/string_utils.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -75,7 +76,7 @@ class IntroDetail extends StatelessWidget {
               runSpacing: 8,
               children: videoTags!.map((tag) {
                 return InkWell(
-                  borderRadius: BorderRadius.circular(6),
+                  borderRadius: BorderRadius.circular(5),
                   onTap: () {
                     Get.toNamed('/searchResult',
                         parameters: {'keyword': tag.tagName!});
@@ -87,13 +88,17 @@ class IntroDetail extends StatelessWidget {
                     ),
                     decoration: BoxDecoration(
                       color: Theme.of(context).disabledColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(6),
+                      borderRadius: BorderRadius.circular(5),
                     ),
                     child: Text(
                       tag.tagName ?? '',
                       style: TextStyle(
                         fontSize: 12,
-                        color: Theme.of(context).textTheme.bodySmall?.color,
+                        color: Theme.of(context)
+                            .textTheme
+                            .labelMedium!
+                            .color!
+                            .withOpacity(0.7),
                       ),
                     ),
                   ),
@@ -155,6 +160,13 @@ class IntroDetail extends StatelessWidget {
 
           if (previousEndIndex < currentDesc.rawText.length) {
             spanChildren.add(TextSpan(
+                style: TextStyle(fontSize: 12,
+                  color: Theme.of(context)
+                      .textTheme
+                      .labelMedium!
+                      .color!
+                      .withOpacity(0.7),
+                ),
                 text: currentDesc.rawText.substring(previousEndIndex)));
           }
 
@@ -163,6 +175,7 @@ class IntroDetail extends StatelessWidget {
         case 2:
           final Color colorSchemePrimary =
               Theme.of(context).colorScheme.primary;
+          final String heroTag = StringUtils.makeHeroTag(currentDesc.bizId);
           return TextSpan(
             text: '@${currentDesc.rawText}',
             style: TextStyle(color: colorSchemePrimary),
@@ -172,6 +185,7 @@ class IntroDetail extends StatelessWidget {
                   '/member?mid=${currentDesc.bizId}',
                   arguments: {
                     'face': videoDetail!.owner!.face!,
+                    'heroTag': heroTag,
                   },
                 );
               },

@@ -91,7 +91,7 @@ class SearchPanelController extends GetxController {
               matchRes[matchKeys.first] == aid ||
           aid.toString() == keyword) {
         Get.toNamed(
-          '/video?bvid=$bvid&cid=$cid',preventDuplicates: false,
+          '/video/bvid=$bvid', 
           arguments: {
             'videoItem': resultList.first,
             'heroTag': heroTag,

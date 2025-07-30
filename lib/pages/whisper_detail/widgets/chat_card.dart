@@ -187,7 +187,7 @@ class ChatCard extends StatelessWidget {
                   await SmartDialog.dismiss();
                   if (source == 5) {
                     Get.toNamed<dynamic>(
-                      '/video?bvid=$bvid&cid=$cid',preventDuplicates: false,
+                      '/video/bvid=$bvid', 
                       arguments: <String, String?>{
                         'pic': content['thumb'],
                         'heroTag': heroTag,
@@ -246,7 +246,7 @@ class ChatCard extends StatelessWidget {
                   final int cid = await SearchHttp.ab2c(bvid: bvid);
                   final String heroTag = StringUtils.makeHeroTag(bvid);
                   SmartDialog.dismiss<dynamic>().then(
-                    (e) => Get.toNamed<dynamic>('/video?bvid=$bvid&cid=$cid',preventDuplicates: false,
+                    (e) => Get.toNamed<dynamic>('/video/bvid=$bvid', 
                         arguments: <String, String?>{
                           'pic': content['thumb'] ?? '',
                           'heroTag': heroTag,
@@ -328,7 +328,7 @@ class ChatCard extends StatelessWidget {
                           final String heroTag = StringUtils.makeHeroTag(bvid);
                           SmartDialog.dismiss<dynamic>().then(
                             (e) => Get.toNamed<dynamic>(
-                                '/video?bvid=$bvid&cid=$cid',preventDuplicates: false,
+                                '/video/bvid=$bvid', 
                                 arguments: <String, String?>{
                                   'pic': i['cover_url'],
                                   'heroTag': heroTag,

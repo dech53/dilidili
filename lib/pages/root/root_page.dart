@@ -48,7 +48,6 @@ class _RootPageState extends State<RootPage> {
         scrolledUnderElevation: 0,
         backgroundColor: Theme.of(context).colorScheme.surface,
       ),
-      backgroundColor: Theme.of(context).colorScheme.surface,
       bottomNavigationBar: _getBottomNavigator(context),
       body: LazyLoadIndexedStack(
         index: _index,

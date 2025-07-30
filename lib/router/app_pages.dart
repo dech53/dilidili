@@ -17,7 +17,7 @@ import 'package:get/get.dart';
 class Routes {
   static final List<GetPage<dynamic>> getPages = [
     CustomGetPage(name: '/', page: () => const HomePage()),
-    CustomGetPage(name: '/video', page: () => const VideoPage()),
+    CustomGetPage(name: '/video/:bvid', page: () => const VideoPage()),
     CustomGetPage(name: '/member', page: () => const MemberPage()),
     CustomGetPage(name: '/search', page: () => const SearchPage()),
     CustomGetPage(name: '/searchResult', page: () => const SearchResultPage()),

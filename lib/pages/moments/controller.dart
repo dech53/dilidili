@@ -128,7 +128,7 @@ class MomentsController extends GetxController {
         try {
           int cid = await SearchHttp.ab2c(bvid: bvid);
           Get.toNamed(
-              '/video?bvid=$bvid&cid=$cid',preventDuplicates: false,
+              '/video/bvid=$bvid', 
               arguments: {
                 'pic': cover,
                 'heroTag': bvid,

@@ -59,6 +59,8 @@ class DPlayerController extends GetxController {
   final DPlayerDataStatus dataStatus = DPlayerDataStatus();
   Stream<DataStatus> get onDataStatusChanged => dataStatus.status.stream;
 
+  Rx<bool> isBuffering = true.obs;
+
   Timer? _timer;
   //主控制器
   Player? _videoPlayerController;
@@ -151,6 +153,9 @@ class DPlayerController extends GetxController {
       videoPlayerController!.stream.buffer.listen((event) {
         _buffered.value = event;
         updateBufferedSecond();
+      }),
+      videoPlayerController!.stream.buffering.listen((event) {
+        isBuffering.value = event;
       }),
     ]);
   }
@@ -276,6 +281,7 @@ class DPlayerController extends GetxController {
     bool enableHA,
     Duration seekTo,
   ) async {
+    isBuffering.value = false;
     _position.value = Duration.zero;
     Player player = _videoPlayerController ??
         Player(

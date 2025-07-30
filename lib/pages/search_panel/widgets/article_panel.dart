@@ -2,11 +2,13 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dilidili/common/constants.dart';
 import 'package:dilidili/common/widgets/http_error.dart';
 import 'package:dilidili/common/widgets/network_img_layer.dart';
+import 'package:dilidili/model/search_type.dart';
 import 'package:dilidili/pages/search_panel/controller.dart';
 import 'package:dilidili/utils/num_utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 
 class SearchArticlePanel extends StatelessWidget {
@@ -27,26 +29,41 @@ class SearchArticlePanel extends StatelessWidget {
       alignment: Alignment.topCenter,
       children: [
         searchArticlePanel(context, ctr, list),
-        // Container(
-        //   width: double.infinity,
-        //   height: 36,
-        //   padding: const EdgeInsets.only(left: 8, top: 0, right: 8),
-        //   child: Row(
-        //     children: [
-        //       Expanded(
-        //           child: SingleChildScrollView(
-        //         scrollDirection: Axis.horizontal,
-        //         child: Obx(
-        //           () => Wrap(
-        //             children: [
-
-        //             ],
-        //           ),
-        //         ),
-        //       ))
-        //     ],
-        //   ),
-        // )
+        Container(
+          width: double.infinity,
+          height: 36,
+          padding: const EdgeInsets.only(left: 8, top: 0, right: 8),
+          child: Row(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Obx(
+                    () => Wrap(
+                      children: [
+                        for (var i in controller.filterList) ...[
+                          CustomFilterChip(
+                            label: i['label'],
+                            type: i['type'],
+                            selectedType: controller.selectedType.value,
+                            callFn: (bool selected) async {
+                              controller.selectedType.value = i['type'];
+                              ctr.order.value =
+                                  i['type'].toString().split('.').last;
+                              SmartDialog.showLoading(msg: 'loading');
+                              await ctr.onRefresh();
+                              SmartDialog.dismiss();
+                            },
+                          ),
+                        ]
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }
@@ -178,6 +195,64 @@ class SearchArticlePanel extends StatelessWidget {
   }
 }
 
+class CustomFilterChip extends StatelessWidget {
+  const CustomFilterChip({
+    this.label,
+    this.type,
+    this.selectedType,
+    this.callFn,
+    Key? key,
+  }) : super(key: key);
+
+  final String? label;
+  final ArticleFilterType? type;
+  final ArticleFilterType? selectedType;
+  final Function? callFn;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 34,
+      child: FilterChip(
+        padding: const EdgeInsets.only(left: 11, right: 11),
+        labelPadding: EdgeInsets.zero,
+        label: Text(
+          label!,
+          style: const TextStyle(fontSize: 13),
+        ),
+        labelStyle: TextStyle(
+            color: type == selectedType
+                ? Theme.of(context).colorScheme.primary
+                : Theme.of(context).colorScheme.outline),
+        selected: type == selectedType,
+        showCheckmark: false,
+        shape: ContinuousRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        selectedColor: Colors.transparent,
+        // backgroundColor:
+        //     Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
+        backgroundColor: Colors.transparent,
+        side: BorderSide.none,
+        onSelected: (bool selected) => callFn!(selected),
+      ),
+    );
+  }
+}
+
 class ArticlePanelController extends GetxController {
   RxList<Map> filterList = [{}].obs;
+  Rx<ArticleFilterType> selectedType = ArticleFilterType.values.first.obs;
+
+  @override
+  void onInit() {
+    List<Map<String, dynamic>> list = ArticleFilterType.values
+        .map((type) => {
+              'label': type.description,
+              'type': type,
+            })
+        .toList();
+    filterList.value = list;
+    super.onInit();
+  }
 }

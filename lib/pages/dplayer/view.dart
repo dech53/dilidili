@@ -309,7 +309,7 @@ class _DPlayerState extends State<DPlayer> with TickerProviderStateMixin {
           ),
         ),
         Obx(() {
-          if (_.dataStatus.loading) {
+          if (_.dataStatus.loading || _.isBuffering.value) {
             return Center(
               child: Container(
                 padding: const EdgeInsets.all(30),

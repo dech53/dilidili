@@ -82,6 +82,7 @@ class _SearchResultPageState extends State<SearchResultPage>
                     color: Theme.of(context).colorScheme.secondaryContainer,
                     borderRadius: const BorderRadius.all(Radius.circular(20)),
                   ),
+                  indicatorAnimation: TabIndicatorAnimation.elastic,
                   indicatorSize: TabBarIndicatorSize.tab,
                   labelColor:
                       Theme.of(context).colorScheme.onSecondaryContainer,

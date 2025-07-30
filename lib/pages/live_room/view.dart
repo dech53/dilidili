@@ -3,6 +3,7 @@ import 'package:dilidili/pages/damuku/view.dart';
 import 'package:dilidili/pages/dplayer/controller.dart';
 import 'package:dilidili/pages/dplayer/view.dart';
 import 'package:dilidili/pages/live_room/controller.dart';
+import 'package:dilidili/pages/live_room/widget/bottom_control.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -106,6 +107,17 @@ class _LiveRoomPageState extends State<LiveRoomPage>
             // alignment: _liveRoomController.isPortrait.value
             //     ? Alignment.topCenter
             //     : Alignment.center,
+            bottomControl: BottomControl(
+              controller: dPlayerController,
+              liveRoomController: _liveRoomController,
+              onRefresh: () {
+                setState(
+                  () {
+                    _futureBuilderFuture = _liveRoomController.queryLiveInfo();
+                  },
+                );
+              },
+            ),
             danmuWidget: Danmuku(
               cid: roomId,
               playerController: dPlayerController,

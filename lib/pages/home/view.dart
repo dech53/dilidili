@@ -114,7 +114,7 @@ class _HomePageState extends State<HomePage>
                       alignment: Alignment.centerLeft,
                       height: 40.h,
                       decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surfaceContainer,
+                        color: Theme.of(context).colorScheme.onSecondaryContainer.withOpacity(0.05),
                         borderRadius: BorderRadius.circular(12.r),
                       ),
                       child: Row(
