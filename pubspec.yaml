@@ -119,7 +119,7 @@ flutter_launcher_icons:
   remove_alpha_ios: true
   image_path: "assets/images/logo/icon.png"
   image_path_android: assets/images/logo/icon.png
-  image_path_ios: assets/images/logo/icon.png
+  image_path_ios: assets/images/logo/ios.png
   adaptive_icon_background: "#ffffff"
   adaptive_icon_foreground: assets/images/logo/icon.png
   adaptive_icon_monochrome: assets/images/logo/icon.png
