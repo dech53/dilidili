@@ -1,4 +1,3 @@
-import 'package:dilidili/component/common_btn.dart';
 import 'package:dilidili/http/static/api_string.dart';
 import 'package:dilidili/http/video.dart';
 import 'package:dilidili/model/bottom_control_type.dart';
@@ -20,8 +19,11 @@ class VideoDetailController extends GetxController
   String bvid = Get.arguments['bvid']!;
   late VideoQuality currentVideoQa;
   RxString archiveSourceType = 'dash'.obs;
+  AudioQuality? currentAudioQa;
+  VideoDecodeFormats? currentDecodeFormats;
   RxBool enableHA = false.obs;
   RxBool isShowCover = true.obs;
+  RxString cover = ''.obs;
   RxDouble sheetHeight = 0.0.obs;
   ScrollController? replyScrollController;
   late VideoItem firstVideo;
@@ -34,6 +36,8 @@ class VideoDetailController extends GetxController
     BottomControlType.space,
     BottomControlType.fullscreen,
   ].obs;
+  // 视频详情
+  Map videoItem = {};
   RxInt cid = int.parse(Get.arguments['cid']!).obs;
   RxInt danmakuCid = 0.obs;
   RxInt oid = 0.obs;
@@ -47,16 +51,66 @@ class VideoDetailController extends GetxController
   @override
   void onInit() {
     super.onInit();
+    final Map argMap = Get.arguments;
+    if (argMap.containsKey('videoItem')) {
+      var args = argMap['videoItem'];
+      updateCover(args.pic);
+    } else if (argMap.containsKey('pic')) {
+      updateCover(argMap['pic']);
+    }
     tabCtr = TabController(length: 2, vsync: this);
     danmakuCid.value = cid.value;
     oid.value = IdUtils.bv2av(Get.arguments['bvid']!);
-
     headerControl = HeaderControl(
       controller: dPlayerController,
       videoDetailCtr: this,
       bvid: bvid,
       videoType: videoType,
     );
+  }
+
+  void updateCover(String? pic) {
+    if (pic != null) {
+      cover.value = videoItem['pic'] = pic;
+    }
+  }
+
+  updatePlayer() {
+    defaultST = dPlayerController.position.value;
+    dPlayerController.removeListeners();
+    dPlayerController.isBuffering.value = false;
+    dPlayerController.buffered.value = Duration.zero;
+
+    /// 根据currentVideoQa和currentDecodeFormats 重新设置videoUrl
+    List<VideoItem> videoList =
+        data.dash!.video!.where((i) => i.id == currentVideoQa.code).toList();
+    try {
+      firstVideo = videoList
+          .firstWhere((i) => i.codecs!.startsWith(currentDecodeFormats?.code));
+    } catch (_) {
+      if (currentVideoQa == VideoQuality.dolbyVision) {
+        firstVideo = videoList.first;
+        currentDecodeFormats =
+            VideoDecodeFormatsCode.fromString(videoList.first.codecs!)!;
+      } else {
+        // 当前格式不可用
+        currentDecodeFormats = VideoDecodeFormatsCode.fromString(
+            VideoDecodeFormats.values.last.code)!;
+        firstVideo = videoList.firstWhere(
+            (i) => i.codecs!.startsWith(currentDecodeFormats?.code));
+      }
+    }
+    videoUrl = firstVideo.baseUrl!;
+
+    /// 根据currentAudioQa 重新设置audioUrl
+    if (currentAudioQa != null) {
+      final AudioItem firstAudio = data.dash!.audio!.firstWhere(
+        (AudioItem i) => i.id == currentAudioQa!.code,
+        orElse: () => data.dash!.audio!.first,
+      );
+      audioUrl = firstAudio.baseUrl ?? '';
+    }
+    playerInit();
   }
 
   void onControllerCreated(ScrollController controller) {
@@ -94,14 +148,21 @@ class VideoDetailController extends GetxController
       }
       final List<VideoItem> allVideosList = data.dash!.video!;
       int currentHighVideoQa = allVideosList.first.quality!.code;
+      currentVideoQa = VideoQualityCode.fromCode(currentHighVideoQa)!;
       final List<VideoItem> videosList = allVideosList
           .where((e) => e.quality!.code == currentHighVideoQa)
           .toList();
+      currentDecodeFormats = VideoDecodeFormatsCode.fromString(
+          VideoDecodeFormats.values.last.code);
       firstVideo = videosList.first;
       videoUrl = firstVideo.baseUrl!;
       final List<AudioItem> audiosList = data.dash!.audio!;
       firstAudio = audiosList.first;
       audioUrl = firstAudio.baseUrl!;
+      if (firstAudio.id != null) {
+        currentAudioQa = AudioQualityCode.fromCode(firstAudio.id!)!;
+      }
+      defaultST = Duration(milliseconds: data.lastPlayTime!);
       await playerInit();
       isShowCover.value = false;
     } else {
@@ -116,6 +177,7 @@ class VideoDetailController extends GetxController
   Future playerInit({
     video,
     audio,
+    seekToTime,
     duration,
   }) async {
     await dPlayerController.setDataSource(
@@ -129,7 +191,10 @@ class VideoDetailController extends GetxController
           'referer': ApiString.mainUrl
         },
       ),
+      seekTo: seekToTime ?? defaultST,
       duration: duration ?? Duration(milliseconds: data.timeLength ?? 0),
+      bvid: bvid,
+      cid: cid.value,
     );
     dPlayerController.headerControl = headerControl;
   }
@@ -138,6 +203,5 @@ class VideoDetailController extends GetxController
   void onClose() {
     super.onClose();
     dPlayerController.dispose();
-    // print("控制器内部实例数量${dPlayerController!.playerCount.value.toString()}");
   }
 }

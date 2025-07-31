@@ -369,4 +369,25 @@ class VideoHttp {
       return {'status': false, 'data': [], 'msg': err};
     }
   }
+
+  // 视频播放进度
+  static Future heartBeat({bvid, cid, progress}) async {
+    print("心跳记录标识bvid=$bvid, cid=$cid, progress=$progress");
+    await DioInstance.instance().post(
+      path: ApiString.baseUrl + ApiString.heartBeat,
+      param: {
+        // 'aid': aid,
+        'bvid': bvid,
+        'cid': cid,
+        // 'epid': '',
+        // 'sid': '',
+        // 'mid': '',
+        'played_time': progress,
+        // 'realtime': realtime,
+        // 'type': '',
+        // 'sub_type': '',
+        'csrf': await DioInstance.instance().getCsrf(),
+      },
+    );
+  }
 }

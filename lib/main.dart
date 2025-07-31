@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:dilidili/common/custom_toast.dart';
 import 'package:dilidili/http/dio_instance.dart';
 import 'package:dilidili/model/color_type.dart';
 import 'package:dilidili/pages/search/view.dart';
@@ -72,7 +73,16 @@ void main() async {
               },
             ),
           ),
-          builder: FlutterSmartDialog.init(),
+          builder: (BuildContext context, Widget? child) {
+            return FlutterSmartDialog(
+              toastBuilder: (String msg) => CustomToast(msg: msg),
+              child: MediaQuery(
+                data: MediaQuery.of(context)
+                    .copyWith(textScaler: const TextScaler.linear(1.0)),
+                child: child!,
+              ),
+            );
+          },
           getPages: Routes.getPages,
           debugShowCheckedModeBanner: false,
           home: const MyApp(),

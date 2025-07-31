@@ -3,7 +3,6 @@ import 'package:dilidili/model/video/video_basic_info.dart';
 import 'package:dilidili/model/video/video_episode_type.dart';
 import 'package:dilidili/pages/video/detail/controller.dart';
 import 'package:dilidili/pages/video/introduction/controller.dart';
-import 'package:dilidili/utils/id_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -30,13 +29,11 @@ class _SeasonPanelState extends State<SeasonPanel> {
   late int cid;
   late RxInt currentIndex = (-1).obs;
   final String heroTag = Get.arguments['heroTag'];
-  late VideoDetailController _videoDetailController;
   late PersistentBottomSheetController? _bottomSheetController;
   @override
   void initState() {
     super.initState();
     cid = widget.cid!;
-    _videoDetailController = Get.find<VideoDetailController>(tag: heroTag);
     final List<SectionItem> sections = widget.ugcSeason.sections!;
     for (int i = 0; i < sections.length; i++) {
       final List<EpisodeItem> episodesList = sections[i].episodes!;
@@ -48,15 +45,15 @@ class _SeasonPanelState extends State<SeasonPanel> {
       }
     }
     currentIndex.value = episodes.indexWhere((EpisodeItem e) => e.cid == cid);
-    _videoDetailController.cid.listen((int p0) {
-      cid = p0;
-      currentIndex.value = episodes.indexWhere((EpisodeItem e) => e.cid == cid);
-    });
+    // _videoDetailController.cid.listen((int p0) {
+    //   cid = p0;
+    //   currentIndex.value = episodes.indexWhere((EpisodeItem e) => e.cid == cid);
+    // });
   }
 
   void changeFucCall(item, int i) async {
     widget.changeFuc?.call(
-      IdUtils.av2bv(item.aid),
+      item.bvid,
       item.cid,
       item.aid,
       item.cover,
@@ -110,7 +107,7 @@ class _SeasonPanelState extends State<SeasonPanel> {
           onTap: () {
             widget.videoIntroController.bottomSheetController =
                 _bottomSheetController = EpisodeBottomSheet(
-              currentCid: cid,
+              currentCid: episodes[currentIndex.value].cid!,
               episodes: episodes,
               changeFucCall: changeFucCall,
               sheetHeight: widget.sheetHeight,

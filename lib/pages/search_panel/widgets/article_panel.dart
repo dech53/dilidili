@@ -50,7 +50,7 @@ class SearchArticlePanel extends StatelessWidget {
                               controller.selectedType.value = i['type'];
                               ctr.order.value =
                                   i['type'].toString().split('.').last;
-                              SmartDialog.showLoading(msg: 'loading');
+                              SmartDialog.showLoading(msg: '加载中');
                               await ctr.onRefresh();
                               SmartDialog.dismiss();
                             },

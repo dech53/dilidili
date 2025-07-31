@@ -5,14 +5,18 @@ import 'package:dilidili/model/bottom_control_type.dart';
 import 'package:dilidili/pages/dplayer/controller.dart';
 import 'package:dilidili/pages/dplayer/utils.dart';
 import 'package:dilidili/pages/dplayer/widgets/app_bar_ani.dart';
+import 'package:dilidili/pages/dplayer/widgets/backward_seek.dart';
 import 'package:dilidili/pages/dplayer/widgets/bottom_control.dart';
 import 'package:dilidili/pages/dplayer/widgets/control_bar.dart';
+import 'package:dilidili/pages/dplayer/widgets/forward_seek.dart';
 import 'package:dilidili/pages/video/widgets/play_pause_btn.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
+import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
+import 'package:media_kit_video/media_kit_video_controls/src/controls/extensions/duration.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 
 class DPlayer extends StatefulWidget {
@@ -45,6 +49,12 @@ class _DPlayerState extends State<DPlayer> with TickerProviderStateMixin {
   final RxDouble _brightnessValue = 0.0.obs;
   final RxBool _brightnessIndicator = false.obs;
   late AnimationController animationController;
+
+  final RxBool _mountSeekBackwardButton = false.obs;
+  final RxBool _mountSeekForwardButton = false.obs;
+  final RxBool _hideSeekBackwardButton = false.obs;
+  final RxBool _hideSeekForwardButton = false.obs;
+
   Timer? _brightnessTimer;
   late double screenWidth;
   @override
@@ -158,6 +168,28 @@ class _DPlayerState extends State<DPlayer> with TickerProviderStateMixin {
     widget.controller.brightness.value = value;
   }
 
+  void doubleTapFuc(String type) {
+    switch (type) {
+      case 'left':
+        onDoubleTapSeekBackward();
+        break;
+      case 'center':
+        onDoubleTapCenter();
+        break;
+      case 'right':
+        onDoubleTapSeekForward();
+        break;
+    }
+  }
+
+  void onDoubleTapSeekBackward() {
+    _mountSeekBackwardButton.value = true;
+  }
+
+  void onDoubleTapSeekForward() {
+    _mountSeekForwardButton.value = true;
+  }
+
   // 双击播放、暂停
   void onDoubleTapCenter() {
     final DPlayerController _ = widget.controller;
@@ -225,6 +257,57 @@ class _DPlayerState extends State<DPlayer> with TickerProviderStateMixin {
             ),
           ),
         ),
+
+        /// 时间进度 toast
+        Obx(
+          () => Align(
+            alignment: Alignment.topCenter,
+            child: FractionalTranslation(
+              translation: const Offset(0.0, 1.0), // 上下偏移量（负数向上偏移）
+              child: AnimatedOpacity(
+                curve: Curves.easeInOut,
+                opacity: _.isSliderMoving.value ? 1.0 : 0.0,
+                duration: const Duration(milliseconds: 150),
+                child: IntrinsicWidth(
+                  child: Container(
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: const Color(0x88000000),
+                      borderRadius: BorderRadius.circular(64.0),
+                    ),
+                    height: 34.0,
+                    padding: const EdgeInsets.only(left: 10, right: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Obx(() {
+                          return Text(
+                            _.sliderTempPosition.value.inMinutes >= 60
+                                ? printDurationWithHours(
+                                    _.sliderTempPosition.value)
+                                : printDuration(_.sliderTempPosition.value),
+                            style: textStyle,
+                          );
+                        }),
+                        const SizedBox(width: 2),
+                        const Text('/', style: textStyle),
+                        const SizedBox(width: 2),
+                        Obx(
+                          () => Text(
+                            _.duration.value.inMinutes >= 60
+                                ? printDurationWithHours(_.duration.value)
+                                : printDuration(_.duration.value),
+                            style: textStyle,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
         //亮度控制条展示
         Obx(
           () => ControlBar(
@@ -252,7 +335,21 @@ class _DPlayerState extends State<DPlayer> with TickerProviderStateMixin {
               _.controls = !_.showControls.value;
             },
             onDoubleTapDown: (TapDownDetails details) {
-              onDoubleTapCenter();
+              if (_.videoType == 'live') {
+                return;
+              }
+              final double totalWidth = MediaQuery.sizeOf(context).width;
+              final double tapPosition = details.localPosition.dx;
+              final double sectionWidth = totalWidth / 3;
+              String type = 'left';
+              if (tapPosition < sectionWidth) {
+                type = 'left';
+              } else if (tapPosition < sectionWidth * 2) {
+                type = 'center';
+              } else {
+                type = 'right';
+              }
+              doubleTapFuc(type);
             },
             onLongPressStart: (LongPressStartDetails detail) {
               _.setDoubleSpeedStatus(true);
@@ -260,14 +357,12 @@ class _DPlayerState extends State<DPlayer> with TickerProviderStateMixin {
             onLongPressEnd: (LongPressEndDetails details) {
               _.setDoubleSpeedStatus(false);
             },
-            // 垂直方向 音量/亮度调节
             onVerticalDragUpdate: (DragUpdateDetails details) async {
               final double totalWidth = MediaQuery.sizeOf(context).width;
               final double tapPosition = details.localPosition.dx;
               final double sectionWidth = totalWidth / 3;
               final double delta = details.delta.dy;
               if (tapPosition < sectionWidth) {
-                // 左边区域 👈
                 final double level = (screenWidth * 9 / 16) * 3;
                 final double brightness =
                     _brightnessValue.value - delta / level;
@@ -275,6 +370,29 @@ class _DPlayerState extends State<DPlayer> with TickerProviderStateMixin {
                 setBrightness(result);
               } else if (tapPosition < sectionWidth * 2) {
               } else {}
+            },
+            onHorizontalDragEnd: (DragEndDetails details) {
+              if (_.videoType == 'live') {
+                return;
+              }
+              _.onChangedSliderEnd();
+              _.seekTo(_.sliderPosition.value, type: 'slider');
+            },
+            onHorizontalDragUpdate: (DragUpdateDetails details) {
+              if (_.videoType == 'live') {
+                return;
+              }
+              // final double tapPosition = details.localPosition.dx;
+              final int curSliderPosition =
+                  _.sliderPosition.value.inMilliseconds;
+              final double scale = 90000 / MediaQuery.sizeOf(context).width;
+              final Duration pos = Duration(
+                  milliseconds:
+                      curSliderPosition + (details.delta.dx * scale).round());
+              final Duration result =
+                  pos.clamp(Duration.zero, _.duration.value);
+              _.onChangedSliderStart();
+              _.onUpdatedSliderProgress(result);
             },
           ),
         ),
@@ -308,27 +426,124 @@ class _DPlayerState extends State<DPlayer> with TickerProviderStateMixin {
             ],
           ),
         ),
-        Obx(() {
-          if (_.dataStatus.loading || _.isBuffering.value) {
-            return Center(
-              child: Container(
-                padding: const EdgeInsets.all(30),
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: RadialGradient(
-                    colors: [Colors.black26, Colors.transparent],
+        Obx(
+          () {
+            if (_.dataStatus.loading || _.isBuffering.value) {
+              return Center(
+                child: Container(
+                  padding: const EdgeInsets.all(30),
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(
+                      colors: [Colors.black26, Colors.transparent],
+                    ),
+                  ),
+                  child: Lottie.asset(
+                    'assets/loading.json',
+                    width: 200,
                   ),
                 ),
-                child: Lottie.asset(
-                  'assets/loading.json',
-                  width: 200,
-                ),
+              );
+            } else {
+              return const SizedBox();
+            }
+          },
+        ),
+
+        /// 点击 快进/快退
+        Obx(
+          () => Visibility(
+            visible:
+                _mountSeekBackwardButton.value || _mountSeekForwardButton.value,
+            child: Positioned.fill(
+              child: Row(
+                children: [
+                  Expanded(
+                    child: _mountSeekBackwardButton.value
+                        ? TweenAnimationBuilder<double>(
+                            tween: Tween<double>(
+                              begin: 0.0,
+                              end: _hideSeekBackwardButton.value ? 0.0 : 1.0,
+                            ),
+                            duration: const Duration(milliseconds: 150),
+                            builder: (BuildContext context, double value,
+                                    Widget? child) =>
+                                Opacity(
+                              opacity: value,
+                              child: child,
+                            ),
+                            onEnd: () {
+                              if (_hideSeekBackwardButton.value) {
+                                _hideSeekBackwardButton.value = false;
+                                _mountSeekBackwardButton.value = false;
+                              }
+                            },
+                            child: BackwardSeekIndicator(
+                              onChanged: (Duration value) => {},
+                              onSubmitted: (Duration value) {
+                                _hideSeekBackwardButton.value = true;
+                                final Player player =
+                                    widget.controller.videoPlayerController!;
+                                Duration result = player.state.position - value;
+                                result = result.clamp(
+                                  Duration.zero,
+                                  player.state.duration,
+                                );
+                                player.seek(result);
+                                widget.controller.play();
+                              },
+                            ),
+                          )
+                        : const SizedBox(),
+                  ),
+                  Expanded(
+                    child: SizedBox(
+                      width: MediaQuery.sizeOf(context).width / 4,
+                    ),
+                  ),
+                  Expanded(
+                    child: _mountSeekForwardButton.value
+                        ? TweenAnimationBuilder<double>(
+                            tween: Tween<double>(
+                              begin: 0.0,
+                              end: _hideSeekForwardButton.value ? 0.0 : 1.0,
+                            ),
+                            duration: const Duration(milliseconds: 150),
+                            builder: (BuildContext context, double value,
+                                    Widget? child) =>
+                                Opacity(
+                              opacity: value,
+                              child: child,
+                            ),
+                            onEnd: () {
+                              if (_hideSeekForwardButton.value) {
+                                _hideSeekForwardButton.value = false;
+                                _mountSeekForwardButton.value = false;
+                              }
+                            },
+                            child: ForwardSeekIndicator(
+                              onChanged: (Duration value) => {},
+                              onSubmitted: (Duration value) {
+                                _hideSeekForwardButton.value = true;
+                                final Player player =
+                                    widget.controller.videoPlayerController!;
+                                Duration result = player.state.position + value;
+                                result = result.clamp(
+                                  Duration.zero,
+                                  player.state.duration,
+                                );
+                                player.seek(result);
+                                widget.controller.play();
+                              },
+                            ),
+                          )
+                        : const SizedBox(),
+                  ),
+                ],
               ),
-            );
-          } else {
-            return const SizedBox();
-          }
-        }),
+            ),
+          ),
+        ),
       ],
     );
   }

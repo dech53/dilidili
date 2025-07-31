@@ -50,17 +50,16 @@ class BottomControl extends StatelessWidget implements PreferredSizeWidget {
                   barHeight: 3.5,
                   thumbRadius: 7,
                   onDragStart: (duration) {
-                    // feedBack();
-                    // _.onChangedSliderStart();
+                    _.onChangedSliderStart();
                   },
                   onDragUpdate: (duration) {
-                    // _.onUpdatedSliderProgress(duration.timeStamp);
+                    _.onUpdatedSliderProgress(duration.timeStamp);
                   },
                   onSeek: (duration) {
-                    // _.onChangedSliderEnd();
-                    // _.onChangedSlider(duration.inSeconds.toDouble());
-                    // _.seekTo(Duration(seconds: duration.inSeconds),
-                    //     type: 'slider');
+                    _.onChangedSliderEnd();
+                    _.onChangedSlider(duration.inSeconds.toDouble());
+                    _.seekTo(Duration(seconds: duration.inSeconds),
+                        type: 'slider');
                   },
                 ),
               );

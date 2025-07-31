@@ -7,6 +7,9 @@ import 'package:dilidili/model/nav_user_info.dart';
 import 'package:dilidili/model/user/fav_folder.dart';
 import 'package:dilidili/model/video/video_basic_info.dart';
 import 'package:dilidili/model/video/video_tag.dart';
+import 'package:dilidili/pages/video/detail/controller.dart';
+import 'package:dilidili/pages/video/related/controller.dart';
+import 'package:dilidili/pages/video/reply/controller.dart';
 import 'package:dilidili/utils/id_utils.dart';
 import 'package:dilidili/utils/storage.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +22,7 @@ class VideoIntroController extends GetxController {
   SharedPreferencesInstance prefs = SPStorage.prefs;
   String bvid;
   // 在线人数
+  String heroTag = '';
   RxString total = '1'.obs;
   Timer? timer;
   bool isPaused = false;
@@ -41,10 +45,14 @@ class VideoIntroController extends GetxController {
   RxList<VideoTag> videoTags = <VideoTag>[].obs;
   // 最近播放集数
   RxInt lastPlayCid = 0.obs;
+  RxInt lastPlaySCid = 0.obs;
   @override
   void onInit() async {
     super.onInit();
     // 定时更新在线人数
+    try {
+      heroTag = Get.arguments['heroTag'];
+    } catch (_) {}
     queryOnlineTotal();
     startTimer();
     lastPlayCid.value = int.parse(Get.arguments['cid']!);
@@ -74,7 +82,38 @@ class VideoIntroController extends GetxController {
     int cid,
     int? aid,
     String? cover,
-  ) async {}
+    String? type,
+  ) async {
+    // 重新获取视频资源
+    final VideoDetailController videoDetailCtr =
+        Get.find<VideoDetailController>(tag: heroTag);
+    //相关推荐视频
+    final ReleatedVideoController releatedCtr =
+        Get.find<ReleatedVideoController>(tag: heroTag);
+    releatedCtr.bvid = bvid;
+    releatedCtr.queryRelatedVideo();
+    videoDetailCtr
+      ..bvid = bvid
+      ..oid.value = aid ?? IdUtils.bv2av(bvid)
+      ..cid.value = cid
+      ..danmakuCid.value = cid
+      ..cover.value = cover ?? ''
+      ..queryVideoUrl();
+    try {
+      final VideoReplyController videoReplyCtr =
+          Get.find<VideoReplyController>(tag: heroTag);
+      videoReplyCtr.aid = aid;
+      videoReplyCtr.queryReplyList(type: 'init');
+    } catch (_) {}
+    this.bvid = bvid;
+    await queryVideoIntro();
+    if (type == 'season') {
+      lastPlaySCid.value = lastPlayCid.value = cid;
+    } else {
+      lastPlayCid.value = cid;
+    }
+    print("调试: lastPlayCid: ${lastPlayCid.value}");
+  }
 
   // 查看同时在看人数
   Future queryOnlineTotal() async {
@@ -96,7 +135,13 @@ class VideoIntroController extends GetxController {
     }
     var result = await VideoHttp.videoIntro(bvid: bvid);
     if (result['status']) {
-      videoDetail.value = result['data'];
+      videoDetail.value = result['data']!;
+      lastPlayCid.value = videoDetail.value.pages!.first.cid!;
+      lastPlaySCid.value = videoDetail.value.cid!;
+      final VideoDetailController videoDetailCtr =
+          Get.find<VideoDetailController>(tag: heroTag);
+      videoDetailCtr.tabs.value = ['简介', '评论 ${result['data']?.stat?.reply}'];
+      videoDetailCtr.cover.value = result['data'].pic ?? '';
     }
 
     await queryUserInfo();
@@ -158,11 +203,9 @@ class VideoIntroController extends GetxController {
     var result = await VideoHttp.likeVideo(bvid: bvid, type: !hasLike.value);
     if (result['status']) {
       if (!hasLike.value) {
-        SmartDialog.showToast('点赞成功');
         hasLike.value = true;
         videoDetail.value.stat!.like = videoDetail.value.stat!.like! + 1;
       } else if (hasLike.value) {
-        SmartDialog.showToast('取消赞');
         hasLike.value = false;
         videoDetail.value.stat!.like = videoDetail.value.stat!.like! - 1;
       }
@@ -201,7 +244,6 @@ class VideoIntroController extends GetxController {
                       var res =
                           await VideoHttp.coinVideo(bvid: bvid, multiply: e);
                       if (res['status']) {
-                        SmartDialog.showToast('投币成功');
                         hasCoin.value = true;
                         videoDetail.value.stat!.coin =
                             videoDetail.value.stat!.coin! + e;
@@ -253,9 +295,7 @@ class VideoIntroController extends GetxController {
       }
       followStatus['attribute'] = actionStatus;
       followStatus.refresh();
-      if (actionStatus == 2) {
-        SmartDialog.showToast("操作成功");
-      }
+      if (actionStatus == 2) {}
     }
     SmartDialog.showToast(result['msg']);
   }
@@ -272,7 +312,6 @@ class VideoIntroController extends GetxController {
     );
     if (result['status']) {
       await queryHasFavVideo();
-      SmartDialog.showToast("操作成功");
     } else {
       SmartDialog.showToast(result['msg']);
     }

@@ -56,6 +56,9 @@ class _VideoIntroPanelState extends State<VideoIntroPanel>
     _futureBuilderFuture = videoIntroController.queryVideoIntro();
     videoIntroController.videoDetail.listen((value) {
       videoDetail = value;
+      if (videoDetail!.pages != null && videoDetail!.pages!.length > 1) {
+        print('视频分集信息${videoDetail!.pages!.map((e) => e.cid)}');
+      }
     });
   }
 
@@ -400,8 +403,8 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
               Obx(
                 () => SeasonPanel(
                   ugcSeason: widget.videoDetail!.ugcSeason!,
-                  cid: videoIntroController.lastPlayCid.value != 0
-                      ? videoIntroController.lastPlayCid.value
+                  cid: videoIntroController.lastPlaySCid.value != 0
+                      ? videoIntroController.lastPlaySCid.value
                       : widget.videoDetail!.pages!.first.cid,
                   sheetHeight: videoDetailCtr.sheetHeight.value,
                   changeFuc: (bvid, cid, aid, cover) =>
@@ -410,6 +413,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                     cid,
                     aid,
                     cover,
+                    'season',
                   ),
                   videoIntroController: videoIntroController,
                 ),
@@ -423,13 +427,16 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
                   pages: widget.videoDetail!.pages!,
                   cid: videoIntroController.lastPlayCid.value,
                   sheetHeight: videoDetailCtr.sheetHeight.value,
-                  changeFuc: (cid, cover) =>
-                      videoIntroController.changeSeasonOrbangu(
-                    videoIntroController.bvid,
-                    cid,
-                    null,
-                    cover,
-                  ),
+                  changeFuc: (cid, cover) {
+                    print("切换后的cid: $cid, cover: $cover");
+                    videoIntroController.changeSeasonOrbangu(
+                      videoIntroController.bvid,
+                      cid,
+                      null,
+                      cover,
+                      'page',
+                    );
+                  },
                   videoIntroCtr: videoIntroController,
                 ),
               )

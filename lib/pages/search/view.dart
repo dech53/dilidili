@@ -1,6 +1,7 @@
 import 'package:dilidili/common/widgets/http_error.dart';
 import 'package:dilidili/pages/search/controller.dart';
 import 'package:dilidili/pages/search/widgets/hot_keyword.dart';
+import 'package:dilidili/pages/search/widgets/search_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -83,6 +84,59 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
             Visibility(
               visible: _searchController.enableHotKey,
               child: hotSearch(_searchController),
+            ),
+            _history(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _history() {
+    return Obx(
+      () => Container(
+        width: double.infinity,
+        padding: const EdgeInsets.fromLTRB(10, 25, 6, 0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (_searchController.historyList.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(6, 0, 0, 2),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      '搜索历史',
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleMedium!
+                          .copyWith(fontWeight: FontWeight.bold),
+                    ),
+                    TextButton(
+                      onPressed: () {},
+                      child: const Text('清空'),
+                    )
+                  ],
+                ),
+              ),
+            Obx(
+              () => Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                direction: Axis.horizontal,
+                textDirection: TextDirection.ltr,
+                children: [
+                  for (int i = 0; i < _searchController.historyList.length; i++)
+                    SearchText(
+                      searchText: _searchController.historyList[i],
+                      searchTextIdx: i,
+                      onSelect: (value) => _searchController.onSelect(value),
+                      onLongSelect: (value) =>
+                          _searchController.onLongSelect(value),
+                    )
+                ],
+              ),
             ),
           ],
         ),

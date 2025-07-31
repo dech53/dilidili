@@ -176,7 +176,7 @@ class ChatCard extends StatelessWidget {
             children: [
               GestureDetector(
                 onTap: () async {
-                  SmartDialog.showLoading();
+                  SmartDialog.showLoading(msg: '加载中');
                   final String bvid = IdUtils.av2bv(int.parse(content['id']));
                   // 16番剧 5投稿
                   final int source = content["source"];
@@ -241,7 +241,7 @@ class ChatCard extends StatelessWidget {
             children: [
               GestureDetector(
                 onTap: () async {
-                  SmartDialog.showLoading();
+                  SmartDialog.showLoading(msg: '加载中');
                   var bvid = content["bvid"];
                   final int cid = await SearchHttp.ab2c(bvid: bvid);
                   final String heroTag = StringUtils.makeHeroTag(bvid);
@@ -323,7 +323,7 @@ class ChatCard extends StatelessWidget {
                         Match match = matches.first;
                         String bvid = match.group(0)!;
                         try {
-                          SmartDialog.showLoading();
+                          SmartDialog.showLoading(msg: '加载中');
                           final int cid = await SearchHttp.ab2c(bvid: bvid);
                           final String heroTag = StringUtils.makeHeroTag(bvid);
                           SmartDialog.dismiss<dynamic>().then(

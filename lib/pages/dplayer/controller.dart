@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:dilidili/http/video.dart';
 import 'package:dilidili/pages/dplayer/models/data_source.dart';
 import 'package:dilidili/pages/dplayer/models/data_status.dart';
 import 'package:dilidili/pages/dplayer/models/fullscreen_mode.dart';
@@ -23,10 +24,12 @@ class DPlayerController extends GetxController {
   String videoType = 'archive';
   //弹幕组件
   Widget? danmuWidget;
+  RxList subtitles = [].obs;
 
   /// 弹幕开关
   Rx<bool> isOpenDanmu = true.obs;
   DanmakuController? danmakuController;
+  RxString subtitleContent = ''.obs;
 
   /// 视频比例
   Rx<BoxFit> get videoFit => _videoFit;
@@ -61,6 +64,19 @@ class DPlayerController extends GetxController {
 
   Rx<bool> isBuffering = true.obs;
 
+  /// 视频缓冲
+  Rx<Duration> get buffered => _buffered;
+  Stream<Duration> get onBufferedChanged => _buffered.stream;
+
+  /// 进度条位置及监听
+  Rx<Duration> get sliderPosition => _sliderPosition;
+  Stream<Duration> get onSliderPositionChanged => _sliderPosition.stream;
+
+  // 记录历史记录
+  String _bvid = '';
+  int _cid = 0;
+  int _heartDuration = 0;
+
   Timer? _timer;
   //主控制器
   Player? _videoPlayerController;
@@ -87,6 +103,9 @@ class DPlayerController extends GetxController {
 
   Rx<bool> _isSliderMoving = false.obs;
   Rx<bool> get isSliderMoving => _isSliderMoving;
+
+  Rx<Duration> get sliderTempPosition => _sliderTempPosition;
+  final Rx<Duration> _sliderTempPosition = Rx(Duration.zero);
 
   /// 亮度控制
   final Rx<double> _currentBrightness = 0.0.obs;
@@ -120,6 +139,7 @@ class DPlayerController extends GetxController {
         for (var element in _positionListeners) {
           element(event);
         }
+        makeHeartBeat(event.inSeconds);
       }),
       videoPlayerController!.stream.playing.listen(
         (event) {
@@ -133,6 +153,9 @@ class DPlayerController extends GetxController {
           for (var element in _statusListeners) {
             element(event ? DPlayerStatus.playing : DPlayerStatus.paused);
           }
+          if (videoPlayerController!.state.position.inSeconds != 0) {
+            makeHeartBeat(positionSeconds.value, type: 'status');
+          }
         },
       ),
       videoPlayerController!.stream.completed.listen((event) {
@@ -144,6 +167,7 @@ class DPlayerController extends GetxController {
             element(DPlayerStatus.completed);
           }
         }
+        makeHeartBeat(positionSeconds.value, type: 'status');
       }),
       videoPlayerController!.stream.duration.listen((event) {
         if (event > Duration.zero) {
@@ -169,6 +193,32 @@ class DPlayerController extends GetxController {
   void removeStatusLister(Function(DPlayerStatus status) listener) =>
       _statusListeners.remove(listener);
 
+  // 记录播放记录
+  Future makeHeartBeat(int progress, {type = 'playing'}) async {
+    if (videoType == 'live') {
+      return;
+    }
+    // 播放状态变化时，更新
+    if (type == 'status') {
+      await VideoHttp.heartBeat(
+        bvid: _bvid,
+        cid: _cid,
+        progress: playerStatus.status.value == DPlayerStatus.completed
+            ? -1
+            : progress,
+      );
+    } else
+    // 正常播放时，间隔5秒更新一次
+    if (progress - _heartDuration >= 5) {
+      _heartDuration = progress;
+      await VideoHttp.heartBeat(
+        bvid: _bvid,
+        cid: _cid,
+        progress: progress,
+      );
+    }
+  }
+
   set controls(bool visible) {
     _showControls.value = visible;
     _timer?.cancel();
@@ -193,6 +243,27 @@ class DPlayerController extends GetxController {
     if (sliderPositionSeconds.value != newSecond) {
       sliderPositionSeconds.value = newSecond;
     }
+  }
+
+  /// 调整播放时间
+  onChangedSlider(double v) {
+    _sliderPosition.value = Duration(seconds: v.floor());
+    updateSliderPositionSecond();
+  }
+
+  void onChangedSliderStart() {
+    _isSliderMoving.value = true;
+  }
+
+  void onUpdatedSliderProgress(Duration value) {
+    _sliderTempPosition.value = value;
+    _sliderPosition.value = value;
+    updateSliderPositionSecond();
+  }
+
+  void onChangedSliderEnd() {
+    _isSliderMoving.value = false;
+    _hideTaskControls();
   }
 
   void updatePositionSecond() {
@@ -249,15 +320,20 @@ class DPlayerController extends GetxController {
   Future<void> setDataSource(
     DataSource dataSource, {
     Duration? duration,
-    String? direction,
+    String? direction, // 初始化播放位置
+    Duration seekTo = Duration.zero,
+    String bvid = '',
+    int cid = 0,
   }) async {
     if (_playerCount.value == 0) {
       return;
     }
     dataStatus.status.value = DataStatus.loading;
     _direction.value = direction ?? 'horizontal';
+    _bvid = bvid;
+    _cid = cid;
     _videoPlayerController = await _createVideoController(
-        dataSource, PlaylistMode.none, true, Duration.zero);
+        dataSource, PlaylistMode.none, true, seekTo);
     _duration.value = duration ?? _videoPlayerController!.state.duration;
     updateDurationSecond();
     dataStatus.status.value = DataStatus.loaded;
@@ -283,6 +359,7 @@ class DPlayerController extends GetxController {
   ) async {
     isBuffering.value = false;
     _position.value = Duration.zero;
+    _heartDuration = 0;
     Player player = _videoPlayerController ??
         Player(
           configuration: const PlayerConfiguration(
@@ -410,6 +487,7 @@ class DPlayerController extends GetxController {
       }
       _position.value = position;
       updatePositionSecond();
+      _heartDuration = position.inSeconds;
       if (duration.value.inSeconds != 0) {
         if (type != 'slider') {
           await _videoPlayerController?.stream.buffer.first;

@@ -134,4 +134,7 @@ class ApiString {
 
   /// 视频相关tag
   static const String videoTag = '/x/web-interface/view/detail/tag';
+
+  /// 记录视频播放进度
+  static const String heartBeat = '/x/click-interface/web/heartbeat';
 }

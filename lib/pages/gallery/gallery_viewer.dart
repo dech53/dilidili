@@ -260,7 +260,7 @@ class _GalleryViewerState extends State<GalleryViewer>
   }
 
   void onShareImg(String imgUrl) async {
-    SmartDialog.showLoading();
+    SmartDialog.showLoading(msg: '加载中');
     var response = await Dio()
         .get(imgUrl, options: Options(responseType: ResponseType.bytes));
     final temp = await getTemporaryDirectory();

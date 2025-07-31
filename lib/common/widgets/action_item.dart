@@ -21,10 +21,11 @@ class ActionItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Color bgColor = selectStatus
-        ? Theme.of(context).colorScheme.onInverseSurface.withOpacity(0.8)
-        : Colors.grey.withOpacity(0.2);
-    final Color contentColor =
-        selectStatus ? Theme.of(context).colorScheme.primary.withOpacity(0.8) : Colors.black.withOpacity(0.7);
+        ? Theme.of(context).colorScheme.primary
+        : Theme.of(context).colorScheme.onInverseSurface;
+    final Color contentColor = selectStatus
+        ? Theme.of(context).colorScheme.onInverseSurface
+        : Theme.of(context).colorScheme.primary;
     return InkWell(
       onTap: () => {
         onTap!(),

@@ -26,8 +26,8 @@ VideoPlayUrl _$VideoPlayUrlFromJson(Map<String, dynamic> json) => VideoPlayUrl(
       dash: Dash.fromJson(json['dash'] as Map<String, dynamic>),
       supportFormats: json['support_formats'] as List<dynamic>,
       highFormat: json['high_format'],
-      lastPlayTime: (json['lastPlayTime'] as num?)?.toInt(),
-      lastPlayCid: (json['lastPlayCid'] as num?)?.toInt(),
+      lastPlayTime: json['last_play_time'],
+      lastPlayCid: json['last_play_cid'],
     );
 
 Map<String, dynamic> _$VideoPlayUrlToJson(VideoPlayUrl instance) =>

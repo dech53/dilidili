@@ -30,25 +30,23 @@ class PagesPanel extends StatefulWidget {
 class _PagesPanelState extends State<PagesPanel> {
   late List<Part> episodes;
   late int cid;
-  late RxInt currentIndex = (-1).obs;
+  late RxInt currentIndex = (0).obs;
   final String heroTag = Get.arguments['heroTag'];
-  late VideoDetailController _videoDetailController;
   final ScrollController listViewScrollCtr = ScrollController();
-  late PersistentBottomSheetController? _bottomSheetController;
+  // late PersistentBottomSheetController? _bottomSheetController;
 
   @override
   void initState() {
     super.initState();
     cid = widget.cid;
     episodes = widget.pages;
-    _videoDetailController = Get.find<VideoDetailController>(tag: heroTag);
     currentIndex.value = episodes.indexWhere((Part e) => e.cid == cid);
     scrollToIndex();
-    _videoDetailController.cid.listen((int p0) {
-      cid = p0;
-      currentIndex.value = episodes.indexWhere((Part e) => e.cid == cid);
-      scrollToIndex();
-    });
+    // widget.videoIntroCtr.lastPlayCid.listen((int p0) {
+    //   cid = p0;
+    //   currentIndex.value = episodes.indexWhere((Part e) => e.cid == cid);
+    //   scrollToIndex();
+    // });
   }
 
   @override
@@ -60,7 +58,7 @@ class _PagesPanelState extends State<PagesPanel> {
   void changeFucCall(item, i) async {
     widget.changeFuc?.call(item.cid, item.cover);
     currentIndex.value = i;
-    _bottomSheetController?.close();
+    // _bottomSheetController?.close();
     scrollToIndex();
   }
 
@@ -109,8 +107,9 @@ class _PagesPanelState extends State<PagesPanel> {
                     padding: MaterialStateProperty.all(EdgeInsets.zero),
                   ),
                   onPressed: () {
-                    widget.videoIntroCtr.bottomSheetController =
-                        _bottomSheetController = EpisodeBottomSheet(
+                    widget.videoIntroCtr.bottomSheetController
+                        // =_bottomSheetController
+                        = EpisodeBottomSheet(
                       currentCid: cid,
                       episodes: episodes,
                       changeFucCall: changeFucCall,
@@ -142,7 +141,10 @@ class _PagesPanelState extends State<PagesPanel> {
                 width: 150,
                 margin: const EdgeInsets.only(right: 10),
                 child: Material(
-                  color: Theme.of(context).colorScheme.onInverseSurface.withOpacity(0.8),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onInverseSurface
+                      .withOpacity(0.8),
                   borderRadius: BorderRadius.circular(6),
                   clipBehavior: Clip.hardEdge,
                   child: InkWell(
