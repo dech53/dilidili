@@ -26,7 +26,7 @@ class MomentsController extends GetxController {
   Box userInfoCache = SPStorage.userInfo;
   var userInfo;
   Rx<FollowUpModel> upData = FollowUpModel().obs;
-  RxList<DynamicItemModel> dynamicsList = <DynamicItemModel>[].obs;
+  RxList<MomentItemModel> dynamicsList = <MomentItemModel>[].obs;
   RxBool isLoadingDynamic = false.obs;
   //过滤
   List filterTypeList = [
@@ -59,7 +59,7 @@ class MomentsController extends GetxController {
       upData.value.upList = <UpItem>[];
       upData.value.liveList = <LiveUserItem>[];
     }
-    var res = await DynamicsHttp.followUp();
+    var res = await MomentsHttp.followUp();
     if (res['status']) {
       upData.value = res['data'];
       if (upData.value.upList!.isEmpty) {
@@ -84,7 +84,7 @@ class MomentsController extends GetxController {
       return;
     }
     isLoadingDynamic.value = true;
-    var res = await DynamicsHttp.followDynamic(
+    var res = await MomentsHttp.followDynamic(
       page: type == 'init' ? 1 : page,
       type: dynamicsType.value.values,
       offset: offset,
@@ -177,7 +177,7 @@ class MomentsController extends GetxController {
 
   onSelectType(value) async {
     dynamicsType.value = filterTypeList[value]['value'];
-    dynamicsList.value = <DynamicItemModel>[];
+    dynamicsList.value = <MomentItemModel>[];
     page = 1;
     initialValue.value = value;
     await queryFollowDynamic();

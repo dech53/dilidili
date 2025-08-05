@@ -4,7 +4,9 @@ import 'package:dilidili/common/widgets/http_error.dart';
 import 'package:dilidili/common/widgets/no_data.dart';
 import 'package:dilidili/http/dynamics.dart';
 import 'package:dilidili/model/dynamics/result.dart';
+import 'package:dilidili/pages/dpopup/dpop.dart';
 import 'package:dilidili/pages/moments/controller.dart';
+import 'package:dilidili/pages/moments/up_moments/route_panel.dart';
 import 'package:dilidili/pages/moments/widgets/moments_panel.dart';
 import 'package:dilidili/pages/moments/widgets/up_panel.dart';
 import 'package:dilidili/utils/storage.dart';
@@ -217,7 +219,7 @@ class _MomentsPageState extends State<MomentsPage>
                           TextButton(
                             onPressed: () async {
                               if (_inputText.value != '') {
-                                var res = await DynamicsHttp.createDynamic(
+                                var res = await MomentsHttp.createDynamic(
                                   content: _inputText.value,
                                   option: _momentsController.option.value == 1
                                       ? {}
@@ -383,7 +385,17 @@ class _MomentsPageState extends State<MomentsPage>
                     return Obx(
                       () => UpPanel(
                         upData: _momentsController.upData.value,
-                        onClickUpCb: (data) {},
+                        onClickUpCb: (data) {
+                          Navigator.push(
+                            context,
+                            DPopupRoute(
+                              child: OverlayPanel(
+                                ctr: _momentsController,
+                                upInfo: data,
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     );
                   } else {
@@ -409,7 +421,7 @@ class _MomentsPageState extends State<MomentsPage>
                   }
                   Map? data = snapshot.data;
                   if (data != null && data['status']) {
-                    List<DynamicItemModel> list =
+                    List<MomentItemModel> list =
                         _momentsController.dynamicsList;
                     return Obx(
                       () {
@@ -462,7 +474,7 @@ class _MomentsPageState extends State<MomentsPage>
   Widget skeleton() {
     return SliverList(
       delegate: SliverChildBuilderDelegate((context, index) {
-        return const DynamicCardSkeleton();
+        return const MomentsCardSkeleton();
       }, childCount: 5),
     );
   }

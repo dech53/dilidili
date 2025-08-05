@@ -11,7 +11,7 @@ import 'package:get/get.dart';
 
 class ActionPanel extends StatefulWidget {
   const ActionPanel({super.key, required this.item});
-  final DynamicItemModel item;
+  final MomentItemModel item;
   @override
   State<ActionPanel> createState() => _ActionPanelState();
 }
@@ -150,7 +150,7 @@ class _ActionPanelState extends State<ActionPanel>
 
   momentForward(String type) async {
     String dynamicId = widget.item.idStr!;
-    var res = await DynamicsHttp.dynamicCreate(
+    var res = await MomentsHttp.dynamicCreate(
       dynIdStr: dynamicId,
       mid: _momentsController.userInfo.mid,
       rawText: _inputText,
@@ -291,7 +291,7 @@ class _ActionPanelState extends State<ActionPanel>
     int count = like.count == '点赞' ? 0 : int.parse(like.count ?? '0');
     bool status = like.status!;
     int up = status ? 2 : 1;
-    var res = await DynamicsHttp.likeDynamic(dynamicId: dynamicId, up: up);
+    var res = await MomentsHttp.likeDynamic(dynamicId: dynamicId, up: up);
     if (res['status']) {
       SmartDialog.showToast(!status ? '点赞成功' : '取消赞');
       if (up == 1) {

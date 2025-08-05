@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'skeleton.dart';
 
-class DynamicCardSkeleton extends StatelessWidget {
-  const DynamicCardSkeleton({super.key});
+class MomentsCardSkeleton extends StatelessWidget {
+  const MomentsCardSkeleton({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -1,4 +1,3 @@
-import 'package:dilidili/model/dynamics/result.dart';
 import 'package:dilidili/pages/moments/controller.dart';
 import 'package:dilidili/pages/moments/widgets/action_panel.dart';
 import 'package:dilidili/pages/moments/widgets/author_panel.dart';

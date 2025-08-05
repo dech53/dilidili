@@ -2,6 +2,7 @@ import 'package:dilidili/common/widgets/network_img_layer.dart';
 import 'package:dilidili/model/dynamics/up.dart';
 import 'package:dilidili/model/live/item.dart';
 import 'package:dilidili/utils/string_utils.dart';
+import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -104,11 +105,20 @@ class _UpPanelState extends State<UpPanel> {
     );
   }
 
+  void onClickUp(data, i) {
+    currentMid = data.mid;
+    widget.onClickUpCb?.call(data);
+  }
+
   Widget upItemBuild(data, i) {
     bool isCurrent = currentMid == data.mid || currentMid == -1;
     return InkWell(
       onTap: () {
         if (data.type == 'up') {
+          EasyThrottle.throttle('follow', const Duration(milliseconds: 300),
+              () {
+            onClickUp(data, i);
+          });
         } else if (data.type == 'live') {
           LiveItemModel liveItem = LiveItemModel.fromJson({
             'title': data.title,

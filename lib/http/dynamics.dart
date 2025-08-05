@@ -6,7 +6,7 @@ import 'package:dilidili/model/dynamics/result.dart';
 import 'package:dilidili/model/dynamics/up.dart';
 import 'package:dio/dio.dart';
 
-class DynamicsHttp {
+class MomentsHttp {
   static Future followUp() async {
     var res = await DioInstance.instance().get(
       path: ApiString.baseUrl + ApiString.followUp,
@@ -49,7 +49,7 @@ class DynamicsHttp {
       try {
         return {
           'status': true,
-          'data': DynamicsDataModel.fromJson(res.data['data']),
+          'data': MomentsDataModel.fromJson(res.data['data']),
         };
       } catch (err) {
         print(err);

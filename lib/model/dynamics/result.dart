@@ -1,27 +1,27 @@
 import 'dart:convert';
 
-class DynamicsDataModel {
-  DynamicsDataModel({
+class MomentsDataModel {
+  MomentsDataModel({
     this.hasMore,
     this.items,
     this.offset,
   });
   bool? hasMore;
-  List<DynamicItemModel>? items;
+  List<MomentItemModel>? items;
   String? offset;
 
-  DynamicsDataModel.fromJson(Map<String, dynamic> json) {
+  MomentsDataModel.fromJson(Map<String, dynamic> json) {
     hasMore = json['has_more'];
     items = json['items']
-        .map<DynamicItemModel>((e) => DynamicItemModel.fromJson(e))
+        .map<MomentItemModel>((e) => MomentItemModel.fromJson(e))
         .toList();
     offset = json['offset'];
   }
 }
 
 // 单个动态
-class DynamicItemModel {
-  DynamicItemModel({
+class MomentItemModel {
+  MomentItemModel({
     this.basic,
     this.idStr,
     this.modules,
@@ -37,7 +37,7 @@ class DynamicItemModel {
   String? type;
   bool? visible;
 
-  DynamicItemModel.fromJson(Map<String, dynamic> json) {
+  MomentItemModel.fromJson(Map<String, dynamic> json) {
     basic = json['basic'];
     idStr = json['id_str'];
     modules = ItemModulesModel.fromJson(json['modules']);
