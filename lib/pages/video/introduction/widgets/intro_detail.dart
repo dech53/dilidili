@@ -182,10 +182,11 @@ class IntroDetail extends StatelessWidget {
             recognizer: TapGestureRecognizer()
               ..onTap = () {
                 Get.toNamed(
-                  '/member?mid=${currentDesc.bizId}',
+                  '/member/mid=${currentDesc.bizId}',
                   arguments: {
                     'face': videoDetail!.owner!.face!,
                     'heroTag': heroTag,
+                    'mid': currentDesc.bizId.toString(),
                   },
                 );
               },

@@ -1,8 +1,10 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dilidili/common/constants.dart';
 import 'package:dilidili/common/skeleton/video_card_h.dart';
 import 'package:dilidili/common/widgets/http_error.dart';
+import 'package:dilidili/common/widgets/network_img_layer.dart';
 import 'package:dilidili/pages/favorite/controller.dart';
+import 'package:dilidili/utils/string_utils.dart';
+import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -21,150 +23,154 @@ class _FavoritePageState extends State<FavoritePage>
   @override
   void initState() {
     super.initState();
-    _futureBuilder = _favoriteController.getUserFolderDetail();
+    _futureBuilder = _favoriteController.queryFavFolder();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15),
-      child: Container(
-        clipBehavior: Clip.hardEdge,
-        margin: const EdgeInsets.symmetric(horizontal: 4),
-        decoration: const BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(12)),
-        ),
-        child: CustomScrollView(
-          controller: _favoriteController.scrollController,
-          physics: const AlwaysScrollableScrollPhysics(),
-          slivers: [
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(0, 16, 0, 4),
-              sliver: FutureBuilder(
-                future: _futureBuilder,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    Map data = snapshot.data as Map;
-                    if (data['status']) {
-                      return Obx(
-                        () => SliverList(
-                          delegate: SliverChildBuilderDelegate(
-                            (context, index) {
-                              return Padding(
-                                padding: const EdgeInsets.fromLTRB(0, 0, 0, 8),
-                                child: InkWell(
-                                  borderRadius: BorderRadius.circular(12),
-                                  onTap: () {},
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(12),
-                                      color: Theme.of(context).cardColor,
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 3),
-                                      child: LayoutBuilder(
-                                        builder: (context, boxConstraints) {
-                                          double width = (boxConstraints
-                                                      .maxWidth -
-                                                  StyleString.cardSpace * 6) /
-                                              2;
-                                          return SizedBox(
-                                            height:
-                                                width / StyleString.aspectRatio,
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                AspectRatio(
-                                                  aspectRatio:
-                                                      StyleString.aspectRatio,
-                                                  child: ClipRRect(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            8), // 设置圆角大小
-                                                    child: CachedNetworkImage(
-                                                      imageUrl:
-                                                          _favoriteController
-                                                              .favoriteInfos[
-                                                                  index]
-                                                              .cover!,
-                                                      placeholder:
-                                                          (context, url) =>
-                                                              Container(
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          borderRadius:
-                                                              BorderRadius.circular(
-                                                                  8), // 确保占位图也有圆角
-                                                          color: Theme.of(
-                                                                  context)
-                                                              .disabledColor,
-                                                        ),
-                                                      ),
-                                                      errorWidget: (context,
-                                                              url, error) =>
-                                                          Icon(
-                                                        Icons.error,
-                                                        color: Theme.of(context)
-                                                            .colorScheme
-                                                            .error,
-                                                      ),
-                                                      fit: BoxFit.cover,
-                                                      alignment:
-                                                          Alignment.topCenter,
-                                                    ),
-                                                  ),
-                                                ),
-                                                const SizedBox(width: 12),
-                                                VideoContent(
-                                                  favFolderItem:
-                                                      _favoriteController
-                                                          .favoriteInfos[index],
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                            childCount: _favoriteController.favorites.length,
-                          ),
-                        ),
+    super.build(context);
+    return FutureBuilder(
+      future: _futureBuilder,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          Map? data = snapshot.data;
+          if (data != null && data['status']) {
+            if (_favoriteController.favFolderList.isNotEmpty) {
+              return Obx(
+                () => CustomScrollView(
+                  slivers: [
+                    SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (_, index) {
+                          if (index >=
+                              _favoriteController.favFolderList.length - 2) {
+                            EasyThrottle.throttle(
+                                'history', const Duration(seconds: 1), () {
+                              _favoriteController.onLoad();
+                            });
+                          }
+                          return FavItem(
+                            favFolderItem:
+                                _favoriteController.favFolderList[index],
+                            isOwner: _favoriteController.isOwner.value,
+                          );
+                        },
+                        childCount: _favoriteController.favFolderList.length,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            } else {
+              return CustomScrollView(
+                physics: const NeverScrollableScrollPhysics(),
+                slivers: [
+                  HttpError(
+                    errMsg: '用户没有公开收藏夹',
+                    fn: () {
+                      setState(
+                        () {
+                          _futureBuilder = _favoriteController.queryFavFolder();
+                        },
                       );
-                    } else {
-                      return HttpError(
-                        errMsg: data['msg'],
-                        fn: () {},
-                      );
-                    }
-                  } else {
-                    return SliverList(
-                      delegate: SliverChildBuilderDelegate((context, index) {
-                        return const Padding(
-                          padding: EdgeInsets.fromLTRB(0, 0, 0, 8),
-                          child: VideoCardHSkeleton(),
-                        );
-                      }, childCount: 6),
+                    },
+                  ),
+                ],
+              );
+            }
+          } else {
+            return CustomScrollView(
+              physics: const NeverScrollableScrollPhysics(),
+              slivers: [
+                HttpError(
+                  errMsg: data?['msg'] ?? '请求异常',
+                  btnText: data?['code'] == -101 ? '去登录' : null,
+                  fn: () {
+                    setState(
+                      () {
+                        _futureBuilder = _favoriteController.queryFavFolder();
+                      },
                     );
-                  }
-                },
-              ),
-            )
-          ],
-        ),
-      ),
+                  },
+                ),
+              ],
+            );
+          }
+        } else {
+          // 骨架屏
+          return CustomScrollView(
+            physics: const NeverScrollableScrollPhysics(),
+            slivers: [
+              SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (_, i) {
+                    return const VideoCardHSkeleton();
+                  },
+                  childCount: 5,
+                ),
+              )
+            ],
+          );
+        }
+      },
     );
   }
 
   @override
   bool get wantKeepAlive => true;
+}
+
+class FavItem extends StatelessWidget {
+  final favFolderItem;
+  final bool isOwner;
+  const FavItem(
+      {super.key, required this.favFolderItem, required this.isOwner});
+
+  @override
+  Widget build(BuildContext context) {
+    String heroTag = StringUtils.makeHeroTag(favFolderItem.fid);
+    return InkWell(
+      onTap: () async {
+        //跳转收藏夹详情
+      },
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(12, 7, 12, 7),
+        child: LayoutBuilder(
+          builder: (context, boxConstraints) {
+            double width =
+                (boxConstraints.maxWidth - StyleString.cardSpace * 6) / 2;
+            return SizedBox(
+              height: width / StyleString.aspectRatio,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  AspectRatio(
+                    aspectRatio: StyleString.aspectRatio,
+                    child: LayoutBuilder(
+                      builder: (context, boxConstraints) {
+                        double maxWidth = boxConstraints.maxWidth;
+                        double maxHeight = boxConstraints.maxHeight;
+                        return Hero(
+                          tag: heroTag,
+                          child: NetworkImgLayer(
+                            src: favFolderItem.cover,
+                            width: maxWidth,
+                            height: maxHeight,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  VideoContent(favFolderItem: favFolderItem)
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
 }
 
 class VideoContent extends StatelessWidget {
@@ -175,24 +181,21 @@ class VideoContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(0, 2, 6, 10),
+        padding: const EdgeInsets.fromLTRB(10, 2, 6, 10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               favFolderItem.title,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: Theme.of(context).textTheme.labelLarge!.fontSize,
+              textAlign: TextAlign.start,
+              style: const TextStyle(
+                fontWeight: FontWeight.w500,
                 letterSpacing: 0.3,
-                color: Theme.of(context).textTheme.titleMedium!.color,
               ),
             ),
-            const SizedBox(height: 4),
             Text(
               '${favFolderItem.mediaCount}个内容',
+              textAlign: TextAlign.start,
               style: TextStyle(
                 fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
                 color: Theme.of(context).colorScheme.outline,
@@ -201,6 +204,7 @@ class VideoContent extends StatelessWidget {
             const Spacer(),
             Text(
               [23, 1].contains(favFolderItem.attr) ? '私密' : '公开',
+              textAlign: TextAlign.start,
               style: TextStyle(
                 fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
                 color: Theme.of(context).colorScheme.outline,

@@ -17,8 +17,8 @@ Widget searchUserPanel(BuildContext context, ctr, list) {
       var i = list![index];
       String heroTag = StringUtils.makeHeroTag(i!.mid);
       return InkWell(
-        onTap: () => Get.toNamed('/member?mid=${i.mid}',
-            arguments: {'heroTag': heroTag, 'face': i.upic}),
+        onTap: () => Get.toNamed('/member/mid=${i.mid}',
+            arguments: {'heroTag': heroTag, 'face': i.upic, 'mid': i.mid.toString()}),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
           child: Row(

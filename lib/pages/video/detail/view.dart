@@ -236,7 +236,7 @@ class _VideoPageState extends State<VideoPage>
                     tabs: vdCtr.tabs
                         .map((String name) => Tab(text: name))
                         .toList(),
-                    onTap: (index) {},
+                    onTap: (index) => vdCtr.onTapTabbar(index),
                   ),
                 ),
               ),

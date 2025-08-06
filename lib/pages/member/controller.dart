@@ -33,7 +33,7 @@ class MemberController extends GetxController with GetTickerProviderStateMixin {
     heroTag = Get.arguments['heroTag'] ?? '';
     tabsCtrList = memberTabs.map((e) => e['ctr']).toList();
     tabsPageList = memberTabs.map<Widget>((e) => e['page']).toList();
-    mid = int.parse(Get.parameters['mid']!);
+    mid = int.parse(Get.arguments['mid']!);
 
     //获取当前登录用户的mid
     ownerMid = SPStorage.userInfo.get('userInfoCache').mid;

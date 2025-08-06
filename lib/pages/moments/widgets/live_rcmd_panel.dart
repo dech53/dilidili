@@ -23,8 +23,8 @@ Widget liveRcmdPanel(item, context, {floor = 1}) {
           children: [
             GestureDetector(
               onTap: () => Get.toNamed(
-                  '/member?mid=${item.modules.moduleAuthor.mid}',
-                  arguments: {'face': item.modules.moduleAuthor.face}),
+                  '/member/mid=${item.modules.moduleAuthor.mid}',
+                  arguments: {'face': item.modules.moduleAuthor.face,'mid': item.modules.moduleAuthor.mid.toString()}),
               child: Text(
                 '@${item.modules.moduleAuthor.name}',
                 style: authorStyle,

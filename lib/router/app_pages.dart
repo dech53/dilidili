@@ -18,7 +18,7 @@ class Routes {
   static final List<GetPage<dynamic>> getPages = [
     CustomGetPage(name: '/', page: () => const HomePage()),
     CustomGetPage(name: '/video/:bvid', page: () => const VideoPage()),
-    CustomGetPage(name: '/member', page: () => const MemberPage()),
+    CustomGetPage(name: '/member/:mid', page: () => const MemberPage()),
     CustomGetPage(name: '/search', page: () => const SearchPage()),
     CustomGetPage(name: '/searchResult', page: () => const SearchResultPage()),
     CustomGetPage(name: '/read', page: () => const ReadPage()),

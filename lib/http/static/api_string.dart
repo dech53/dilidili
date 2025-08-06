@@ -40,9 +40,9 @@ class ApiString {
   static const String getMemberViewApi = '/x/space/upstat';
   // 查询用户与自己关系_仅查关注
   static const String hasFollow = '/x/relation';
-  //查询用户公开收藏夹
-  //传入up_mid,用户id
-  static const String getUserFolder = '/x/v3/fav/folder/created/list-all';
+  // 收藏夹
+  // https://api.bilibili.com/x/v3/fav/folder/created/list?pn=1&ps=10&up_mid=17340771
+  static const String userFavFolder = '/x/v3/fav/folder/created/list';
   //查询收藏夹元数据,收藏夹封面图
   //传入media_id,收藏夹id
   static const String getFolerDetail = '/x/v3/fav/folder/info';
@@ -62,7 +62,7 @@ class ApiString {
   // order_avoided=true&
   // w_rid=d893cf98a4e010cf326373194a648360&
   // wts=1689767832
-  static const String memberArchive = '/x/space/wbi/arc/search';
+  static const String memberPost = '/x/space/wbi/arc/search';
 
   /// 搜索结果计数
   static const String searchCount = '/x/web-interface/wbi/search/all/v2';

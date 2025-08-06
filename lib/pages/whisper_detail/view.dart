@@ -72,8 +72,9 @@ class _WhisperDetailPageState extends State<WhisperDetailPage>
               const SizedBox(width: 10),
               GestureDetector(
                 onTap: () => Get.toNamed(
-                    '/member?mid=${_whisperDetailController.mid}',
-                    arguments: {'face': _whisperDetailController.face}),
+                    '/member/mid=${_whisperDetailController.mid}',
+                    arguments: {'face': _whisperDetailController.face,
+                      'mid': _whisperDetailController.mid.toString()}),
                 child: Row(
                   children: <Widget>[
                     Container(

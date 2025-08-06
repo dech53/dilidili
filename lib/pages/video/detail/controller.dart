@@ -116,6 +116,12 @@ class VideoDetailController extends GetxController
   void onControllerCreated(ScrollController controller) {
     replyScrollController = controller;
   }
+  void onTapTabbar(int index) {
+    if (tabCtr.animation!.isCompleted && index == 1 && tabCtr.index == 1) {
+      replyScrollController?.animateTo(0,
+          duration: const Duration(milliseconds: 300), curve: Curves.ease);
+    }
+  }
 
 // 视频链接
   Future queryVideoUrl() async {

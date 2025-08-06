@@ -20,8 +20,9 @@ class AuthorPanel extends StatelessWidget {
               return;
             }
             Get.toNamed(
-              '/member?mid=${item.modules.moduleAuthor.mid}',
+              '/member/mid=${item.modules.moduleAuthor.mid}',
               arguments: {
+                'mid': item.modules.moduleAuthor.mid.toString(),
                 'face': item.modules.moduleAuthor.face,
                 'heroTag': heroTag
               },

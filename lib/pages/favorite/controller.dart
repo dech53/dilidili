@@ -1,45 +1,63 @@
-import 'package:dilidili/http/member.dart';
-import 'package:dilidili/model/member/folder_detail.dart';
-import 'package:dilidili/model/member/folder_info.dart';
+import 'package:dilidili/http/user.dart';
+import 'package:dilidili/model/user/fav_folder.dart';
+import 'package:dilidili/model/user/info.dart';
+import 'package:dilidili/utils/storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 
 class FavoriteController extends GetxController {
   late int mid;
-  RxList<FolderItem> favorites = <FolderItem>[].obs;
-  RxList<FolderDetail> favoriteInfos = <FolderDetail>[].obs;
+  late int ownerMid;
+  Rx<FavFolderData> favFolderData = FavFolderData().obs;
+  RxList<FavFolderItemData> favFolderList = <FavFolderItemData>[].obs;
   final ScrollController scrollController = ScrollController();
+  Box userInfoCache = SPStorage.userInfo;
+  UserInfoData? userInfo;
+  RxBool hasMore = true.obs;
+  int currentPage = 1;
+  int pageSize = 60;
+  RxBool isOwner = false.obs;
   @override
   void onInit() {
     super.onInit();
-    mid = int.parse(Get.parameters['mid']!);
+    mid = int.parse(Get.arguments['mid'] ?? '-1');
+    userInfo = userInfoCache.get('userInfoCache');
+    ownerMid = userInfo != null ? userInfo!.mid! : -1;
+    isOwner.value = mid == -1 || mid == ownerMid;
   }
 
-  Future getUserFolder() async {
-    var res = await MemberHttp.getUserFolder(mid: mid);
-    if (res['status']) {
-      favorites.value = res['data'];
+  Future<dynamic> queryFavFolder({type = 'init'}) async {
+    if (userInfo == null) {
+      return {'status': false, 'msg': '账号未登录', 'code': -101};
     }
-    return res;
-  }
-
-  Future getUserFolderDetail() async {
-    await getUserFolder();
-    var res;
-    if (favorites.isNotEmpty) {
-      for (var item in favorites) {
-        res = await MemberHttp.memberFolderDetail(id: item.id!);
-        if (res['status']) {
-          favoriteInfos.add(res['data']);
+    if (!hasMore.value) {
+      return;
+    }
+    var res = await UserHttp.userfavFolder(
+      pn: currentPage,
+      ps: pageSize,
+      mid: isOwner.value ? ownerMid : mid,
+    );
+    if (res['status']) {
+      if (type == 'init') {
+        favFolderData.value = res['data'];
+        favFolderList.value = res['data'].list;
+      } else {
+        if (res['data'].list.isNotEmpty) {
+          favFolderList.addAll(res['data'].list);
+          favFolderData.update((val) {});
         }
       }
+      hasMore.value = res['data'].hasMore;
+      currentPage++;
     } else {
-      res = {
-        'status': false,
-        'data': [],
-        'msg': '用户没有公开收藏夹',
-      };
+      SmartDialog.showToast(res['msg']);
     }
     return res;
+  }
+  Future onLoad() async {
+    queryFavFolder(type: 'onload');
   }
 }

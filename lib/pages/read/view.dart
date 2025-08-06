@@ -267,8 +267,8 @@ class _ReadPageState extends State<ReadPage> {
         InkWell(
           onTap: () {
             Get.toNamed(
-              '/member?mid=${author.mid}',
-              arguments: {'face': author.face},
+              '/member/mid=${author.mid}',
+              arguments: {'face': author.face, 'mid': author.mid.toString()},
             );
           },
           child: CircleAvatar(

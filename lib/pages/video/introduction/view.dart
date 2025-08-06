@@ -165,10 +165,11 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
               child: GestureDetector(
                 onTap: () {
                   Get.toNamed(
-                    '/member?mid=${widget.videoDetail!.owner!.mid}',
+                    '/member/mid=${widget.videoDetail!.owner!.mid}',
                     arguments: {
                       'face': widget.videoDetail!.owner!.face,
                       'heroTag': widget.heroTag,
+                      'mid': widget.videoDetail!.owner!.mid.toString(),
                     },
                   );
                 },

@@ -65,9 +65,10 @@ class ReplyItem extends StatelessWidget {
       children: <Widget>[
         GestureDetector(
           onTap: () {
-            Get.toNamed('/member?mid=${replyItem!.mid}', arguments: {
+            Get.toNamed('/member/mid=${replyItem!.mid}', arguments: {
               'face': replyItem!.member!.avatar!,
-              'heroTag': heroTag
+              'heroTag': heroTag,
+              'mid': replyItem!.member!.mid.toString(),
             });
           },
           child: Row(
