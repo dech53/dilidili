@@ -28,8 +28,7 @@ class _MemberPostPageState extends State<MemberPostPage>
   void initState() {
     super.initState();
     mid = int.parse(Get.arguments['mid']!);
-    final String heroTag = StringUtils.makeHeroTag(mid);
-    _memberPostController = Get.put(MemberPostController(), tag: heroTag);
+    _memberPostController = Get.put(MemberPostController(), tag: mid.toString());
     _futureBuilderFuture = _memberPostController.getMemberPost('init');
     scrollController = _memberPostController.scrollController;
     scrollController.addListener(
@@ -47,6 +46,7 @@ class _MemberPostPageState extends State<MemberPostPage>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return CustomScrollView(
       slivers: [
         FutureBuilder(

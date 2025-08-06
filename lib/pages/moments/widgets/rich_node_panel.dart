@@ -41,6 +41,7 @@ InlineSpan richNode(item, context) {
     } else {
       for (var i in richTextNodes) {
         if (i.type == 'RICH_TEXT_NODE_TYPE_TEXT') {
+          print("动态文字内容: ${i.origText}");
           spanChilds.add(
               TextSpan(text: i.origText, style: const TextStyle(height: 1.65)));
         }

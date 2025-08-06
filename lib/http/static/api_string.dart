@@ -107,8 +107,7 @@ class ApiString {
 
   static const String whisper_unread =
       '/session_svr/v1/session_svr/single_unread';
-  // 关注的up动态
-  static const String followDynamic = '/x/polymer/web-dynamic/v1/feed/all';
+
   // 正在直播的up & 关注的up
   static const String followUp = '/x/polymer/web-dynamic/v1/portal';
   // 动态点赞
@@ -137,4 +136,8 @@ class ApiString {
 
   /// 记录视频播放进度
   static const String heartBeat = '/x/click-interface/web/heartbeat';
+  // 用户动态
+  static const String memberMoment = '/x/polymer/web-dynamic/v1/feed/space';
+  // 关注的up动态
+  static const String followDynamic = '/x/polymer/web-dynamic/v1/feed/all';
 }

@@ -1,5 +1,6 @@
 import 'package:dilidili/http/dio_instance.dart';
 import 'package:dilidili/http/static/api_string.dart';
+import 'package:dilidili/model/dynamics/result.dart';
 import 'package:dilidili/model/member/archive.dart';
 import 'package:dilidili/model/member/folder_detail.dart';
 import 'package:dilidili/model/member/folder_info.dart';
@@ -113,6 +114,33 @@ class MemberHttp {
       return {
         'status': true,
         'data': MemberPostDataModel.fromJson(res.data['data'])
+      };
+    } else {
+      Map errMap = {
+        -352: '风控校验失败，请检查登录状态',
+      };
+      return {
+        'status': false,
+        'data': [],
+        'msg': errMap[res.data['code']] ?? res.data['message'],
+      };
+    }
+  }
+
+  // 用户动态
+  static Future memberMoment({String? offset, int? mid}) async {
+    var res = await DioInstance.instance().get(
+      path: ApiString.baseUrl + ApiString.memberMoment,
+      param: {
+        'offset': offset ?? '',
+        'host_mid': mid,
+        'timezone_offset': '-480',
+      },
+    );
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': MomentsDataModel.fromJson(res.data['data']),
       };
     } else {
       Map errMap = {

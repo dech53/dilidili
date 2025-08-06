@@ -17,12 +17,14 @@ class FavoritePage extends StatefulWidget {
 
 class _FavoritePageState extends State<FavoritePage>
     with AutomaticKeepAliveClientMixin {
-  final FavoriteController _favoriteController = Get.put(FavoriteController());
-  late Future _futureBuilder;
+  late FavoriteController _favoriteController ;
+  late Future _futureBuilder;late int mid;
 
   @override
   void initState() {
     super.initState();
+    mid = int.parse(Get.arguments['mid']!);
+    _favoriteController = Get.put(FavoriteController(), tag: mid.toString());
     _futureBuilder = _favoriteController.queryFavFolder();
   }
 
