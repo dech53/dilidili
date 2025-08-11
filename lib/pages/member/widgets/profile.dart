@@ -96,7 +96,15 @@ class ProfilePanel extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         InkWell(
-                          onTap: () {},
+                          onTap: () {
+                            Get.toNamed(
+                              '/follow?mid=${memberInfo.mid}&name=${memberInfo.name}',
+                              arguments: {
+                                'mid': memberInfo.mid.toString(),
+                                'name': memberInfo.name,
+                              },
+                            );
+                          },
                           child: Column(
                             children: [
                               Text(

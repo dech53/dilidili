@@ -2,7 +2,7 @@ import 'package:dilidili/common/constants.dart';
 import 'package:dilidili/common/skeleton/video_card_h.dart';
 import 'package:dilidili/common/widgets/http_error.dart';
 import 'package:dilidili/common/widgets/network_img_layer.dart';
-import 'package:dilidili/pages/favorite/controller.dart';
+import 'package:dilidili/pages/fav/controller.dart';
 import 'package:dilidili/utils/string_utils.dart';
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
@@ -17,8 +17,9 @@ class FavoritePage extends StatefulWidget {
 
 class _FavoritePageState extends State<FavoritePage>
     with AutomaticKeepAliveClientMixin {
-  late FavoriteController _favoriteController ;
-  late Future _futureBuilder;late int mid;
+  late FavoriteController _favoriteController;
+  late Future _futureBuilder;
+  late int mid;
 
   @override
   void initState() {
@@ -133,7 +134,15 @@ class FavItem extends StatelessWidget {
     String heroTag = StringUtils.makeHeroTag(favFolderItem.fid);
     return InkWell(
       onTap: () async {
-        //跳转收藏夹详情
+        Get.toNamed(
+          '/favDetail',
+          arguments: {
+            'favFolderItem': favFolderItem,
+            'heroTag': heroTag,
+            'mediaId': favFolderItem.id.toString(),
+            'isOwner': isOwner ? '1' : '0',
+          },
+        );
       },
       child: Padding(
         padding: const EdgeInsets.fromLTRB(12, 7, 12, 7),

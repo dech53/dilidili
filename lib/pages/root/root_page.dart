@@ -57,25 +57,65 @@ class _RootPageState extends State<RootPage> {
   }
 
   Widget _getBottomNavigator(BuildContext context) {
-    return SalomonBottomBar(
-      currentIndex: _index,
-      onTap: (index) {
-        setState(() {
-          _index = index;
-        });
-      },
-      items: List.generate(
-        rootApp.length,
-        (index) {
-          return SalomonBottomBarItem(
-            selectedColor: Theme.of(context).colorScheme.onSurface,
-            unselectedColor: Theme.of(context).colorScheme.onSurface,
-            icon: Icon(rootApp[index]
-                [(_index == index) ? 'SelectedIcon' : 'unSelectedIcon']),
-            title: Text(rootApp[index]['text']),
-          );
-        },
-      ),
+    // return SalomonBottomBar(
+    //   currentIndex: _index,
+    //   onTap: (index) {
+    //     setState(() {
+    //       _index = index;
+    //     });
+    //   },
+    //   items: List.generate(
+    //     rootApp.length,
+    //     (index) {
+    //       return SalomonBottomBarItem(
+    //         selectedColor: Theme.of(context).colorScheme.onSurface,
+    //         unselectedColor: Theme.of(context).colorScheme.onSurface,
+    //         icon: Icon(rootApp[index]['unSelectedIcon']),
+    //         title: Text(rootApp[index]['text']),
+    //         activeIcon: Icon(rootApp[index]['SelectedIcon']),
+    //       );
+    //     },
+    //   ),
+    // );
+
+    // return BottomNavigationBar(
+    //   currentIndex: _index,
+    //   iconSize: 16,
+    //   selectedFontSize: 12,
+    //   unselectedFontSize: 12,
+    //   type: BottomNavigationBarType.fixed,
+    //   onTap: (index) {
+    //     setState(() {
+    //       _index = index;
+    //     });
+    //   },
+    //   items: List.generate(
+    //     rootApp.length,
+    //     (index) {
+    //       return BottomNavigationBarItem(
+    //         icon: Icon(rootApp[index]['unSelectedIcon']),
+    //         activeIcon: Icon(rootApp[index]['SelectedIcon']),
+    //         label: rootApp[index]['text'],
+    //       );
+    //     },
+    //   ),
+    // );
+    return NavigationBar(
+      onDestinationSelected: (value) => setState(() {
+        _index = value;
+      }),
+      selectedIndex: _index,
+      destinations: <Widget>[
+        ...rootApp.map(
+          (e) {
+            return NavigationDestination(
+              icon: Icon(e['unSelectedIcon']),
+              label: e['text'],
+              selectedIcon: Icon(e['SelectedIcon']),
+            );
+          },
+        )
+      ],
     );
   }
 }

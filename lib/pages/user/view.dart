@@ -311,7 +311,7 @@ class _UserPageState extends State<UserPage> {
                     ),
                     InkWell(
                       onTap: () {
-                        // _userPageController.pushFollow();
+                        _userPageController.pushFollow();
                       },
                       borderRadius: StyleString.mdRadius,
                       child: Column(

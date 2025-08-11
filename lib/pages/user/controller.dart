@@ -99,6 +99,20 @@ class UserPageController extends GetxController {
     return res;
   }
 
+  pushFollow() {
+    if (!userLogin.value) {
+      SmartDialog.showToast('账号未登录');
+      return;
+    }
+    Get.toNamed(
+      '/follow?mid=${userInfo.value.mid}',
+      arguments: {
+        'mid': userInfo.value.mid.toString(),
+      },
+      preventDuplicates: false,
+    );
+  }
+
   Future resetUserInfo() async {
     userInfo.value = UserInfoData();
     userStat.value = UserStat();

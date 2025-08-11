@@ -57,7 +57,17 @@ class FavoriteController extends GetxController {
     }
     return res;
   }
+
   Future onLoad() async {
     queryFavFolder(type: 'onload');
+  }
+
+  removeFavFolder({required int mediaIds}) async {
+    for (var i in favFolderList) {
+      if (i.id == mediaIds) {
+        favFolderList.remove(i);
+        break;
+      }
+    }
   }
 }

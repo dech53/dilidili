@@ -1,6 +1,7 @@
 import 'package:dilidili/http/dio_instance.dart';
 import 'package:dilidili/http/static/api_string.dart';
 import 'package:dilidili/model/message/unread.dart';
+import 'package:dilidili/model/user/fav_detail.dart';
 import 'package:dilidili/model/user/fav_folder.dart';
 import 'package:dilidili/model/user/info.dart';
 import 'package:dilidili/model/user/stat.dart';
@@ -82,6 +83,51 @@ class UserHttp {
         'msg': res.data['message'],
         'code': res.data['code'],
       };
+    }
+  }
+
+  // 删除文件夹
+  static Future delFavFolder({required int mediaIds}) async {
+    var res = await DioInstance.instance().post(
+      path: ApiString.baseUrl + ApiString.delFavFolder,
+      param: {
+        'media_ids': mediaIds,
+        'platform': 'web',
+        'csrf': await DioInstance.instance().getCsrf(),
+      },
+    );
+    if (res.data['code'] == 0) {
+      return {'status': true};
+    } else {
+      return {'status': false, 'msg': res.data['message']};
+    }
+  }
+
+  static Future<dynamic> userFavFolderDetail(
+      {required int mediaId,
+      required int pn,
+      required int ps,
+      String keyword = '',
+      String order = 'mtime',
+      int type = 0}) async {
+    var res = await DioInstance.instance().get(
+      path: ApiString.baseUrl + ApiString.userFavFolderDetail,
+      param: {
+        'media_id': mediaId,
+        'pn': pn,
+        'ps': ps,
+        'keyword': keyword,
+        'order': order,
+        'type': type,
+        'tid': 0,
+        'platform': 'web'
+      },
+    );
+    if (res.data['code'] == 0) {
+      FavDetailData data = FavDetailData.fromJson(res.data['data']);
+      return {'status': true, 'data': data};
+    } else {
+      return {'status': false, 'data': [], 'msg': res.data['message']};
     }
   }
 }

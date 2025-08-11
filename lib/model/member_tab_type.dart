@@ -1,5 +1,5 @@
-import 'package:dilidili/pages/favorite/controller.dart';
-import 'package:dilidili/pages/favorite/view.dart';
+import 'package:dilidili/pages/fav/controller.dart';
+import 'package:dilidili/pages/fav/view.dart';
 import 'package:dilidili/pages/memberMoment/controller.dart';
 import 'package:dilidili/pages/memberMoment/view.dart';
 import 'package:dilidili/pages/member_post/controller.dart';

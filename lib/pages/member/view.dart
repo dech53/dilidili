@@ -38,7 +38,7 @@ class _MemberPageState extends State<MemberPage>
     statusBarHeight = SPStorage.statusBarHeight;
     mid = int.parse(Get.arguments['mid']!);
     heroTag = Get.arguments['heroTag'] ?? StringUtils.makeHeroTag(mid);
-    _memberController = Get.put(MemberController());
+    _memberController = Get.put(MemberController(), tag: mid.toString());
     _futureBuilderFuture = _memberController.getInfo();
     _tabController = TabController(
       length: memberTabs.length,

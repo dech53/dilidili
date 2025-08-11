@@ -250,7 +250,7 @@ class VideoHttp {
     }
   }
 
-  // （取消）点赞
+  // (取消)点赞
   static Future likeVideo({required String bvid, required bool type}) async {
     var res = await DioInstance.instance().post(
       path: ApiString.baseUrl + ApiString.likeVideo,
@@ -258,6 +258,10 @@ class VideoHttp {
         'bvid': bvid,
         'like': type ? 1 : 2,
         'csrf': await DioInstance.instance().getCsrf(),
+        'spmid': '333.788.0.0',
+        'source': 'web_normal',
+        'ga': 1,
+        'ramval': 0,
       },
     );
     if (res.data['code'] == 0) {
@@ -267,6 +271,7 @@ class VideoHttp {
     }
   }
 
+  // 投币
   static Future coinVideo({required String bvid, required int multiply}) async {
     var res = await DioInstance.instance().post(
       path: ApiString.baseUrl + ApiString.coinVideo,
@@ -275,6 +280,10 @@ class VideoHttp {
         'multiply': multiply,
         'select_like': 0,
         'csrf': await DioInstance.instance().getCsrf(),
+        'spmid': '333.788.0.0',
+        'source': 'web_normal',
+        'ga': 1,
+        'ramval': 0,
       },
     );
     if (res.data['code'] == 0) {
@@ -300,7 +309,7 @@ class VideoHttp {
     }
   }
 
-  // （取消）收藏
+  // (取消)收藏
   static Future favVideo(
       {required int aid, String? addIds, String? delIds}) async {
     var res = await DioInstance.instance().post(

@@ -140,4 +140,17 @@ class ApiString {
   static const String memberMoment = '/x/polymer/web-dynamic/v1/feed/space';
   // 关注的up动态
   static const String followDynamic = '/x/polymer/web-dynamic/v1/feed/all';
+  /// 删除收藏夹
+  static const String delFavFolder = '/x/v3/fav/folder/del';
+  /// 收藏夹 详情
+  /// media_id  当前收藏夹id 搜索全部时为默认收藏夹id
+  /// pn int 当前页
+  /// ps int pageSize
+  /// keyword String 搜索词
+  /// order String 排序方式 view 最多播放 mtime 最近收藏 pubtime 最近投稿
+  /// tid int 分区id
+  /// platform web
+  /// type 0 当前收藏夹 1 全部收藏夹
+  // https://api.bilibili.com/x/v3/fav/resource/list?media_id=76614671&pn=1&ps=20&keyword=&order=mtime&type=0&tid=0
+  static const String userFavFolderDetail = '/x/v3/fav/resource/list';
 }
