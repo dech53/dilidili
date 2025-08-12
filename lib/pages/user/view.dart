@@ -379,6 +379,39 @@ class _UserPageState extends State<UserPage> {
             },
           ),
         ),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            return Container(
+              margin: const EdgeInsets.only(top: 6, bottom: 4),
+              height: constraints.maxWidth / 5,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly, // 均匀分布
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: _userPageController.list.map<Widget>((e) {
+                  return InkWell(
+                    onTap: () => e['onTap'](),
+                    borderRadius: StyleString.mdRadius,
+                    child: SizedBox(
+                      width: (constraints.maxWidth - 24) / 5, // 可选：固定宽度
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const SizedBox(height: 4),
+                          Icon(e['icon'],
+                              size: 20,
+                              color: Theme.of(context).colorScheme.primary),
+                          const SizedBox(height: 6),
+                          Text(e['title'],
+                              style: Theme.of(context).textTheme.labelSmall),
+                        ],
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            );
+          },
+        ),
       ],
     );
   }

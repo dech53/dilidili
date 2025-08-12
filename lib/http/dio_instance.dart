@@ -45,11 +45,8 @@ class DioInstance {
     dio.interceptors.add(cookieManager);
     final List<Cookie> cookie = await cookieManager.cookieJar
         .loadForRequest(Uri.parse(ApiString.baseUrl));
-    cookie.add(Cookie('buvid3', buvid ?? '')
-      ..httpOnly = true
-      ..domain = '.bilibili.com'
-      ..path = '/'
-      ..expires = DateTime.now().add(const Duration(days: 365)));
+    cookie.add(
+        Cookie('buvid3', '2C79183B-D96A-5418-7EFB-2AC765933C8706972infoc'));
     final String cookieString = cookie
         .map((Cookie cookie) => '${cookie.name}=${cookie.value}')
         .join('; ');

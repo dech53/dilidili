@@ -4,6 +4,7 @@ import 'package:dilidili/model/user/stat.dart';
 import 'package:dilidili/utils/storage.dart';
 import 'package:dilidili/http/login.dart';
 import 'package:dilidili/utils/user.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:dilidili/model/user/info.dart';
@@ -31,6 +32,30 @@ class UserPageController extends GetxController {
   // 用户状态 动态、关注、粉丝
   Rx<UserStat> userStat = UserStat().obs;
   Timer? validTimer;
+
+
+  List list = [
+    {
+      'icon': Icons.history,
+      'title': '观看记录',
+      'onTap': () => Get.toNamed('/history'),
+    },
+    {
+      'icon': Icons.star_border,
+      'title': '我的收藏',
+      'onTap': () => Get.toNamed('/fav'),
+    },
+    {
+      'icon': Icons.subscriptions_outlined,
+      'title': '我的订阅',
+      'onTap': () => Get.toNamed('/subscription'),
+    },
+    {
+      'icon': Icons.watch_later_outlined,
+      'title': '稍后再看',
+      'onTap': () => Get.toNamed('/later'),
+    },
+  ];
 
   @override
   onInit() {

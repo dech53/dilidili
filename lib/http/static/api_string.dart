@@ -153,4 +153,13 @@ class ApiString {
   /// type 0 当前收藏夹 1 全部收藏夹
   // https://api.bilibili.com/x/v3/fav/resource/list?media_id=76614671&pn=1&ps=20&keyword=&order=mtime&type=0&tid=0
   static const String userFavFolderDetail = '/x/v3/fav/resource/list';
+  // 一键三连
+  // https://api.bilibili.com/x/web-interface/archive/like/triple
+  // aid	num	稿件avid	必要（可选）	avid与bvid任选一个
+  // bvid	str	稿件bvid	必要（可选）	avid与bvid任选一个
+  // csrf	str	CSRF Token（位于cookie）	必要
+  static const String oneThree = '/x/web-interface/archive/like/triple';
+
+  // 获取历史记录
+  static const String historyList = '/x/web-interface/history/cursor';
 }

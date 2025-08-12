@@ -451,6 +451,7 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
   }
 
   Widget actionGrid(BuildContext context, videoIntroController) {
+    
     Map<String, Widget> menuListWidgets = {
       'like': Obx(
         () => ActionItem(
@@ -505,3 +506,132 @@ class _VideoInfoState extends State<VideoInfo> with TickerProviderStateMixin {
     );
   }
 }
+
+
+
+
+
+// Map<String, Widget> menuListWidgets = {
+    //   'like': Obx(
+    //     () => ActionButton(
+    //       selectStatus: videoIntroController.hasLike.value,
+    //       bgColor: Theme.of(context).colorScheme.primary,
+    //       controller: _controllers[0],
+    //       onLongPress: () async {
+    //         Future.delayed(Duration(seconds: 1));
+    //         // 三连逻辑
+    //         videoIntroController.actionOneThree();
+    //       },
+    //       onLongPressEnd: () {
+    //         _controllers.forEach((e) {
+    //           if (e.status == AnimationStatus.forward && e.value < 1.0) {
+    //             e.reverse();
+    //           }
+    //         });
+    //       },
+    //       onTap: videoIntroController.actionLikeVideo,
+    //       opacity: 0.1,
+    //       color: Theme.of(context).colorScheme.primary,
+    //       child: Container(
+    //         padding:
+    //             const EdgeInsets.symmetric(horizontal: 15.0, vertical: 2.0),
+    //         decoration: BoxDecoration(
+    //           borderRadius: BorderRadius.circular(20.0),
+    //         ),
+    //         child: Row(
+    //           mainAxisSize: MainAxisSize.min,
+    //           crossAxisAlignment: CrossAxisAlignment.center,
+    //           children: [
+    //             const Icon(
+    //               FontAwesomeIcons.thumbsUp,
+    //               size: 14,
+    //             ),
+    //             const SizedBox(width: 6),
+    //             Text(
+    //               NumUtils.int2Num(widget.videoDetail!.stat!.like!),
+    //               style: TextStyle(
+    //                 fontSize: Theme.of(context).textTheme.labelMedium?.fontSize,
+    //               ),
+    //             ),
+    //           ],
+    //         ),
+    //       ),
+    //     ),
+    //   ),
+    //   'coin': Obx(
+    //     () => ActionButton(
+    //       enableLongPress: false,
+    //       selectStatus: videoIntroController.hasCoin.value,
+    //       bgColor: Theme.of(context).colorScheme.primary,
+    //       color: Theme.of(context).colorScheme.primary,
+    //       controller: _controllers[1],
+    //       onTap: videoIntroController.actionCoinVideo,
+    //       opacity: 0.1,
+    //       child: Container(
+    //         padding:
+    //             const EdgeInsets.symmetric(horizontal: 15.0, vertical: 2.0),
+    //         decoration: BoxDecoration(
+    //           borderRadius: BorderRadius.circular(20.0),
+    //         ),
+    //         child: Row(
+    //           mainAxisSize: MainAxisSize.min,
+    //           crossAxisAlignment: CrossAxisAlignment.center,
+    //           children: [
+    //             const Icon(
+    //               FontAwesomeIcons.b,
+    //               size: 14,
+    //             ),
+    //             const SizedBox(width: 6),
+    //             Text(
+    //               NumUtils.int2Num(widget.videoDetail!.stat!.coin!),
+    //               style: TextStyle(
+    //                 fontSize: Theme.of(context).textTheme.labelMedium?.fontSize,
+    //               ),
+    //             ),
+    //           ],
+    //         ),
+    //       ),
+    //     ),
+    //   ),
+    //   'collect': Obx(
+    //     () => ActionButton(
+    //       enableLongPress: false,
+    //       color: Theme.of(context).colorScheme.primary,
+    //       selectStatus: videoIntroController.hasFav.value,
+    //       bgColor: Theme.of(context).colorScheme.primary,
+    //       controller: _controllers[2],
+    //       onTap: videoIntroController.actionFavVideo,
+    //       opacity: 0.1,
+    //       child: Container(
+    //         padding:
+    //             const EdgeInsets.symmetric(horizontal: 15.0, vertical: 2.0),
+    //         decoration: BoxDecoration(
+    //           borderRadius: BorderRadius.circular(20.0),
+    //         ),
+    //         child: Row(
+    //           mainAxisSize: MainAxisSize.min,
+    //           crossAxisAlignment: CrossAxisAlignment.center,
+    //           children: [
+    //             const Icon(
+    //               FontAwesomeIcons.star,
+    //               size: 14,
+    //             ),
+    //             const SizedBox(width: 6),
+    //             Text(
+    //               NumUtils.int2Num(widget.videoDetail!.stat!.favorite!),
+    //               style: TextStyle(
+    //                 fontSize: Theme.of(context).textTheme.labelMedium?.fontSize,
+    //               ),
+    //             ),
+    //           ],
+    //         ),
+    //       ),
+    //     ),
+    //   ),
+    //   'share': ActionItem(
+    //     icon: const Icon(FontAwesomeIcons.share),
+    //     onTap: () => videoIntroController.actionShareVideo(),
+    //     selectStatus: false,
+    //     text: NumUtils.int2Num(widget.videoDetail!.stat!.share!),
+    //   ),
+    // };

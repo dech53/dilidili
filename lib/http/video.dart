@@ -260,6 +260,7 @@ class VideoHttp {
         'csrf': await DioInstance.instance().getCsrf(),
         'spmid': '333.788.0.0',
         'source': 'web_normal',
+        'from_spmid': '333.337.search-card.all.click',
         'ga': 1,
         'ramval': 0,
       },
@@ -282,6 +283,8 @@ class VideoHttp {
         'csrf': await DioInstance.instance().getCsrf(),
         'spmid': '333.788.0.0',
         'source': 'web_normal',
+        'from_spmid': '333.337.search-card.all.click',
+        'eab_x': 2,
         'ga': 1,
         'ramval': 0,
       },
@@ -398,5 +401,27 @@ class VideoHttp {
         'csrf': await DioInstance.instance().getCsrf(),
       },
     );
+  }
+
+  // 一键三连
+  static Future oneThree({required String bvid}) async {
+    var res = await DioInstance.instance().post(
+      path: ApiString.baseUrl + ApiString.oneThree,
+      param: {
+        'bvid': bvid,
+        'csrf': await DioInstance.instance().getCsrf(),
+        'spmid': '333.788.0.0',
+        'source': 'web_normal',
+        'from_spmid': '333.337.search-card.all.click',
+        'eab_x': 2,
+        'ga': 1,
+        'ramval': 0,
+      },
+    );
+    if (res.data['code'] == 0) {
+      return {'status': true, 'data': res.data['data']};
+    } else {
+      return {'status': false, 'data': [], 'msg': res.data['message']};
+    }
   }
 }

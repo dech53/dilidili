@@ -3,6 +3,7 @@ import 'package:dilidili/http/static/api_string.dart';
 import 'package:dilidili/model/message/unread.dart';
 import 'package:dilidili/model/user/fav_detail.dart';
 import 'package:dilidili/model/user/fav_folder.dart';
+import 'package:dilidili/model/user/history.dart';
 import 'package:dilidili/model/user/info.dart';
 import 'package:dilidili/model/user/stat.dart';
 
@@ -128,6 +129,27 @@ class UserHttp {
       return {'status': true, 'data': data};
     } else {
       return {'status': false, 'data': [], 'msg': res.data['message']};
+    }
+  }
+
+  // 观看历史
+  static Future historyList(int? max, int? viewAt) async {
+    var res = await DioInstance.instance()
+        .get(path: ApiString.baseUrl + ApiString.historyList, param: {
+      'type': 'all',
+      'ps': 20,
+      'max': max ?? 0,
+      'view_at': viewAt ?? 0,
+    });
+    if (res.data['code'] == 0) {
+      return {'status': true, 'data': HistoryData.fromJson(res.data['data'])};
+    } else {
+      return {
+        'status': false,
+        'data': [],
+        'msg': res.data['message'],
+        'code': res.data['code'],
+      };
     }
   }
 }

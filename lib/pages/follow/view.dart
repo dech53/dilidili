@@ -17,6 +17,7 @@ class _FollowPageState extends State<FollowPage>
   late FollowController _followController;
   final ScrollController scrollController = ScrollController();
   late AnimationController _controller;
+  RxBool selected = false.obs;
 
   @override
   void initState() {
@@ -75,104 +76,41 @@ class _FollowPageState extends State<FollowPage>
         ],
       ),
       body: Center(
-          child: Row(
-        spacing: 10.0,
-        children: [
-          ActionButton(
-            bgColor: Theme.of(context).colorScheme.primary,
-            controller: _controller,
-            onTap: () {},
-            opacity: 0.1,
-            child: Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 15.0, vertical: 2.0),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20.0),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Icon(
-                    FontAwesomeIcons.thumbsUp,
-                    size: 14,
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    '6572',
-                    style: TextStyle(
-                      fontSize:
-                          Theme.of(context).textTheme.labelMedium?.fontSize,
+        child: Row(
+          children: [
+            ActionButton(
+              borderWidth: 0.0,
+              bgColor: Theme.of(context).colorScheme.primary.withOpacity(0.25),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Icon(
+                      FontAwesomeIcons.star,
+                      color: Theme.of(context).colorScheme.primary,
+                      size: 14,
                     ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          ActionButton(
-            bgColor: Theme.of(context).colorScheme.primary,
-            controller: _controller,
-            onTap: () {},
-            opacity: 0.1,
-            child: Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 15.0, vertical: 2.0),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20.0),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Icon(
-                    FontAwesomeIcons.thumbsUp,
-                    size: 14,
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    '6572',
-                    style: TextStyle(
-                      fontSize:
-                          Theme.of(context).textTheme.labelMedium?.fontSize,
+                    const SizedBox(width: 6),
+                    Text(
+                      '123',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.primary,
+                        fontSize:
+                            Theme.of(context).textTheme.labelMedium?.fontSize,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ),
-          ActionButton(
-            bgColor: Theme.of(context).colorScheme.primary,
-            controller: _controller,
-            onTap: () {},
-            opacity: 0.1,
-            child: Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 15.0, vertical: 2.0),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20.0),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Icon(
-                    FontAwesomeIcons.thumbsUp,
-                    size: 14,
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    '6572',
-                    style: TextStyle(
-                      fontSize:
-                          Theme.of(context).textTheme.labelMedium?.fontSize,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      )),
+            )
+          ],
+        ),
+      ),
     );
   }
 }

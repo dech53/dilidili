@@ -182,6 +182,28 @@ class VideoIntroController extends GetxController {
     hasLike.value = result["data"] == 1 ? true : false;
   }
 
+  // 一键三连
+  Future actionOneThree() async {
+    if (userInfo == null) {
+      SmartDialog.showToast('账号未登录');
+      return;
+    }
+    if (hasLike.value && hasCoin.value && hasFav.value) {
+      // 已点赞、投币、收藏
+      SmartDialog.showToast('UP已经收到了～');
+      return false;
+    }
+    var result = await VideoHttp.oneThree(bvid: bvid);
+    if (result['status']) {
+      hasLike.value = result["data"]["like"];
+      hasCoin.value = result["data"]["coin"];
+      hasFav.value = result["data"]["fav"];
+      SmartDialog.showToast('三连成功');
+    } else {
+      SmartDialog.showToast(result['msg']);
+    }
+  }
+
   // 获取投币状态
   Future queryHasCoinVideo() async {
     var result = await VideoHttp.hasCoinVideo(bvid: bvid);
