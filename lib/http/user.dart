@@ -152,4 +152,21 @@ class UserHttp {
       };
     }
   }
+
+  // 删除历史记录
+  static Future delHistory(kid) async {
+    var res = await DioInstance.instance().post(
+      path: ApiString.baseUrl + ApiString.delHistory,
+      param: {
+        'kid': kid,
+        'jsonp': 'jsonp',
+        'csrf': await DioInstance.instance().getCsrf(),
+      },
+    );
+    if (res.data['code'] == 0) {
+      return {'status': true, 'msg': '已删除'};
+    } else {
+      return {'status': false, 'msg': res.data['message']};
+    }
+  }
 }

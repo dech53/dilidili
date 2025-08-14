@@ -1,4 +1,5 @@
 import 'package:dilidili/pages/about/view.dart';
+import 'package:dilidili/pages/fav/view.dart';
 import 'package:dilidili/pages/fav_detail/view.dart';
 import 'package:dilidili/pages/follow/view.dart';
 import 'package:dilidili/pages/history/view.dart';
@@ -36,6 +37,7 @@ class Routes {
     CustomGetPage(name: '/favDetail', page: () => const FavDetailPage()),
     CustomGetPage(name: '/follow', page: () => const FollowPage()),
     CustomGetPage(name: '/history', page: () => const HistoryPage()),
+    CustomGetPage(name: '/fav', page: () => const FavPage()),
   ];
 }
 

@@ -79,7 +79,7 @@ class _HomePageState extends State<HomePage>
                   () => Text(
                     "${StringUtils.getTimeGreeting()}${_homeController.userName.value == '' ? '' : ',${_homeController.userName.value}'}",
                     style: TextStyle(
-                      fontSize: 22.sp,
+                      fontSize: (22).sp,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -114,7 +114,10 @@ class _HomePageState extends State<HomePage>
                       alignment: Alignment.centerLeft,
                       height: 40.h,
                       decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.onSecondaryContainer.withOpacity(0.05),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSecondaryContainer
+                            .withOpacity(0.05),
                         borderRadius: BorderRadius.circular(12.r),
                       ),
                       child: Row(

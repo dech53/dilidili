@@ -1,7 +1,7 @@
 import 'package:dilidili/http/user.dart';
 import 'package:dilidili/model/user/fav_detail.dart';
 import 'package:dilidili/model/user/fav_folder.dart';
-import 'package:dilidili/pages/fav/controller.dart';
+import 'package:dilidili/pages/member_fav/controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';

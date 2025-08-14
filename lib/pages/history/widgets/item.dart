@@ -12,6 +12,7 @@ import 'package:dilidili/utils/string_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
+
 class HistoryItem extends StatelessWidget {
   final dynamic videoItem;
   final dynamic ctr;
@@ -93,8 +94,11 @@ class HistoryItem extends StatelessWidget {
                 int cid = videoItem.history.cid ??
                     // videoItem.history.oid ??
                     await SearchHttp.ab2c(aid: aid, bvid: bvid);
-                Get.toNamed('/video/bvid=$bvid',
-                    arguments: {'heroTag': heroTag, 'pic': videoItem.cover});
+                Get.toNamed('/video/bvid=$bvid', arguments: {
+                  'heroTag': heroTag,
+                  'pic': videoItem.cover,
+                  'cid': cid.toString(),
+                });
               }
             }
           } else {
@@ -110,8 +114,12 @@ class HistoryItem extends StatelessWidget {
           int cid = videoItem.history.cid ??
               // videoItem.history.oid ??
               await SearchHttp.ab2c(aid: aid, bvid: bvid);
-          Get.toNamed('/video/bvid=$bvid',
-              arguments: {'heroTag': heroTag, 'pic': videoItem.cover,'bvid':bvid,'cid':cid.toString()});
+          Get.toNamed('/video/bvid=$bvid', arguments: {
+            'heroTag': heroTag,
+            'pic': videoItem.cover,
+            'bvid': bvid,
+            'cid': cid.toString()
+          });
         }
       },
       onLongPress: () {

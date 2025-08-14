@@ -162,4 +162,6 @@ class ApiString {
 
   // 获取历史记录
   static const String historyList = '/x/web-interface/history/cursor';
+  // 删除某条历史记录
+  static const String delHistory = '/x/v2/history/delete';
 }

@@ -2,132 +2,125 @@ import 'package:dilidili/common/constants.dart';
 import 'package:dilidili/common/skeleton/video_card_h.dart';
 import 'package:dilidili/common/widgets/http_error.dart';
 import 'package:dilidili/common/widgets/network_img_layer.dart';
-import 'package:dilidili/pages/fav/controller.dart';
+import 'package:dilidili/pages/member_fav/controller.dart';
 import 'package:dilidili/utils/string_utils.dart';
 import 'package:easy_debounce/easy_throttle.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class FavPage extends StatefulWidget {
-  const FavPage({super.key});
+class FavoritePage extends StatefulWidget {
+  const FavoritePage({super.key});
 
   @override
-  State<FavPage> createState() => _FavPageState();
+  State<FavoritePage> createState() => _FavoritePageState();
 }
 
-class _FavPageState extends State<FavPage> {
-  final FavController _favController = Get.put(FavController());
-  late Future _futureBuilderFuture;
-  late ScrollController scrollController;
+class _FavoritePageState extends State<FavoritePage>
+    with AutomaticKeepAliveClientMixin {
+  late FavoriteController _favoriteController;
+  late Future _futureBuilder;
+  late int mid;
 
   @override
   void initState() {
     super.initState();
-    _futureBuilderFuture = _favController.queryFavFolder();
-    scrollController = _favController.scrollController;
-    scrollController.addListener(
-      () {
-        if (scrollController.position.pixels >=
-            scrollController.position.maxScrollExtent - 300) {
-          EasyThrottle.throttle('history', const Duration(seconds: 1), () {
-            _favController.onLoad();
-          });
+    mid = int.parse(Get.arguments['mid']!);
+    _favoriteController = Get.put(FavoriteController(), tag: mid.toString());
+    _futureBuilder = _favoriteController.queryFavFolder();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return FutureBuilder(
+      future: _futureBuilder,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          Map? data = snapshot.data;
+          if (data != null && data['status']) {
+            if (_favoriteController.favFolderList.isNotEmpty) {
+              return Obx(
+                () => CustomScrollView(
+                  slivers: [
+                    SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (_, index) {
+                          if (index >=
+                              _favoriteController.favFolderList.length - 2) {
+                            EasyThrottle.throttle(
+                                'history', const Duration(seconds: 1), () {
+                              _favoriteController.onLoad();
+                            });
+                          }
+                          return FavItem(
+                            favFolderItem:
+                                _favoriteController.favFolderList[index],
+                            isOwner: _favoriteController.isOwner.value,
+                          );
+                        },
+                        childCount: _favoriteController.favFolderList.length,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            } else {
+              return CustomScrollView(
+                physics: const NeverScrollableScrollPhysics(),
+                slivers: [
+                  HttpError(
+                    errMsg: '用户没有公开收藏夹',
+                    fn: () {
+                      setState(
+                        () {
+                          _futureBuilder = _favoriteController.queryFavFolder();
+                        },
+                      );
+                    },
+                  ),
+                ],
+              );
+            }
+          } else {
+            return CustomScrollView(
+              physics: const NeverScrollableScrollPhysics(),
+              slivers: [
+                HttpError(
+                  errMsg: data?['msg'] ?? '请求异常',
+                  btnText: data?['code'] == -101 ? '去登录' : null,
+                  fn: () {
+                    setState(
+                      () {
+                        _futureBuilder = _favoriteController.queryFavFolder();
+                      },
+                    );
+                  },
+                ),
+              ],
+            );
+          }
+        } else {
+          // 骨架屏
+          return CustomScrollView(
+            physics: const NeverScrollableScrollPhysics(),
+            slivers: [
+              SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (_, i) {
+                    return const VideoCardHSkeleton();
+                  },
+                  childCount: 5,
+                ),
+              )
+            ],
+          );
         }
       },
     );
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: false,
-        titleSpacing: 0,
-        title: Text(
-          '我的收藏',
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-        actions: [
-          IconButton(
-            onPressed: () async {
-              // await Get.toNamed('/favEdit');
-              // _favController.hasMore.value = true;
-              // _favController.currentPage = 1;
-              // setState(() {
-              //   _futureBuilderFuture = _favController.queryFavFolder();
-              // });
-            },
-            icon: const Icon(Icons.add_outlined),
-            tooltip: '新建收藏夹',
-          ),
-          IconButton(
-            onPressed: () {
-              // Get.toNamed(
-              //   '/favSearch?searchType=1&mediaId=${_favController.favFolderData.value.list!.first.id}')
-            },
-            icon: const Icon(Icons.search_outlined),
-          ),
-          const SizedBox(width: 14),
-        ],
-      ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          _favController.hasMore.value = true;
-          _favController.currentPage = 1;
-          setState(() {
-            _futureBuilderFuture = _favController.queryFavFolder(type: 'init');
-          });
-        },
-        child: FutureBuilder(
-          future: _futureBuilderFuture,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              Map? data = snapshot.data;
-              if (data != null && data['status']) {
-                return Obx(
-                  () => ListView.builder(
-                    controller: scrollController,
-                    itemCount: _favController.favFolderList.length,
-                    itemBuilder: (context, index) {
-                      return FavItem(
-                        favFolderItem: _favController.favFolderList[index],
-                        isOwner: _favController.isOwner.value,
-                      );
-                    },
-                  ),
-                );
-              } else {
-                return CustomScrollView(
-                  physics: const NeverScrollableScrollPhysics(),
-                  slivers: [
-                    HttpError(
-                      errMsg: data?['msg'] ?? '请求异常',
-                      btnText: data?['code'] == -101 ? '去登录' : null,
-                      fn: () {
-                        setState(() {
-                          _futureBuilderFuture =
-                              _favController.queryFavFolder();
-                        });
-                      },
-                    ),
-                  ],
-                );
-              }
-            } else {
-              // 骨架屏
-              return ListView.builder(
-                itemBuilder: (context, index) {
-                  return const VideoCardHSkeleton();
-                },
-                itemCount: 10,
-              );
-            }
-          },
-        ),
-      ),
-    );
-  }
+  bool get wantKeepAlive => true;
 }
 
 class FavItem extends StatelessWidget {

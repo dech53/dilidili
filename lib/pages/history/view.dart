@@ -89,7 +89,7 @@ class _HistoryPageState extends State<HistoryPage> {
                     // _historyController.onClearHistory();
                     break;
                   case 'del':
-                    // _historyController.onDelHistory();
+                    _historyController.onDelHistory();
                     break;
                   case 'multiple':
                     _historyController.enableMultiple.value = true;

@@ -385,24 +385,28 @@ class _UserPageState extends State<UserPage> {
               margin: const EdgeInsets.only(top: 6, bottom: 4),
               height: constraints.maxWidth / 5,
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly, // 均匀分布
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: _userPageController.list.map<Widget>((e) {
                   return InkWell(
                     onTap: () => e['onTap'](),
                     borderRadius: StyleString.mdRadius,
                     child: SizedBox(
-                      width: (constraints.maxWidth - 24) / 5, // 可选：固定宽度
+                      width: (constraints.maxWidth - 24) / 5,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           const SizedBox(height: 4),
-                          Icon(e['icon'],
-                              size: 20,
-                              color: Theme.of(context).colorScheme.primary),
+                          Icon(
+                            e['icon'],
+                            size: Get.width / 17,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
                           const SizedBox(height: 6),
-                          Text(e['title'],
-                              style: Theme.of(context).textTheme.labelSmall),
+                          Text(
+                            e['title'],
+                            style: Theme.of(context).textTheme.labelMedium,
+                          ),
                         ],
                       ),
                     ),

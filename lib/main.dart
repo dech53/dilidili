@@ -45,10 +45,8 @@ void main() async {
       builder: ((ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
         ColorScheme? lightColorScheme;
         if (lightDynamic != null && darkDynamic != null) {
-          // dynamic取色成功
           lightColorScheme = lightDynamic.harmonized();
         } else {
-          // dynamic取色失败，采用品牌色
           lightColorScheme = ColorScheme.fromSeed(
             seedColor: colorThemeTypes[0]['color'],
             brightness: Brightness.light,

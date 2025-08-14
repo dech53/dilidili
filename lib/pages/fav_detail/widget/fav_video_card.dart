@@ -36,7 +36,15 @@ class FavVideoCardH extends StatelessWidget {
     String heroTag = StringUtils.makeHeroTag(id);
     return InkWell(
       onTap: () async {
-        
+        Get.toNamed(
+          '/video/bvid=${bvid}',
+          arguments: {
+            'heroTag':heroTag,
+            'pic':videoItem.pic,
+            'bvid':bvid,
+            'cid':videoItem.cid.toString(),
+          },
+        );
       },
       onLongPress: () => imageSaveDialog(
         context,
@@ -76,7 +84,7 @@ class FavVideoCardH extends StatelessWidget {
                                 ),
                                 PBadge(
                                   text:
-                                      NumUtils.dateFormat(videoItem.duration!),
+                                      NumUtils.int2time(videoItem.duration!),
                                   right: 6.0,
                                   bottom: 6.0,
                                   type: 'gray',

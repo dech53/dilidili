@@ -7,27 +7,25 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 
-class FavController extends GetxController {
-  final ScrollController scrollController = ScrollController();
+class FavoriteController extends GetxController {
+  late int mid;
+  late int ownerMid;
   Rx<FavFolderData> favFolderData = FavFolderData().obs;
   RxList<FavFolderItemData> favFolderList = <FavFolderItemData>[].obs;
-  int currentPage = 1;
-  int pageSize = 60;
-  RxBool hasMore = true.obs;
+  final ScrollController scrollController = ScrollController();
   Box userInfoCache = SPStorage.userInfo;
   UserInfoData? userInfo;
-  late int ownerMid;
-  RxBool isOwner = true.obs;
-
+  RxBool hasMore = true.obs;
+  int currentPage = 1;
+  int pageSize = 60;
+  RxBool isOwner = false.obs;
   @override
   void onInit() {
+    super.onInit();
+    mid = int.parse(Get.arguments['mid'] ?? '-1');
     userInfo = userInfoCache.get('userInfoCache');
     ownerMid = userInfo != null ? userInfo!.mid! : -1;
-    super.onInit();
-  }
-
-  Future onLoad() async {
-    queryFavFolder(type: 'onload');
+    isOwner.value = mid == -1 || mid == ownerMid;
   }
 
   Future<dynamic> queryFavFolder({type = 'init'}) async {
@@ -40,7 +38,7 @@ class FavController extends GetxController {
     var res = await UserHttp.userfavFolder(
       pn: currentPage,
       ps: pageSize,
-      mid: ownerMid,
+      mid: isOwner.value ? ownerMid : mid,
     );
     if (res['status']) {
       if (type == 'init') {
@@ -58,6 +56,10 @@ class FavController extends GetxController {
       SmartDialog.showToast(res['msg']);
     }
     return res;
+  }
+
+  Future onLoad() async {
+    queryFavFolder(type: 'onload');
   }
 
   removeFavFolder({required int mediaIds}) async {
