@@ -138,6 +138,14 @@ class UserPageController extends GetxController {
     );
   }
 
+  pushFans() {
+    if (!userLogin.value) {
+      SmartDialog.showToast('账号未登录');
+      return;
+    }
+    Get.toNamed('/fan?mid=${userInfo.value.mid}', preventDuplicates: false);
+  }
+
   Future resetUserInfo() async {
     userInfo.value = UserInfoData();
     userStat.value = UserStat();

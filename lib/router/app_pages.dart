@@ -1,9 +1,11 @@
 import 'package:dilidili/pages/about/view.dart';
+import 'package:dilidili/pages/fan/view.dart';
 import 'package:dilidili/pages/fav/view.dart';
 import 'package:dilidili/pages/fav_detail/view.dart';
 import 'package:dilidili/pages/follow/view.dart';
 import 'package:dilidili/pages/history/view.dart';
 import 'package:dilidili/pages/home/view.dart';
+import 'package:dilidili/pages/later/view.dart';
 import 'package:dilidili/pages/live_room/view.dart';
 import 'package:dilidili/pages/member/view.dart';
 import 'package:dilidili/pages/moments/detail/view.dart';
@@ -11,6 +13,8 @@ import 'package:dilidili/pages/read/view.dart';
 import 'package:dilidili/pages/search/view.dart';
 import 'package:dilidili/pages/search_result/view.dart';
 import 'package:dilidili/pages/setting/view.dart';
+import 'package:dilidili/pages/subscription/view.dart';
+import 'package:dilidili/pages/subscription_detail/view.dart';
 import 'package:dilidili/pages/video/detail/view.dart';
 import 'package:dilidili/pages/webview/view.dart';
 import 'package:dilidili/pages/whisper/view.dart';
@@ -38,6 +42,14 @@ class Routes {
     CustomGetPage(name: '/follow', page: () => const FollowPage()),
     CustomGetPage(name: '/history', page: () => const HistoryPage()),
     CustomGetPage(name: '/fav', page: () => const FavPage()),
+    // 订阅
+    CustomGetPage(name: '/subscription', page: () => const SubPage()),
+    // 订阅详情
+    CustomGetPage(name: '/subDetail', page: () => const SubDetailPage()),
+    // 粉丝
+    CustomGetPage(name: '/fan', page: () => const FansPage()),
+    // 稍后再看
+    CustomGetPage(name: '/later', page: () => const LaterPage()),
   ];
 }
 

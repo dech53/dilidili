@@ -1,7 +1,7 @@
-import 'package:dilidili/pages/memberMoment/controller.dart';
-import 'package:dilidili/pages/memberMoment/view.dart';
 import 'package:dilidili/pages/member_fav/controller.dart';
 import 'package:dilidili/pages/member_fav/view.dart';
+import 'package:dilidili/pages/member_moment/controller.dart';
+import 'package:dilidili/pages/member_moment/view.dart';
 import 'package:dilidili/pages/member_post/controller.dart';
 import 'package:dilidili/pages/member_post/view.dart';
 import 'package:flutter/material.dart';

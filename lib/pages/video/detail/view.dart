@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:dilidili/model/search_type.dart';
+import 'package:dilidili/pages/bangumi/introduction/view.dart';
 import 'package:dilidili/pages/damuku/view.dart';
 import 'package:dilidili/pages/dplayer/controller.dart';
 import 'package:dilidili/pages/dplayer/models/play_status.dart';
@@ -427,6 +428,10 @@ class _VideoPageState extends State<VideoPage>
                               slivers: <Widget>[
                                 if (vdCtr.videoType == SearchType.video) ...[
                                   VideoIntroPanel(bvid: vdCtr.bvid),
+                                ] else if (vdCtr.videoType ==
+                                    SearchType.media_bangumi) ...[
+                                  Obx(() =>
+                                      BangumiIntroPanel(cid: vdCtr.cid.value)),
                                 ],
                                 SliverToBoxAdapter(
                                   child: Divider(
@@ -437,7 +442,8 @@ class _VideoPageState extends State<VideoPage>
                                         .withOpacity(0.06),
                                   ),
                                 ),
-                                const RelatedVideoPanel(),
+                                if (vdCtr.videoType == SearchType.video)
+                                  const RelatedVideoPanel(),
                               ],
                             );
                           },

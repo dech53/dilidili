@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:dilidili/common/widgets/pages_bottom_sheet.dart';
 import 'package:dilidili/model/video/video_basic_info.dart';
 import 'package:dilidili/model/video/video_episode_type.dart';
-import 'package:dilidili/pages/video/detail/controller.dart';
 import 'package:dilidili/pages/video/introduction/controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

@@ -1,5 +1,4 @@
 import 'package:dilidili/pages/trend/zone/view.dart';
-import 'package:flutter/material.dart';
 
 enum RandType {
   all,

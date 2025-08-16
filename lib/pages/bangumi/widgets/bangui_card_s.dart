@@ -1,6 +1,5 @@
 import 'package:dilidili/common/constants.dart';
 import 'package:dilidili/common/skeleton/skeleton.dart';
-import 'package:dilidili/common/widgets/badge.dart';
 import 'package:flutter/material.dart';
 
 class BangumiCardVSkeleton extends StatelessWidget {

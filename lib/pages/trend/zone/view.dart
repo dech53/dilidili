@@ -71,7 +71,7 @@ class _ZonePageState extends State<ZonePage>
                         delegate: SliverChildBuilderDelegate((context, index) {
                           return VideoCardH(
                             videoItem: _zoneController.videoList[index],
-                            enableTap: true,
+                            showPubdate: true,
                           );
                         }, childCount: _zoneController.videoList.length),
                       ),

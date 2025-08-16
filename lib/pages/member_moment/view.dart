@@ -1,7 +1,7 @@
 import 'package:dilidili/common/skeleton/dynamic_card.dart';
 import 'package:dilidili/common/widgets/http_error.dart';
 import 'package:dilidili/model/dynamics/result.dart';
-import 'package:dilidili/pages/memberMoment/controller.dart';
+import 'package:dilidili/pages/member_moment/controller.dart';
 import 'package:dilidili/pages/moments/widgets/moments_panel.dart';
 import 'package:dilidili/utils/string_utils.dart';
 import 'package:easy_debounce/easy_throttle.dart';

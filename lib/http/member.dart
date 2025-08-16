@@ -3,7 +3,6 @@ import 'package:dilidili/http/static/api_string.dart';
 import 'package:dilidili/model/dynamics/result.dart';
 import 'package:dilidili/model/member/archive.dart';
 import 'package:dilidili/model/member/folder_detail.dart';
-import 'package:dilidili/model/member/folder_info.dart';
 import 'package:dilidili/model/member/member_info.dart';
 import 'package:dilidili/utils/utils.dart';
 import 'package:dilidili/utils/wbi_utils.dart';
@@ -98,8 +97,6 @@ class MemberHttp {
     String order = 'pubdate',
     bool orderAvoided = true,
   }) async {
-    String dmImgStr = Utils.base64EncodeRandomString(16, 64);
-    String dmCoverImgStr = Utils.base64EncodeRandomString(32, 128);
     var res = await DioInstance.instance().get(
       path: ApiString.baseUrl + ApiString.memberPost,
       param: await WbiUtils.getWbi(

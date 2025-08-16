@@ -2,8 +2,11 @@ import 'package:dilidili/common/constants.dart';
 import 'package:dilidili/common/widgets/badge.dart';
 import 'package:dilidili/common/widgets/network_img_layer.dart';
 import 'package:dilidili/model/bangumi/list.dart';
+import 'package:dilidili/utils/image_save.dart';
+import 'package:dilidili/utils/route_push.dart';
 import 'package:dilidili/utils/string_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 
 class BangumiCardV extends StatelessWidget {
   const BangumiCardV({
@@ -20,8 +23,15 @@ class BangumiCardV extends StatelessWidget {
       borderRadius: const BorderRadius.all(
         StyleString.imgRadius,
       ),
-      onTap: () {},
-      onLongPress: () {},
+      onTap: () {
+        RoutePush.bangumiPush(
+          bangumiItem.seasonId,
+          null,
+          heroTag: heroTag,
+        );
+      },
+      onLongPress: () =>
+          imageSaveDialog(context, bangumiItem, SmartDialog.dismiss),
       child: Column(
         children: [
           AspectRatio(

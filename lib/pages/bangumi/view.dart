@@ -50,6 +50,7 @@ class _BangumiPageState extends State<BangumiPage>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return RefreshIndicator(
       onRefresh: () async {
         await _bangumidController.queryBangumiListFeed();

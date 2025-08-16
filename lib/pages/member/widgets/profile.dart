@@ -96,6 +96,7 @@ class ProfilePanel extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         InkWell(
+                          borderRadius: BorderRadius.circular(5.0),
                           onTap: () {
                             Get.toNamed(
                               '/follow?mid=${memberInfo.mid}&name=${memberInfo.name}',
@@ -105,50 +106,60 @@ class ProfilePanel extends StatelessWidget {
                               },
                             );
                           },
-                          child: Column(
-                            children: [
-                              Text(
-                                !loadingStatus
-                                    ? ctr.userStat!['following'].toString()
-                                    : '-',
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              Text(
-                                '关注',
-                                style: TextStyle(
-                                    fontSize: Theme.of(context)
-                                        .textTheme
-                                        .labelMedium!
-                                        .fontSize),
-                              )
-                            ],
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
+                            child: Column(
+                              children: [
+                                Text(
+                                  !loadingStatus
+                                      ? ctr.userStat!['following'].toString()
+                                      : '-',
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                Text(
+                                  '关注',
+                                  style: TextStyle(
+                                      fontSize: Theme.of(context)
+                                          .textTheme
+                                          .labelMedium!
+                                          .fontSize),
+                                )
+                              ],
+                            ),
                           ),
                         ),
                         const Text("|"),
                         InkWell(
-                          onTap: () {},
-                          child: Column(
-                            children: [
-                              Text(
-                                  !loadingStatus
-                                      ? ctr.userStat!['follower'] != null
-                                          ? NumUtils.int2Num(
-                                              ctr.userStat!['follower'],
-                                            )
-                                          : '-'
-                                      : '-',
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold)),
-                              Text(
-                                '粉丝',
-                                style: TextStyle(
-                                    fontSize: Theme.of(context)
-                                        .textTheme
-                                        .labelMedium!
-                                        .fontSize),
-                              )
-                            ],
+                          onTap: () {
+                            Get.toNamed(
+                                '/fan?mid=${memberInfo.mid}&name=${memberInfo.name}');
+                          },
+                          borderRadius: BorderRadius.circular(5.0),
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
+                            child: Column(
+                              children: [
+                                Text(
+                                    !loadingStatus
+                                        ? ctr.userStat!['follower'] != null
+                                            ? NumUtils.int2Num(
+                                                ctr.userStat!['follower'],
+                                              )
+                                            : '-'
+                                        : '-',
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold)),
+                                Text(
+                                  '粉丝',
+                                  style: TextStyle(
+                                      fontSize: Theme.of(context)
+                                          .textTheme
+                                          .labelMedium!
+                                          .fontSize),
+                                )
+                              ],
+                            ),
                           ),
                         ),
                         const Text("|"),

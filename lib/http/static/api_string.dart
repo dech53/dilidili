@@ -140,8 +140,10 @@ class ApiString {
   static const String memberMoment = '/x/polymer/web-dynamic/v1/feed/space';
   // 关注的up动态
   static const String followDynamic = '/x/polymer/web-dynamic/v1/feed/all';
+
   /// 删除收藏夹
   static const String delFavFolder = '/x/v3/fav/folder/del';
+
   /// 收藏夹 详情
   /// media_id  当前收藏夹id 搜索全部时为默认收藏夹id
   /// pn int 当前页
@@ -164,4 +166,32 @@ class ApiString {
   static const String historyList = '/x/web-interface/history/cursor';
   // 删除某条历史记录
   static const String delHistory = '/x/v2/history/delete';
+
+  /// 取消订阅
+  static const String cancelSub = '/x/v3/fav/season/unfav';
+
+  /// 我的订阅
+  static const userSubFolder = '/x/v3/fav/folder/collected/list';
+
+  /// 我的订阅详情 type 21
+  static const userSeasonList = '/x/space/fav/season/list';
+
+  /// 我的订阅详情 type 11
+  static const userResourceList = '/x/v3/fav/resource/list';
+  // 粉丝
+  // vmid 用户id pn 页码 ps 每页个数，最大50 order: desc
+  // order_type 排序规则 最近访问传空，最常访问传 attention
+  static const String fans = '/x/relation/fans';
+  // 稍后再看
+  static const String toViewLater = '/x/v2/history/toview/add';
+
+  // 移除已观看
+  static const String toViewDel = '/x/v2/history/toview/del';
+
+  // 清空稍后再看
+  static const String toViewClear = '/x/v2/history/toview/clear';
+  // 获取稍后再看
+  static const String seeYouLater = '/x/v2/history/toview';
+  // 番剧/剧集明细
+  static const String bangumiInfo = '/pgc/view/web/season';
 }

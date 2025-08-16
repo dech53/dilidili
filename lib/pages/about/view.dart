@@ -14,7 +14,6 @@ class _AboutPageState extends State<AboutPage> {
   final AboutController _aboutController = Get.put(AboutController());
   @override
   Widget build(BuildContext context) {
-    final Color outline = Theme.of(context).colorScheme.outline;
     TextStyle subTitleStyle =
         TextStyle(fontSize: 13, color: Theme.of(context).colorScheme.outline);
     return Scaffold(
@@ -25,7 +24,7 @@ class _AboutPageState extends State<AboutPage> {
         child: Column(
           children: [
             Image.asset(
-              'assets/images/logo/icon.jpg',
+              'assets/images/logo/ios.png',
               width: 150,
             ),
             Text(

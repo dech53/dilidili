@@ -2,13 +2,13 @@ import 'dart:convert';
 
 import 'package:dilidili/http/dio_instance.dart';
 import 'package:dilidili/http/static/api_string.dart';
+import 'package:dilidili/model/bangumi/info.dart';
 import 'package:dilidili/model/search/all.dart';
 import 'package:dilidili/model/search/hot.dart';
 import 'package:dilidili/model/search/result.dart';
 import 'package:dilidili/model/search/suggest.dart';
 import 'package:dilidili/model/search_type.dart';
 import 'package:dilidili/utils/wbi_utils.dart';
-import 'package:dio/dio.dart';
 
 class SearchHttp {
   static Future hotSearchList() async {
@@ -175,6 +175,31 @@ class SearchHttp {
       return res.data['data'].first['cid'];
     } else {
       return -1;
+    }
+  }
+
+  static Future<Map<String, dynamic>> bangumiInfo(
+      {int? seasonId, int? epId}) async {
+    final Map<String, dynamic> data = {};
+    if (seasonId != null) {
+      data['season_id'] = seasonId;
+    } else if (epId != null) {
+      data['ep_id'] = epId;
+    }
+    final dynamic res = await DioInstance.instance().get(
+        path: ApiString.baseUrl + ApiString.bangumiInfo,
+        param: <String, dynamic>{...data});
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': BangumiInfoModel.fromJson(res.data['result']),
+      };
+    } else {
+      return {
+        'status': false,
+        'data': [],
+        'msg': '请求错误 🙅',
+      };
     }
   }
 }

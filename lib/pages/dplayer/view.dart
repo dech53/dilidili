@@ -199,7 +199,7 @@ class _DPlayerState extends State<DPlayer> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final DPlayerController _ = widget.controller;
-    final Color colorTheme = Theme.of(context).colorScheme.primary;
+    // final Color colorTheme = Theme.of(context).colorScheme.primary;
     const TextStyle subTitleStyle = TextStyle(
       height: 1.5,
       fontSize: 40.0,

@@ -39,7 +39,7 @@ class SearchVideoPanel extends StatelessWidget {
                           : EdgeInsets.zero,
                       child: VideoCardH(
                         videoItem: i,
-                        enableTap: true,
+                        showPubdate: true,
                       ),
                     );
                   },

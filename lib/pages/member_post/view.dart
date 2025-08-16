@@ -3,7 +3,6 @@ import 'package:dilidili/common/widgets/http_error.dart';
 import 'package:dilidili/common/widgets/no_data.dart';
 import 'package:dilidili/common/widgets/video_card_h.dart';
 import 'package:dilidili/pages/member_post/controller.dart';
-import 'package:dilidili/utils/string_utils.dart';
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -28,7 +27,8 @@ class _MemberPostPageState extends State<MemberPostPage>
   void initState() {
     super.initState();
     mid = int.parse(Get.arguments['mid']!);
-    _memberPostController = Get.put(MemberPostController(), tag: mid.toString());
+    _memberPostController =
+        Get.put(MemberPostController(), tag: mid.toString());
     _futureBuilderFuture = _memberPostController.getMemberPost('init');
     scrollController = _memberPostController.scrollController;
     scrollController.addListener(
@@ -73,7 +73,9 @@ class _MemberPostPageState extends State<MemberPostPage>
                                 }
                                 return VideoCardH(
                                   videoItem: list[index],
-                                  enableTap: true,
+                                  showOwner: false,
+                                  showPubdate: true,
+                                  showCharge: true,
                                 );
                               },
                               childCount: list.length,

@@ -39,26 +39,6 @@ class _ReadPageState extends State<ReadPage> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          controller.scrollController.animateTo(
-            0,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-          );
-        },
-        shape: const CircleBorder(),
-        child: StreamBuilder(
-          stream: controller.appbarStream.stream.distinct(),
-          initialData: false,
-          builder: (BuildContext context, AsyncSnapshot snapshot) {
-            return Icon(
-              snapshot.data ? Icons.arrow_upward : Icons.message,
-              color: Theme.of(context).colorScheme.primary,
-            );
-          },
-        ),
-      ),
     );
   }
 

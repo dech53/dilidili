@@ -57,8 +57,7 @@ class _RelatedVideoPanelState extends State<RelatedVideoPanel>
                   (_, i) {
                     return Material(
                       child: VideoCardH(
-                        videoItem: relatedVideoList[i],
-                        enableTap: true,
+                        videoItem: relatedVideoList[i],showPubdate: true,
                       ),
                     );
                   },

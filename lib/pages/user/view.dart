@@ -176,6 +176,14 @@ class _UserPageState extends State<UserPage> {
                         );
                       },
                     );
+                  } else {
+                    Get.toNamed(
+                      '/member/mid=${_userPageController.userInfo.value.mid}',
+                      arguments: {
+                        'face': _userPageController.userInfo.value.face,
+                        'mid': _userPageController.userInfo.value.mid.toString(),
+                      },
+                    );
                   }
                 },
                 child: ClipOval(
@@ -343,7 +351,7 @@ class _UserPageState extends State<UserPage> {
                     ),
                     InkWell(
                       onTap: () {
-                        // _userPageController.pushFans();
+                        _userPageController.pushFans();
                       },
                       borderRadius: StyleString.mdRadius,
                       child: Column(
