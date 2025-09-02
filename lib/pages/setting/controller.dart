@@ -1,3 +1,4 @@
+import 'package:dilidili/common/theme_type.dart';
 import 'package:dilidili/http/dio_instance.dart';
 import 'package:dilidili/utils/storage.dart';
 import 'package:dilidili/utils/user.dart';
@@ -8,6 +9,8 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 
 class SettingController extends GetxController {
+  Rx<ThemeType> themeType = ThemeType.system.obs;
+  RxDouble toastOpacity = (1.0).obs;
   RxBool userLogin = false.obs;
   var userInfo;
   Box userInfoCache = SPStorage.userInfo;

@@ -1,5 +1,7 @@
 import 'package:dilidili/custom/button/action_button.dart';
 import 'package:dilidili/pages/follow/controller.dart';
+import 'package:dilidili/pages/follow/widgets/follow_list.dart';
+import 'package:dilidili/pages/follow/widgets/owner_follow_list.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -75,41 +77,51 @@ class _FollowPageState extends State<FollowPage>
           const SizedBox(width: 6),
         ],
       ),
-      body: Center(
-        child: Row(
-          children: [
-            ActionButton(
-              borderWidth: 0.0,
-              bgColor: Theme.of(context).colorScheme.primary.withOpacity(0.25),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20.0),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Icon(
-                      FontAwesomeIcons.star,
-                      color: Theme.of(context).colorScheme.primary,
-                      size: 14,
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      '123',
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontSize:
-                            Theme.of(context).textTheme.labelMedium?.fontSize,
-                      ),
-                    ),
-                  ],
-                ),
+      body: Obx(
+        () => !_followController.isOwner.value
+            ? FollowList(ctr: _followController)
+            : FutureBuilder(
+                future: _followController.followUpTags(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    var data = snapshot.data;
+                    if (data['status']) {
+                      return Column(
+                        children: [
+                          TabBar(
+                              controller: _followController.tabController,
+                              isScrollable: true,
+                              tabAlignment: TabAlignment.start,
+                              tabs: [
+                                for (var i in data['data']) ...[
+                                  Tab(text: i.name),
+                                ]
+                              ]),
+                          Expanded(
+                            child: TabBarView(
+                              controller: _followController.tabController,
+                              children: [
+                                for (var i = 0;
+                                    i < _followController.tabController.length;
+                                    i++) ...[
+                                  OwnerFollowList(
+                                    ctr: _followController,
+                                    tagItem: _followController.followTags[i],
+                                  )
+                                ]
+                              ],
+                            ),
+                          ),
+                        ],
+                      );
+                    } else {
+                      return const SizedBox();
+                    }
+                  } else {
+                    return const SizedBox();
+                  }
+                },
               ),
-            )
-          ],
-        ),
       ),
     );
   }

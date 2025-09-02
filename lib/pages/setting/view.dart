@@ -22,7 +22,7 @@ class SettingPage extends StatelessWidget {
         children: [
           ListTile(
             onTap: () {
-              // Get.toNamed('/privacySetting');
+              Get.toNamed('/privacySetting');
             },
             dense: false,
             title: const Text('隐私设置'),
@@ -43,7 +43,7 @@ class SettingPage extends StatelessWidget {
           ),
           ListTile(
             onTap: () {
-              // Get.toNamed('/styleSetting');
+              Get.toNamed('/styleSetting');
             },
             dense: false,
             title: const Text('外观设置'),

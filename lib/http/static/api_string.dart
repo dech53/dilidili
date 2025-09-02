@@ -194,4 +194,31 @@ class ApiString {
   static const String seeYouLater = '/x/v2/history/toview';
   // 番剧/剧集明细
   static const String bangumiInfo = '/pgc/view/web/season';
+  // up主分组
+  static const String followUpTag = '/x/relation/tags';
+  // 全部关注的up
+  // vmid 用户id pn 页码 ps 每页个数，最大50 order: desc
+  // order_type 排序规则 最近访问传空，最常访问传 attention
+  static const String followings = '/x/relation/followings';
+  // 获取指定分组下的up
+  static const String followUpGroup = '/x/relation/tag';
+  // 设置Up主分组
+  // 0 添加至默认分组  否则使用,分割tagid
+  static const String addUsers = '/x/relation/tags/addUsers';
+
+  /// 申请二维码(TV端)
+  static const getTVCode =
+      'https://passport.snm0516.aisee.tv/x/passport-tv-login/qrcode/auth_code';
+
+  /// cookie转access_key
+  static const cookieToKey =
+      'https://passport.bilibili.com/x/passport-tv-login/h5/qrcode/confirm';
+
+  ///扫码登录（TV端）
+  static const qrcodePoll =
+      'https://passport.bilibili.com/x/passport-tv-login/qrcode/poll';
+  // 黑名单
+  static const String blackLst = '/x/relation/blacks';
+  // 移除黑名单
+  static const String removeBlack = '/x/relation/modify';
 }

@@ -50,7 +50,12 @@ class _UpPanelState extends State<UpPanel> {
                   const Text('最新关注'),
                   GestureDetector(
                     onTap: () {
-                      // Get.toNamed('/follow?mid=${userInfo.mid}');
+                      Get.toNamed(
+                        '/follow?mid=${userInfo.mid}',
+                        arguments: {
+                          'mid':userInfo.mid.toString()
+                        },
+                      );
                     },
                     child: Container(
                       padding: const EdgeInsets.only(top: 5, bottom: 5),
@@ -137,8 +142,11 @@ class _UpPanelState extends State<UpPanel> {
           return;
         }
         String heroTag = StringUtils.makeHeroTag(data.mid);
-        Get.toNamed('/member/mid=${data.mid}',
-            arguments: {'face': data.face, 'heroTag': heroTag,'mid': data.mid.toString()});
+        Get.toNamed('/member/mid=${data.mid}', arguments: {
+          'face': data.face,
+          'heroTag': heroTag,
+          'mid': data.mid.toString()
+        });
       },
       child: Padding(
         padding: itemPadding,

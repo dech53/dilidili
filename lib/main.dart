@@ -15,6 +15,7 @@ import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 import 'package:media_kit/media_kit.dart';
 import 'app.dart';
 
@@ -40,15 +41,22 @@ void main() async {
       );
     } catch (_) {}
   }
+  Box setting = SPStorage.setting;
+
   if (Platform.isAndroid) {
     runApp(DynamicColorBuilder(
       builder: ((ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
+        Color defaultColor = colorThemeTypes[
+            setting.get(SettingBoxKey.customColor, defaultValue: 0)]['color'];
+        // 是否动态取色
+        bool isDynamicColor =
+            setting.get(SettingBoxKey.dynamicColor, defaultValue: true);
         ColorScheme? lightColorScheme;
-        if (lightDynamic != null && darkDynamic != null) {
+        if (lightDynamic != null && darkDynamic != null && isDynamicColor) {
           lightColorScheme = lightDynamic.harmonized();
         } else {
           lightColorScheme = ColorScheme.fromSeed(
-            seedColor: colorThemeTypes[0]['color'],
+            seedColor: defaultColor,
             brightness: Brightness.light,
           );
         }
@@ -100,8 +108,14 @@ void main() async {
       }),
     ));
   } else {
+    Color defaultColor =
+        colorThemeTypes[setting.get(SettingBoxKey.customColor, defaultValue: 0)]
+            ['color'];
+    // 是否动态取色
+    bool isDynamicColor =
+        setting.get(SettingBoxKey.dynamicColor, defaultValue: true);
     ColorScheme lightColorScheme = ColorScheme.fromSeed(
-      seedColor: colorThemeTypes[0]['color'],
+      seedColor: defaultColor,
       brightness: Brightness.light,
     );
     runApp(

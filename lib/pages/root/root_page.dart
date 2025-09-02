@@ -4,6 +4,7 @@ import 'package:dilidili/pages/moments/view.dart';
 import 'package:dilidili/pages/root/controller.dart';
 import 'package:dilidili/pages/trend/view.dart';
 import 'package:dilidili/pages/user/view.dart';
+import 'package:dilidili/utils/storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lazy_load_indexed_stack/lazy_load_indexed_stack.dart';
@@ -16,6 +17,12 @@ class RootPage extends StatefulWidget {
 }
 
 class _RootPageState extends State<RootPage> {
+  @override
+  void dispose() async {
+    await SPStorage.close();
+    super.dispose();
+  }
+
   final RootController _rootController = Get.put(RootController());
   int _index = 0;
 

@@ -318,8 +318,9 @@ class VideoIntroController extends GetxController {
       followStatus['attribute'] = actionStatus;
       followStatus.refresh();
       if (actionStatus == 2) {}
+    } else {
+      SmartDialog.showToast(result['msg']);
     }
-    SmartDialog.showToast(result['msg']);
   }
 
   // 收藏

@@ -32,15 +32,23 @@ class _PagesPanelState extends State<PagesPanel> {
   late RxInt currentIndex = (0).obs;
   final String heroTag = Get.arguments['heroTag'];
   final ScrollController listViewScrollCtr = ScrollController();
+  late VideoIntroController videoIntroController;
   // late PersistentBottomSheetController? _bottomSheetController;
 
   @override
   void initState() {
     super.initState();
+    videoIntroController = Get.find<VideoIntroController>(tag: heroTag);
     cid = widget.cid;
     episodes = widget.pages;
     currentIndex.value = episodes.indexWhere((Part e) => e.cid == cid);
     scrollToIndex();
+    videoIntroController.lastPlaySCid.listen((cid) {
+      print("{调试:$cid}");
+      cid = cid;
+      currentIndex.value = 0;
+      scrollToIndex();
+    });
     // widget.videoIntroCtr.lastPlayCid.listen((int p0) {
     //   cid = p0;
     //   currentIndex.value = episodes.indexWhere((Part e) => e.cid == cid);
@@ -57,6 +65,7 @@ class _PagesPanelState extends State<PagesPanel> {
   void changeFucCall(item, i) async {
     widget.changeFuc?.call(item.cid, item.cover);
     currentIndex.value = i;
+    widget.videoIntroCtr.bottomSheetController?.close();
     // _bottomSheetController?.close();
     scrollToIndex();
   }
@@ -109,8 +118,8 @@ class _PagesPanelState extends State<PagesPanel> {
                     widget.videoIntroCtr.bottomSheetController
                         // =_bottomSheetController
                         = EpisodeBottomSheet(
-                      currentCid: cid,
-                      episodes: episodes,
+                      currentCid: widget.cid,
+                      episodes: widget.pages,
                       changeFucCall: changeFucCall,
                       sheetHeight: widget.sheetHeight,
                       dataType: VideoEpidoesType.videoPart,
