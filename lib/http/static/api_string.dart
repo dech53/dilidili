@@ -221,4 +221,5 @@ class ApiString {
   static const String blackLst = '/x/relation/blacks';
   // 移除黑名单
   static const String removeBlack = '/x/relation/modify';
+  static const String shootDanmaku = '/x/v2/dm/post';
 }

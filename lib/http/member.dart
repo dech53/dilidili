@@ -138,6 +138,7 @@ class MemberHttp {
         'offset': offset ?? '',
         'host_mid': mid,
         'timezone_offset': '-480',
+        'features': 'itemOpusStyle'
       },
     );
     if (res.data['code'] == 0) {

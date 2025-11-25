@@ -254,7 +254,7 @@ class _VideoPageState extends State<VideoPage>
                           style: ButtonStyle(
                             padding: MaterialStateProperty.all(EdgeInsets.zero),
                           ),
-                          onPressed: () {},
+                          onPressed: ()=>vdCtr.showShootDanmakuSheet(),
                           child:
                               const Text('发弹幕', style: TextStyle(fontSize: 12)),
                         ),

@@ -36,6 +36,7 @@ class MomentsHttp {
       'page': page ?? 1,
       'timezone_offset': '-480',
       'offset': page == 1 ? '' : offset,
+      'features': 'itemOpusStyle'
     };
     if (mid != -1) {
       data['host_mid'] = mid;

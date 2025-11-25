@@ -22,7 +22,7 @@ class _OverlayPanelState extends State<OverlayPanel>
     with SingleTickerProviderStateMixin {
   static const itemPadding = EdgeInsets.symmetric(horizontal: 6, vertical: 0);
   final PageController pageController = PageController();
-  late double contentWidth = 50;
+  late double contentWidth = 40;
   late List<UpItem> upList;
   late RxInt currentMid = (-1).obs;
   TabController? _tabController;

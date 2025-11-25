@@ -17,17 +17,13 @@ InlineSpan richNode(item, context) {
     if (item.modules.moduleDynamic.desc != null) {
       richTextNodes = item.modules.moduleDynamic.desc.richTextNodes;
     } else if (item.modules.moduleDynamic.major != null) {
-      if (item.modules.moduleDynamic.major.article.desc != null) {
-        richTextNodes = [
-          RichTextNodeItem(
-              type: 'RICH_TEXT_NODE_TYPE_TEXT',
-              origText: item.modules.moduleDynamic.major.article.desc!),
-        ];
-      }
-      if (item.modules.moduleDynamic.major.article.title != null) {
+      // 动态页面 richTextNodes 层级可能与主页动态层级不同
+      richTextNodes =
+          item.modules.moduleDynamic.major.opus.summary.richTextNodes;
+      if (item.modules.moduleDynamic.major.opus.title != null) {
         spanChilds.add(
           TextSpan(
-            text: item.modules.moduleDynamic.major.article.title + '\n',
+            text: item.modules.moduleDynamic.major.opus.title + '\n',
             style: Theme.of(context)
                 .textTheme
                 .titleMedium!
@@ -40,8 +36,10 @@ InlineSpan richNode(item, context) {
       return spacer;
     } else {
       for (var i in richTextNodes) {
+        /// fix 渲染专栏时内容会重复
+        // if (item.modules.moduleDynamic.major.opus.title == null &&
+        //     i.type == 'RICH_TEXT_NODE_TYPE_TEXT') {
         if (i.type == 'RICH_TEXT_NODE_TYPE_TEXT') {
-          print("动态文字内容: ${i.origText}");
           spanChilds.add(
               TextSpan(text: i.origText, style: const TextStyle(height: 1.65)));
         }
@@ -54,8 +52,8 @@ InlineSpan richNode(item, context) {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   GestureDetector(
-                    onTap: () => Get.toNamed('/member/mid=${i.rid}',
-                        arguments: {'face': null, 'mid': i.rid.toString()}),
+                    onTap: () => Get.toNamed('/member?mid=${i.rid}',
+                        arguments: {'face': null}),
                     child: Text(
                       ' ${i.text}',
                       style: authorStyle,
@@ -182,7 +180,7 @@ InlineSpan richNode(item, context) {
           );
         }
 
-        ///商品
+        /// TODO 商品
         if (i.type == 'RICH_TEXT_NODE_TYPE_GOODS') {
           spanChilds.add(
             WidgetSpan(
@@ -226,12 +224,8 @@ InlineSpan richNode(item, context) {
                 onTap: () async {
                   try {
                     int cid = await SearchHttp.ab2c(bvid: i.rid);
-                    Get.toNamed('/video/bvid=${i.rid}',  arguments: {
-                      'pic': null,
-                      'heroTag': i.rid,
-                      'bvid': i.rid,
-                      'cid': cid.toString()
-                    });
+                    Get.toNamed('/video?bvid=${i.rid}&cid=$cid',
+                        arguments: {'pic': null, 'heroTag': i.rid});
                   } catch (err) {
                     SmartDialog.showToast(err.toString());
                   }

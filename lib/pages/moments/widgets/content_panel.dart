@@ -23,23 +23,15 @@ class Content extends StatefulWidget {
 class _ContentState extends State<Content> {
   late bool hasPics;
   late bool hasCovers;
-  List<DynamicDrawItemModel> pics = [];
+  List<OpusPicsModel> pics = [];
   @override
   void initState() {
     super.initState();
     hasPics = widget.item.modules.moduleDynamic.major != null &&
-        widget.item.modules.moduleDynamic.major.draw != null &&
-        widget.item.modules.moduleDynamic.major.draw.items.isNotEmpty;
-    hasCovers = widget.item.modules!.moduleDynamic!.major != null &&
-        widget.item.modules.moduleDynamic.major.type == 'MAJOR_TYPE_ARTICLE' &&
-        widget.item.modules.moduleDynamic.major.article.covers != null;
+        widget.item.modules.moduleDynamic.major.opus != null &&
+        widget.item.modules.moduleDynamic.major.opus.pics.isNotEmpty;
     if (hasPics) {
-      pics = widget.item.modules.moduleDynamic.major.draw.items;
-    }
-    if (hasCovers) {
-      for (var i in widget.item.modules.moduleDynamic.major.article.covers) {
-        pics.add(DynamicDrawItemModel(src: i.toString()));
-      }
+      pics = widget.item.modules.moduleDynamic.major.opus.pics;
     }
   }
 
@@ -61,8 +53,8 @@ class _ContentState extends State<Content> {
     List<String> picList = [];
 
     if (len == 1) {
-      DynamicDrawItemModel pictureItem = pics.first;
-      picList.add(pictureItem.src!);
+      OpusPicsModel pictureItem = pics.first;
+      picList.add(pictureItem.url!);
       spanChilds.add(
         WidgetSpan(
           child: LayoutBuilder(
@@ -75,7 +67,7 @@ class _ContentState extends State<Content> {
                       ? pictureItem.height! / pictureItem.width!
                       : 9 / 16);
               return Hero(
-                tag: pictureItem.src!,
+                tag: pictureItem.url!,
                 placeholderBuilder:
                     (BuildContext context, Size heroSize, Widget child) {
                   return child;
@@ -91,7 +83,7 @@ class _ContentState extends State<Content> {
                       children: [
                         Positioned.fill(
                           child: NetworkImgLayer(
-                            src: pictureItem.src,
+                            src: pictureItem.url,
                             width: maxWidth / 2,
                             height: height,
                           ),
@@ -116,7 +108,7 @@ class _ContentState extends State<Content> {
     if (len > 1) {
       List<Widget> list = [];
       for (var i = 0; i < len; i++) {
-        picList.add(pics[i].src!);
+        picList.add(pics[i].url!);
       }
       for (var i = 0; i < len; i++) {
         list.add(
@@ -135,7 +127,7 @@ class _ContentState extends State<Content> {
                     children: [
                       Positioned.fill(
                         child: NetworkImgLayer(
-                          src: pics[i].src,
+                          src: pics[i].url,
                           width: maxWidth,
                           height: height,
                           origAspectRatio:
@@ -225,7 +217,7 @@ class _ContentState extends State<Content> {
               ),
             ),
           ),
-          if (hasPics || hasCovers) ...[Text.rich(picsNodes())],
+          if (hasPics ) ...[Text.rich(picsNodes())],
         ],
       ),
     );
