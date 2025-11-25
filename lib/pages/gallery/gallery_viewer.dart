@@ -3,6 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dilidili/pages/gallery/custom_dismissible.dart';
 import 'package:dilidili/pages/gallery/interactive_viewer_boundary.dart';
 import 'package:dilidili/utils/download.dart';
+import 'package:dilidili/utils/method_channel.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -392,17 +393,5 @@ class _GalleryViewerState extends State<GalleryViewer>
     File(path).writeAsBytesSync(response.data);
     Share.shareXFiles([XFile(path)], subject: imgUrl);
   }
-
-  void onCopyImg(String imgUrl) {
-    Clipboard.setData(
-            ClipboardData(text: widget.sources[currentIndex!].toString()))
-        .then((value) {
-      SmartDialog.showToast('已复制到粘贴板');
-    }).catchError((err) {
-      SmartDialog.showNotify(
-        msg: err.toString(),
-        notifyType: NotifyType.error,
-      );
-    });
-  }
 }
+

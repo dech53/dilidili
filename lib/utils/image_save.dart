@@ -1,6 +1,7 @@
 import 'package:dilidili/common/constants.dart';
 import 'package:dilidili/common/widgets/network_img_layer.dart';
 import 'package:dilidili/utils/download.dart';
+import 'package:dilidili/utils/method_channel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 
@@ -44,6 +45,32 @@ Future imageSaveDialog(context, videoItem, closeFn) {
                     onPressed: () => closeFn!(),
                     icon: const Icon(
                       Icons.close,
+                      size: 18,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                right: 8,
+                bottom: 8,
+                child: Container(
+                  width: 30,
+                  height: 30,
+                  decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.3),
+                      borderRadius:
+                          const BorderRadius.all(Radius.circular(20))),
+                  child: IconButton(
+                    style: ButtonStyle(
+                      padding: MaterialStateProperty.all(EdgeInsets.zero),
+                    ),
+                    onPressed: () {
+                      onCopyImg(videoItem.pic! as String);
+                      closeFn!();
+                    },
+                    icon: const Icon(
+                      Icons.copy,
                       size: 18,
                       color: Colors.white,
                     ),
