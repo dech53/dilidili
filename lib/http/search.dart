@@ -202,6 +202,23 @@ class SearchHttp {
       };
     }
   }
+
+  static Future<Map<String, dynamic>> ab2cWithPic(
+      {int? aid, String? bvid}) async {
+    Map<String, dynamic> data = {};
+    if (aid != null) {
+      data['aid'] = aid;
+    } else if (bvid != null) {
+      data['bvid'] = bvid;
+    }
+    final dynamic res = await DioInstance.instance().get(
+        path: ApiString.baseUrl + ApiString.ab2c,
+        param: <String, dynamic>{...data});
+    return {
+      'cid': res.data['data'].first['cid'],
+      'pic': res.data['data'].first['first_frame'],
+    };
+  }
 }
 
 class Data {

@@ -146,7 +146,7 @@ class VideoHttp {
             (dynamic data) => HotVideoItemList.fromJson(data),
           ).data.list!,
         );
-        return {'status': true, 'data': list};
+        return {'status': true, 'data': list}; 
       } else {
         return {'status': false, 'data': [], 'msg': res.data['message']};
       }

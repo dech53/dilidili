@@ -35,7 +35,7 @@ class _FollowListState extends State<FollowList> {
             widget.ctr.queryFollowings('onLoad');
           });
         }
-      },
+      }
     );
   }
 

@@ -81,10 +81,6 @@ class DPlayerController extends GetxController {
   //主控制器
   Player? _videoPlayerController;
   VideoController? _videoController;
-  final Rx<int> _playerCount = Rx(0);
-  Rx<int> get playerCount => _playerCount;
-  // 默认投稿视频格式
-  static Rx<String> _videoType = 'archive'.obs;
 
   /// 是否展示控制条及监听
   final Rx<bool> _showControls = false.obs;
@@ -98,8 +94,6 @@ class DPlayerController extends GetxController {
   //播放速度
   final Rx<double> _playbackSpeed = 1.0.obs;
   double get playbackSpeed => _playbackSpeed.value;
-
-  static DPlayerController? _instance;
 
   Rx<bool> _isSliderMoving = false.obs;
   Rx<bool> get isSliderMoving => _isSliderMoving;
@@ -115,9 +109,6 @@ class DPlayerController extends GetxController {
   final Rx<String> _direction = 'horizontal'.obs;
   Rx<String> get direction => _direction;
 
-  //私有构造函数
-  DPlayerController._internal(this.videoType) {}
-
   //获取私有控制器
   Player? get videoPlayerController => _videoPlayerController;
   VideoController? get videoController => _videoController;
@@ -128,6 +119,8 @@ class DPlayerController extends GetxController {
 
   /// 播放事件监听
   void startListeners() {
+    removeListeners();
+    subscriptions.clear();
     subscriptions.addAll([
       videoPlayerController!.stream.position.listen((event) {
         _position.value = event;
@@ -287,17 +280,7 @@ class DPlayerController extends GetxController {
     }
   }
 
-  //构造函数
-  factory DPlayerController({
-    String videoType = 'archive',
-  }) {
-    _instance ??= DPlayerController._internal(videoType);
-    if (videoType != 'none') {
-      _instance!._playerCount.value += 1;
-      _videoType.value = videoType;
-    }
-    return _instance!;
-  }
+  DPlayerController({this.videoType = 'archive'});
 
   Future<void> setBrightness(double brightnes) async {
     try {
@@ -325,9 +308,6 @@ class DPlayerController extends GetxController {
     String bvid = '',
     int cid = 0,
   }) async {
-    if (_playerCount.value == 0) {
-      return;
-    }
     dataStatus.status.value = DataStatus.loading;
     _direction.value = direction ?? 'horizontal';
     _bvid = bvid;
@@ -425,15 +405,10 @@ class DPlayerController extends GetxController {
     for (final s in subscriptions) {
       s.cancel();
     }
+    subscriptions.clear();
   }
 
   Future<void> dispose({String type = 'single'}) async {
-    if (type == 'single' && playerCount.value > 1) {
-      _playerCount.value -= 1;
-      pause();
-      return;
-    }
-    _playerCount.value = 0;
     try {
       _timer?.cancel();
       _timerForSeek?.cancel();
@@ -444,8 +419,8 @@ class DPlayerController extends GetxController {
         await _videoPlayerController?.dispose();
         _videoPlayerController = null;
       }
-      _instance = null;
       resetBrightness();
+      super.dispose();
     } catch (e) {
       print(e);
     }

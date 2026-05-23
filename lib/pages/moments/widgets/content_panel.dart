@@ -22,7 +22,6 @@ class Content extends StatefulWidget {
 
 class _ContentState extends State<Content> {
   late bool hasPics;
-  late bool hasCovers;
   List<OpusPicsModel> pics = [];
   @override
   void initState() {

@@ -1,6 +1,7 @@
 import 'package:dilidili/http/user.dart';
 import 'package:dilidili/pages/home/controller.dart';
 import 'package:dilidili/pages/moments/controller.dart';
+import 'package:dilidili/pages/root/controller.dart';
 import 'package:dilidili/pages/user/controller.dart';
 import 'package:dilidili/utils/cookie.dart';
 import 'package:dilidili/utils/storage.dart';
@@ -9,6 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:uuid/uuid.dart';
 
 class UserUtils {
   static Future refreshLoginStatus(bool status) async {
@@ -25,7 +27,7 @@ class UserUtils {
     }
   }
 
-  static confirmLogin() async {
+  static confirmLogin(url, controller) async {
     try {
       await SetCookie.set();
       final result = await UserHttp.userInfo();
@@ -39,14 +41,15 @@ class UserUtils {
           await userInfoCache.put('userInfoCache', result['data']);
           final HomeController homeCtr = Get.find<HomeController>();
           final UserPageController userCtr = Get.find<UserPageController>();
-          final MomentsController momentsCtr = Get.find<MomentsController>();
-          momentsCtr.userLogin.value = true;
-          momentsCtr.userInfo = result['data'];
           userCtr.userInfo.value = result['data'];
+          userCtr.userLogin.value = true;
           homeCtr.userFace.value = result['data'].face;
           homeCtr.userLogin.value = true;
           homeCtr.userName.value = result['data'].uname;
           SPStorage.userID = result['data'].mid.toString();
+          final MomentsController momentsCtr = Get.find<MomentsController>();
+          momentsCtr.userLogin.value = true;
+          momentsCtr.userInfo = result['data'];
         } catch (e) {
           SmartDialog.show(
             builder: (BuildContext context) {
@@ -63,6 +66,7 @@ class UserUtils {
             },
           );
         }
+        Get.back();
       } else {
         SmartDialog.showToast(result['msg']);
         Clipboard.setData(ClipboardData(text: result['msg']));
@@ -71,5 +75,14 @@ class UserUtils {
       SmartDialog.showNotify(msg: e.toString(), notifyType: NotifyType.warning);
       Clipboard.setData(const ClipboardData(text: "登录失败"));
     }
+  }
+
+  static String generateBuvid() {
+    String uuid = getUUID() + getUUID();
+    return 'XY${uuid.substring(0, 35).toUpperCase()}';
+  }
+
+  static String getUUID() {
+    return const Uuid().v4().replaceAll('-', '');
   }
 }

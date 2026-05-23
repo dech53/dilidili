@@ -240,6 +240,7 @@ class LiveRoomController extends GetxController {
 
   @override
   void onClose() {
+    dPlayerController.dispose();
     heartBeat();
     dSocket?.onClose();
     super.onClose();

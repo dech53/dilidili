@@ -1,13 +1,32 @@
 import 'package:dilidili/common/constants.dart';
 import 'package:dilidili/common/widgets/badge.dart';
 import 'package:dilidili/common/widgets/network_img_layer.dart';
+import 'package:dilidili/pages/gallery/gallery_viewer.dart';
+import 'package:dilidili/pages/gallery/hero_route.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-Widget picWidget(item, context, floor) {
+void onPreviewImg(currentUrl, picList, initIndex, context) {
+  Navigator.of(context).push(
+    HeroRoute<void>(
+      builder: (BuildContext context) => GalleryViewer(
+        sources: picList,
+        initIndex: initIndex,
+        onPageChanged: (int pageIndex) {},
+      ),
+    ),
+  );
+}
+
+Widget picWidget(item, context) {
   String type = item.modules.moduleDynamic.major.type;
   List pictures = [];
-  if (type == 'MAJOR_TYPE_DRAW' ) {
+  if (type == 'MAJOR_TYPE_OPUS') {
+    /// fix 图片跟rich_node_panel重复
+    // pictures = item.modules.moduleDynamic.major.opus.pics;
+    return const SizedBox();
+  }
+  if (type == 'MAJOR_TYPE_DRAW') {
     pictures = item.modules.moduleDynamic.major.draw.items;
   }
   int len = pictures.length;
@@ -27,9 +46,9 @@ Widget picWidget(item, context, floor) {
               return child;
             },
             child: GestureDetector(
-              onTap: () {},
+              onTap: () => onPreviewImg(picList[i], picList, i, context),
               child: NetworkImgLayer(
-                src: pictures[i].src,
+                src: pictures[i].src ?? pictures[i].url,
                 width: box.maxWidth,
                 height: box.maxWidth,
               ),

@@ -171,69 +171,86 @@ class ChatCard extends StatelessWidget {
             ),
           );
         case MsgType.share_v2:
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              GestureDetector(
-                onTap: () async {
-                  SmartDialog.showLoading(msg: '加载中');
-                  final String bvid = IdUtils.av2bv(int.parse(content['id']));
-                  // 16番剧 5投稿
-                  final int source = content["source"];
-                  final String? url = content["url"];
+          return Card(
+            elevation: 4,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            clipBehavior: Clip.antiAlias, // 关键：让图片裁剪进圆角
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                GestureDetector(
+                  onTap: () async {
+                    SmartDialog.showLoading(msg: '加载中');
+                    final String bvid = IdUtils.av2bv(int.parse(content['id']));
+                    final int source = content["source"];
+                    final String? url = content["url"];
 
-                  final int cid = await SearchHttp.ab2c(bvid: bvid);
-                  final String heroTag = StringUtils.makeHeroTag(bvid);
-                  await SmartDialog.dismiss();
-                  if (source == 5) {
-                    Get.toNamed<dynamic>(
-                      '/video/bvid=$bvid', 
-                      arguments: <String, String?>{
-                        'pic': content['thumb'],
-                        'heroTag': heroTag,
-                        'bvid': bvid,
-                        'cid': cid.toString(),
-                      },
-                    );
-                  }
-                  // if (source == 16) {
-                  //   if (url != null) {
-                  //     final String area = url.split('/').last;
-                  //     if (area.startsWith('ep')) {
-                  //       RoutePush.bangumiPush(null, Utils.matchNum(area).first);
-                  //     } else if (area.startsWith('ss')) {
-                  //       RoutePush.bangumiPush(Utils.matchNum(area).first, null);
-                  //     }
-                  //   }
-                  // }
-                },
-                child: Container(
-                  width: 220,
-                  height: 220 * 9 / 16,
-                  child: CachedNetworkImage(imageUrl: content['thumb']),
+                    final int cid = await SearchHttp.ab2c(bvid: bvid);
+                    final String heroTag = StringUtils.makeHeroTag(bvid);
+                    await SmartDialog.dismiss();
+
+                    if (source == 5) {
+                      Get.toNamed<dynamic>(
+                        '/video/bvid=$bvid',
+                        arguments: <String, String?>{
+                          'pic': content['thumb'],
+                          'heroTag': heroTag,
+                          'bvid': bvid,
+                          'cid': cid.toString(),
+                        },
+                      );
+                    }
+                  },
+                  child: Stack(
+                    children: [
+                      SizedBox(
+                        width: double.infinity,
+                        height: 220 * 9 / 16,
+                        child: CachedNetworkImage(
+                          imageUrl: content['thumb'],
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                content['title'],
-                style: TextStyle(
-                  letterSpacing: 0.6,
-                  height: 1.5,
-                  color: textColor(context),
-                  fontWeight: FontWeight.bold,
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 10, 12, 6),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        content['title'],
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          letterSpacing: 0.6,
+                          height: 1.4,
+                          color: Theme.of(context).colorScheme.primary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      const SizedBox(height: 6),
+                      Text(
+                        content['author'] ?? '',
+                        style: TextStyle(
+                          letterSpacing: 0.6,
+                          height: 1.5,
+                          color: Theme.of(context)
+                              .colorScheme
+                              .primary
+                              .withOpacity(0.6),
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 1),
-              Text(
-                content['author'] ?? '',
-                style: TextStyle(
-                  letterSpacing: 0.6,
-                  height: 1.5,
-                  color: textColor(context).withOpacity(0.6),
-                  fontSize: 12,
-                ),
-              ),
-            ],
+              ],
+            ),
           );
         case MsgType.archive_card:
           return Column(
@@ -246,7 +263,7 @@ class ChatCard extends StatelessWidget {
                   final int cid = await SearchHttp.ab2c(bvid: bvid);
                   final String heroTag = StringUtils.makeHeroTag(bvid);
                   SmartDialog.dismiss<dynamic>().then(
-                    (e) => Get.toNamed<dynamic>('/video/bvid=$bvid', 
+                    (e) => Get.toNamed<dynamic>('/video/bvid=$bvid',
                         arguments: <String, String?>{
                           'pic': content['thumb'] ?? '',
                           'heroTag': heroTag,
@@ -327,8 +344,7 @@ class ChatCard extends StatelessWidget {
                           final int cid = await SearchHttp.ab2c(bvid: bvid);
                           final String heroTag = StringUtils.makeHeroTag(bvid);
                           SmartDialog.dismiss<dynamic>().then(
-                            (e) => Get.toNamed<dynamic>(
-                                '/video/bvid=$bvid', 
+                            (e) => Get.toNamed<dynamic>('/video/bvid=$bvid',
                                 arguments: <String, String?>{
                                   'pic': i['cover_url'],
                                   'heroTag': heroTag,

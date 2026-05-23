@@ -2,6 +2,7 @@
 import 'package:dilidili/common/constants.dart';
 import 'package:dilidili/common/widgets/badge.dart';
 import 'package:dilidili/common/widgets/network_img_layer.dart';
+import 'package:dilidili/pages/moments/controller.dart';
 import 'package:dilidili/utils/num_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -10,6 +11,10 @@ import 'package:get/get.dart';
 import 'rich_node_panel.dart';
 
 Widget videoSeasonWidget(item, context, type, {floor = 1}) {
+  final MomentsController momentsController =
+      Get.isRegistered<MomentsController>()
+          ? Get.find<MomentsController>()
+          : Get.put(MomentsController());
   TextStyle authorStyle =
       TextStyle(color: Theme.of(context).colorScheme.primary);
   Map<dynamic, dynamic> dynamicProperty = {
@@ -29,7 +34,10 @@ Widget videoSeasonWidget(item, context, type, {floor = 1}) {
             GestureDetector(
               onTap: () => Get.toNamed(
                   '/member/mid=${item.modules.moduleAuthor.mid}',
-                  arguments: {'face': item.modules.moduleAuthor.face,'mid': item.modules.moduleAuthor.mid.toString()}),
+                  arguments: {
+                    'face': item.modules.moduleAuthor.face,
+                    'mid': item.modules.moduleAuthor.mid.toString()
+                  }),
               child: Text(
                 item.modules.moduleAuthor.type == null
                     ? '@${item.modules.moduleAuthor.name}'
@@ -54,109 +62,127 @@ Widget videoSeasonWidget(item, context, type, {floor = 1}) {
         Text.rich(richNode(item, context)),
         const SizedBox(height: 6),
       ],
-      Padding(
-        padding: floor == 1
-            ? const EdgeInsets.only(left: 12, right: 12)
-            : EdgeInsets.zero,
-        child: LayoutBuilder(
-          builder: (BuildContext context, BoxConstraints boxConstraints) {
-            final double width = (boxConstraints.maxWidth -
-                    StyleString.cardSpace *
-                        6 /
-                        MediaQuery.textScalerOf(context).scale(1.0)) /
-                2;
-            return Container(
-              constraints: const BoxConstraints(minHeight: 88),
-              height: width / StyleString.aspectRatio,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(8.r),
-                    child: AspectRatio(
-                      aspectRatio: StyleString.aspectRatio,
-                      child: LayoutBuilder(
-                        builder: (BuildContext context,
-                            BoxConstraints boxConstraints) {
-                          return Stack(
-                            children: [
-                              NetworkImgLayer(
-                                type: floor == 1 ? 'emote' : null,
-                                width: width,
-                                height: width / StyleString.aspectRatio,
-                                src: content.cover,
+      GestureDetector(
+        onTap: () => momentsController.pushDetail(item, floor),
+        behavior: HitTestBehavior.translucent,
+        child: Padding(
+          padding: floor == 1
+              ? const EdgeInsets.only(left: 12, right: 12)
+              : EdgeInsets.zero,
+          child: LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints boxConstraints) {
+              final double coverWidth =
+                  (boxConstraints.maxWidth - StyleString.cardSpace * 2) / 2;
+              final double coverHeight = coverWidth / StyleString.aspectRatio;
+              final double cardHeight = coverHeight < 88 ? 88 : coverHeight;
+              return SizedBox(
+                height: cardHeight,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8.r),
+                      child: SizedBox(
+                        width: coverWidth,
+                        height: coverHeight,
+                        child: Stack(
+                          children: [
+                            NetworkImgLayer(
+                              type: floor == 1 ? 'emote' : null,
+                              width: coverWidth,
+                              height: coverHeight,
+                              src: content.cover,
+                            ),
+                            if (content.durationText != null)
+                              PBadge(
+                                text: content.durationText,
+                                top: null,
+                                type: 'gray',
+                                right: 10.0,
+                                bottom: 8.0,
+                                left: null,
                               ),
-                              if (content.badge != null &&
-                                  content.badge['text'] != null)
-                                PBadge(
-                                  text: content.badge['text'],
-                                  top: 8.0,
-                                  right: 10.0,
-                                  bottom: null,
-                                  left: null,
-                                ),
-                              if (content.durationText != null)
-                                PBadge(
-                                  text: content.durationText,
-                                  top: null,
-                                  type: 'gray',
-                                  right: 10.0,
-                                  bottom: 8.0,
-                                  left: null,
-                                ),
-                            ],
-                          );
-                        },
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(10, 0, 6, 0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            content.title,
-                            maxLines: 3,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(fontSize: 13.sp),
-                          ),
-                          6.verticalSpace,
-                          Row(
-                            children: [
-                              Text(
-                                content.stat.play + '次围观',
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(10, 0, 6, 0),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            RichText(
+                              maxLines: 3,
+                              overflow: TextOverflow.ellipsis,
+                              text: TextSpan(
                                 style: TextStyle(
-                                  fontSize: Theme.of(context)
-                                      .textTheme
-                                      .labelMedium!
-                                      .fontSize,
-                                  color: Theme.of(context).colorScheme.outline,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
                                 ),
+                                children: [
+                                  if (content.badge != null &&
+                                      content.badge['text'] != null)
+                                    WidgetSpan(
+                                      alignment: PlaceholderAlignment.middle,
+                                      child: Padding(
+                                        padding:
+                                            const EdgeInsets.only(right: 3),
+                                        child: PBadge(
+                                          text: content.badge['text'],
+                                          stack: 'normal',
+                                          type: 'line',
+                                        ),
+                                      ),
+                                    ),
+                                  TextSpan(
+                                    text: content.title,
+                                  ),
+                                ],
                               ),
-                              const SizedBox(width: 10),
-                              Text(
-                                content.stat.danmaku + '条弹幕',
-                                style: TextStyle(
-                                  fontSize: Theme.of(context)
-                                      .textTheme
-                                      .labelMedium!
-                                      .fontSize,
-                                  color: Theme.of(context).colorScheme.outline,
+                            ),
+                            6.verticalSpace,
+                            Wrap(
+                              spacing: 10,
+                              runSpacing: 4,
+                              children: [
+                                Text(
+                                  '${content.stat.play}次围观',
+                                  style: TextStyle(
+                                    fontSize: Theme.of(context)
+                                        .textTheme
+                                        .labelMedium!
+                                        .fontSize,
+                                    color:
+                                        Theme.of(context).colorScheme.outline,
+                                  ),
                                 ),
-                              )
-                            ],
-                          ),
-                        ],
+                                Text(
+                                  '${content.stat.danmaku}条弹幕',
+                                  style: TextStyle(
+                                    fontSize: Theme.of(context)
+                                        .textTheme
+                                        .labelMedium!
+                                        .fontSize,
+                                    color:
+                                        Theme.of(context).colorScheme.outline,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            );
-          },
+                  ],
+                ),
+              );
+            },
+          ),
         ),
       )
     ],

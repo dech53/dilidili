@@ -1,13 +1,16 @@
+import 'package:dilidili/common/reply_type.dart';
 import 'package:dilidili/http/danmaku.dart';
 import 'package:dilidili/http/static/api_string.dart';
 import 'package:dilidili/http/video.dart';
 import 'package:dilidili/model/bottom_control_type.dart';
+import 'package:dilidili/model/reply/item.dart';
 import 'package:dilidili/model/search_type.dart';
 import 'package:dilidili/model/video/quality.dart';
 import 'package:dilidili/model/video/url.dart';
 import 'package:dilidili/pages/dplayer/controller.dart';
 import 'package:dilidili/pages/dplayer/models/data_source.dart';
 import 'package:dilidili/pages/video/detail/widgets/header_control.dart';
+import 'package:dilidili/pages/video/reply_reply/view.dart';
 import 'package:dilidili/utils/id_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
@@ -16,6 +19,12 @@ import 'package:ns_danmaku/ns_danmaku.dart';
 
 class VideoDetailController extends GetxController
     with GetSingleTickerProviderStateMixin {
+
+  // 评论id 请求楼中楼评论使用
+  int fRpid = 0;
+  ReplyItemModel? firstFloor;
+  PersistentBottomSheetController? replyReplyBottomSheetCtr;
+  final scaffoldKey = GlobalKey<ScaffoldState>();
   DPlayerController dPlayerController = DPlayerController();
   // 路由传参
   String bvid = Get.arguments['bvid']!;
@@ -75,6 +84,30 @@ class VideoDetailController extends GetxController
     if (pic != null) {
       cover.value = videoItem['pic'] = pic;
     }
+  }
+
+  
+
+  showReplyReplyPanel(oid, fRpid, firstFloor, currentReply, loadMore) {
+    replyReplyBottomSheetCtr =
+        scaffoldKey.currentState?.showBottomSheet((BuildContext context) {
+      return VideoReplyReplyPanel(
+        oid: oid,
+        rpid: fRpid,
+        closePanel: () => {
+          fRpid = 0,
+        },
+        firstFloor: firstFloor,
+        replyType: ReplyType.video,
+        source: 'videoDetail',
+        sheetHeight: sheetHeight.value,
+        currentReply: currentReply,
+        loadMore: loadMore,
+      );
+    });
+    replyReplyBottomSheetCtr?.closed.then((value) {
+      fRpid = 0;
+    });
   }
 
   updatePlayer() {

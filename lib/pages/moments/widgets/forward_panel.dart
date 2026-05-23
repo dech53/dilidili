@@ -5,6 +5,7 @@ import 'package:dilidili/pages/moments/widgets/article_panel.dart';
 import 'package:dilidili/pages/moments/widgets/foward_pic.dart';
 import 'package:dilidili/pages/moments/widgets/live_panel.dart';
 import 'package:dilidili/pages/moments/widgets/live_rcmd_panel.dart';
+import 'package:dilidili/pages/moments/widgets/pic_panel.dart';
 import 'package:dilidili/pages/moments/widgets/rich_node_panel.dart';
 import 'package:dilidili/pages/moments/widgets/video_panel.dart';
 import 'package:dilidili/utils/num_utils.dart';
@@ -53,10 +54,16 @@ Widget forWard(item, context, ctr, source, {floor = 1}) {
               padding: floor == 2
                   ? EdgeInsets.zero
                   : const EdgeInsets.only(left: 12, right: 12),
-              child: FowardPic(
-                item: item,
-              ),
+              child: FowardPic(item:item),
             ),
+            /// 附加内容 商品信息、直播预约等等
+          if (item.modules.moduleDynamic.additional != null)
+            addWidget(
+              item,
+              context,
+              item.modules.moduleDynamic.additional.type,
+              floor: floor,
+            )
           ],
         ],
       );
@@ -263,7 +270,7 @@ Widget forWard(item, context, ctr, source, {floor = 1}) {
     default:
       return const SizedBox(
         width: double.infinity,
-        child: Text('🙏 暂未支持的类型，请联系开发者反馈 '),
+        child: Text('暂未支持的类型，请联系开发者反馈'),
       );
   }
 }

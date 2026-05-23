@@ -2,12 +2,12 @@ import 'dart:io';
 
 import 'package:dilidili/common/widgets/network_img_layer.dart';
 import 'package:dilidili/pages/home/controller.dart';
-import 'package:dilidili/utils/string_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -63,214 +63,184 @@ class _HomePageState extends State<HomePage>
   }
 
   Widget _getBodyUI() {
-    return Column(
-      mainAxisSize: MainAxisSize.max,
-      children: [
-        10.verticalSpace,
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15),
-          child: SizedBox(
-            height: ScreenUtil().screenHeight * 0.05,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                //问候语
-                Obx(
-                  () => Text(
-                    "${StringUtils.getTimeGreeting()}${_homeController.userName.value == '' ? '' : ',${_homeController.userName.value}'}",
-                    style: TextStyle(
-                      fontSize: (22).sp,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-                //头像
-                Obx(
-                  () => NetworkImgLayer(
-                    width: 40,
-                    height: 40,
-                    type: 'avatar',
-                    src: _homeController.userFace.value,
-                  ),
-                )
-              ],
+    return SafeArea(
+      bottom: false,
+      child: Column(
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          _buildTopActions(context),
+          Expanded(
+            child: TabBarView(
+              controller: _homeController.tabController,
+              children: _homeController.tabsPageList,
             ),
           ),
-        ),
-        15.verticalSpace,
-        //搜索
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15),
-          child: SizedBox(
-            height: ScreenUtil().screenHeight * 0.05,
-            child: Row(
-              children: [
-                //搜索框
-                Expanded(
-                  child: InkWell(
-                    onTap: () => Get.toNamed('/search'),
-                    child: Container(
-                      padding: EdgeInsets.only(left: 12.w),
-                      alignment: Alignment.centerLeft,
-                      height: 40.h,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onSecondaryContainer
-                            .withOpacity(0.05),
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.search_outlined,
-                            size: 25.r,
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ),
-                          5.horizontalSpace,
-                          Text(
-                            "搜索...",
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                Obx(
-                  () => Badge(
-                    offset: const Offset(-8, 5),
-                    label: Text(_homeController.unreadMsg.value.toString()),
-                    isLabelVisible: _homeController.unreadMsg.value > 0,
-                    child: IconButton(
-                      padding: EdgeInsets.zero,
-                      onPressed: () {
-                        if (_homeController.userLogin.value) {
-                          _homeController.unreadMsg.value = 0;
-                          Get.toNamed('/whisper');
-                        } else {
-                          SmartDialog.showToast("用户未登录");
-                        }
-                      },
-                      icon: Icon(
-                        Icons.notifications_outlined,
-                        size: 25.r,
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
-                    ),
-                  ),
-                )
-              ],
-            ),
-          ),
-        ),
-        //Expanded + tabbar
-        //视频列表
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 15),
-          child: CustomTabs(),
-        ),
-        Expanded(
-          child: TabBarView(
-            controller: _homeController.tabController,
-            children: _homeController.tabsPageList,
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
-}
 
-class CustomTabs extends StatefulWidget {
-  const CustomTabs({super.key});
+  Widget _buildTopActions(BuildContext context) {
+    final Color iconColor = Theme.of(context).colorScheme.onSurface;
+    final double actionButtonSize = 40.r;
+    final double avatarSize = 28.r;
 
-  @override
-  State<CustomTabs> createState() => _CustomTabsState();
-}
-
-class _CustomTabsState extends State<CustomTabs> {
-  final HomeController _homeController = Get.put(HomeController());
-
-  void onTap(int index) {
-    if (_homeController.initialIndex.value == index) {
-      _homeController.tabsCtrList[index]().animateToTop();
-    }
-    _homeController.initialIndex.value = index;
-    _homeController.tabController.index = index;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 44,
-      margin: const EdgeInsets.only(top: 8),
-      child: Obx(
-        () => ListView.separated(
-          padding: const EdgeInsets.symmetric(horizontal: 3.0),
-          scrollDirection: Axis.horizontal,
-          itemCount: _homeController.tabs.length,
-          separatorBuilder: (BuildContext context, int index) {
-            return const SizedBox(width: 10);
-          },
-          itemBuilder: (BuildContext context, int index) {
-            String label = _homeController.tabs[index]['label'];
-            return Obx(
-              () => CustomChip(
-                onTap: () => onTap(index),
-                label: label,
-                selected: index == _homeController.initialIndex.value,
+    return Padding(
+      padding: EdgeInsets.fromLTRB(18.w, 8.h, 18.w, 2.h),
+      child: Row(
+        children: [
+          const HomeTabSelector(),
+          const Spacer(),
+          Obx(
+            () => GlassBadge(
+              count: _homeController.unreadMsg.value,
+              child: GlassButton(
+                label: '通知',
+                width: actionButtonSize,
+                height: actionButtonSize,
+                iconSize: 21.r,
+                iconColor: iconColor,
+                useOwnLayer: true,
+                quality: GlassQuality.standard,
+                icon: const Icon(Icons.notifications_none_rounded),
+                onTap: () {
+                  if (_homeController.userLogin.value) {
+                    _homeController.unreadMsg.value = 0;
+                    Get.toNamed('/whisper');
+                  } else {
+                    SmartDialog.showToast("用户未登录");
+                  }
+                },
               ),
-            );
-          },
-        ),
+            ),
+          ),
+          8.horizontalSpace,
+          Obx(
+            () {
+              final bool hasAvatar = _homeController.userFace.value.isNotEmpty;
+
+              return GlassButton.custom(
+                label: '用户',
+                width: actionButtonSize,
+                height: actionButtonSize,
+                useOwnLayer: true,
+                quality: GlassQuality.standard,
+                onTap: () {
+                  if (!_homeController.userLogin.value) {
+                    Get.toNamed('/loginPage');
+                  }
+                },
+                child: hasAvatar
+                    ? NetworkImgLayer(
+                        width: avatarSize,
+                        height: avatarSize,
+                        type: 'avatar',
+                        src: _homeController.userFace.value,
+                      )
+                    : Icon(
+                        Icons.more_horiz_rounded,
+                        size: 22.r,
+                        color: iconColor,
+                      ),
+              );
+            },
+          ),
+        ],
       ),
     );
   }
 }
 
-class CustomChip extends StatelessWidget {
-  final Function onTap;
-  final String label;
-  final bool selected;
-  const CustomChip({
-    super.key,
-    required this.onTap,
-    required this.label,
-    required this.selected,
-  });
+class HomeTabSelector extends StatelessWidget {
+  const HomeTabSelector({super.key});
+
+  static const double _controlWidth = 202;
+  static const double _controlHeight = 40;
+  static const double _controlPadding = 3;
+  static const LiquidGlassSettings _bottomNavigationGlassSettings =
+      LiquidGlassSettings(
+    thickness: 30,
+    blur: 3,
+    chromaticAberration: 0.3,
+    lightIntensity: 0.6,
+    refractiveIndex: 1.59,
+    saturation: 0.7,
+    ambientStrength: 1,
+    lightAngle: 0.7853981633974483,
+    glassColor: Color(0x3DFFFFFF),
+  );
+
+  void _selectTab(HomeController homeController, int index) {
+    if (homeController.initialIndex.value == index) {
+      homeController.tabsCtrList[index]().animateToTop();
+    }
+    homeController.initialIndex.value = index;
+    homeController.tabController.index = index;
+  }
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme colorTheme = Theme.of(context).colorScheme;
-    final Color secondaryContainer = colorTheme.secondaryContainer;
-    final Color onPrimary = colorTheme.onPrimary;
-    final Color primary = colorTheme.primary;
-    final TextStyle chipTextStyle = selected
-        ? TextStyle(fontSize: 13, color: onPrimary)
-        : TextStyle(fontSize: 13, color: colorTheme.onSecondaryContainer);
-    const VisualDensity visualDensity =
-        VisualDensity(horizontal: -4.0, vertical: -2.0);
-    return InputChip(
-      side: BorderSide.none,
-      backgroundColor: secondaryContainer,
-      color: WidgetStateProperty.resolveWith((states) {
-        if (states.contains(WidgetState.selected) ||
-            states.contains(WidgetState.hovered)) {
-          return primary;
-        }
-        return colorTheme.secondaryContainer;
-      }),
-      padding: const EdgeInsets.fromLTRB(6, 1, 6, 1),
-      label: Text(label, style: chipTextStyle),
-      onPressed: () => onTap(),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(6),
-      ),
-      selected: selected,
-      showCheckmark: false,
-      visualDensity: visualDensity,
-    );
+    final HomeController homeController = Get.find<HomeController>();
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final Color selectedColor = colorScheme.primary;
+    final Color unselectedColor = colorScheme.onSurface.withValues(alpha: 0.68);
+    final Color indicatorColor = colorScheme.primary.withValues(alpha: 0.32);
+
+    return Obx(() {
+      if (homeController.tabs.isEmpty) {
+        return const SizedBox(width: _controlWidth, height: _controlHeight);
+      }
+
+      final int selectedIndex = homeController.initialIndex.value
+          .clamp(0, homeController.tabs.length - 1)
+          .toInt();
+      final List<String> labels = homeController.tabs
+          .map<String>((tab) => (tab as Map)['label'] as String)
+          .toList();
+      final LiquidShape capsuleShape =
+          LiquidRoundedSuperellipse(borderRadius: _controlHeight.r / 2);
+
+      return AdaptiveLiquidGlassLayer(
+        settings: _bottomNavigationGlassSettings,
+        quality: GlassQuality.standard,
+        shape: capsuleShape,
+        child: SizedBox(
+          width: _controlWidth.w,
+          height: _controlHeight.h,
+          child: AdaptiveGlass.grouped(
+            quality: GlassQuality.standard,
+            shape: capsuleShape,
+            child: GlassSegmentedControl(
+              segments: labels,
+              selectedIndex: selectedIndex,
+              onSegmentSelected: (index) => _selectTab(homeController, index),
+              height: _controlHeight.h,
+              borderRadius: _controlHeight.r / 2,
+              padding: EdgeInsets.all(_controlPadding.r),
+              backgroundColor: Colors.transparent,
+              indicatorColor: indicatorColor,
+              indicatorSettings: const LiquidGlassSettings(
+                glassColor: Colors.transparent,
+                lightIntensity: 0,
+                chromaticAberration: 0,
+                blur: 0,
+              ),
+              useOwnLayer: false,
+              quality: GlassQuality.standard,
+              selectedTextStyle: TextStyle(
+                color: selectedColor,
+                fontSize: 12.sp,
+                fontWeight: FontWeight.w700,
+              ),
+              unselectedTextStyle: TextStyle(
+                color: unselectedColor,
+                fontSize: 12.sp,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ),
+      );
+    });
   }
 }

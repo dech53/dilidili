@@ -53,9 +53,11 @@ class NetworkImgLayer extends StatelessWidget {
             borderRadius: BorderRadius.circular(
               type == 'avatar'
                   ? 50
-                  : type == 'emote'
-                      ? 0
-                      :const Radius.circular(8).x,
+                  : type == 'pendant'
+                      ? 50
+                      : type == 'emote'
+                          ? 0
+                          : const Radius.circular(8).x,
             ),
             child: CachedNetworkImage(
               imageUrl: imageUrl,
@@ -78,6 +80,12 @@ class NetworkImgLayer extends StatelessWidget {
   }
 
   Widget placeholder(BuildContext context) {
+    if (type == 'pendant') {
+      return Container(
+        width: width,
+        height: height,
+      );
+    }
     return Container(
       width: width,
       height: height,

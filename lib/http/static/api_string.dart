@@ -222,4 +222,14 @@ class ApiString {
   // 移除黑名单
   static const String removeBlack = '/x/relation/modify';
   static const String shootDanmaku = '/x/v2/dm/post';
+  // 楼中楼
+  static const String replyReplyList = '/x/v2/reply/reply';
+
+  static const String passBaseUrl = 'https://passport.bilibili.com';
+  // captcha验证码
+  static const String getCaptcha = '/x/passport-login/captcha?source=main_web';
+  static const getWebKey = '/x/passport-login/web/key';
+  // web端密码登录
+  static const String loginInByWebPwd =
+      '/x/passport-login/web/login';
 }

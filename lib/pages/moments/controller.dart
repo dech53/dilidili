@@ -127,14 +127,12 @@ class MomentsController extends GetxController {
         String cover = item.modules.moduleDynamic.major.archive.cover;
         try {
           int cid = await SearchHttp.ab2c(bvid: bvid);
-          Get.toNamed(
-              '/video/bvid=$bvid', 
-              arguments: {
-                'pic': cover,
-                'heroTag': bvid,
-                'bvid': bvid,
-                'cid': cid.toString(),
-              });
+          Get.toNamed('/video/bvid=$bvid', arguments: {
+            'pic': cover,
+            'heroTag': bvid,
+            'bvid': bvid,
+            'cid': cid.toString(),
+          });
         } catch (err) {
           SmartDialog.showToast(err.toString());
         }
@@ -157,12 +155,15 @@ class MomentsController extends GetxController {
         });
         break;
       case 'DYNAMIC_TYPE_ARTICLE':
-        String title = item.modules.moduleDynamic.major.article.title;
-        Get.toNamed('/read', parameters: {
-          'title': title,
-          'id': item.modules.moduleDynamic.major.article.id.toString(),
-          'articleType': 'read'
-        });
+        String title = item.modules.moduleDynamic.major.opus.title;
+        String jumpUrl = item.modules.moduleDynamic.major.opus.jumpUrl;
+        String url =
+            jumpUrl.startsWith('//') ? jumpUrl.split('//').last : jumpUrl;
+        RegExp digitRegExp = RegExp(r'\d+');
+        Iterable<Match> matches = digitRegExp.allMatches(jumpUrl);
+        String number = matches.first.group(0)!;
+        Get.toNamed('/read',
+            parameters: {'title': title, 'id': number, 'articleType': 'read'});
         break;
       case 'DYNAMIC_TYPE_FORWARD':
         Get.toNamed('/momentsDetail?type=forward',

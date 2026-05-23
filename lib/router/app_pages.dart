@@ -8,6 +8,7 @@ import 'package:dilidili/pages/history/view.dart';
 import 'package:dilidili/pages/home/view.dart';
 import 'package:dilidili/pages/later/view.dart';
 import 'package:dilidili/pages/live_room/view.dart';
+import 'package:dilidili/pages/login/view.dart';
 import 'package:dilidili/pages/member/view.dart';
 import 'package:dilidili/pages/moments/detail/view.dart';
 import 'package:dilidili/pages/read/view.dart';
@@ -54,6 +55,7 @@ class Routes {
     CustomGetPage(name: '/colorSetting', page: () => const ColorSelectPage()),
     CustomGetPage(name: '/privacySetting', page: () => const PrivacySetting()),
     CustomGetPage(name: '/blackListPage', page: () => const BlackListPage()),
+    CustomGetPage(name: '/loginPage', page: () => const LoginPage()),
   ];
 }
 

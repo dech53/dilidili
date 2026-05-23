@@ -26,13 +26,13 @@ class UserPageController extends GetxController {
   // 用户信息 头像、昵称、lv
   Rx<UserInfoData> userInfo = UserInfoData().obs;
   RxInt validSeconds = 180.obs;
+  int second = 0;
   late String qrcodeKey;
   RxBool userLogin = false.obs;
   Box userInfoCache = SPStorage.userInfo;
   // 用户状态 动态、关注、粉丝
   Rx<UserStat> userStat = UserStat().obs;
   Timer? validTimer;
-
 
   List list = [
     {
@@ -57,9 +57,24 @@ class UserPageController extends GetxController {
     },
   ];
 
+  onLogin() async {
+    if (!userLogin.value) {
+      Get.toNamed('/loginPage', preventDuplicates: false);
+    } else {
+      Get.toNamed(
+        '/member/mid=${userInfo.value.mid}',
+        arguments: {
+          'face': userInfo.value.face,
+          'mid': userInfo.value.mid.toString(),
+        },
+      );
+    }
+  }
+
   @override
   onInit() {
     super.onInit();
+    second = TimeOfDay.now().minute;
     if (userInfoCache.get('userInfoCache') != null) {
       userInfo.value = userInfoCache.get('userInfoCache');
       userLogin.value = true;
@@ -91,7 +106,7 @@ class UserPageController extends GetxController {
   Future queryWebQrcodeStatus() async {
     var res = await LoginHttp.queryWebQrcodeStatus(qrcodeKey);
     if (res['status']) {
-      await UserUtils.confirmLogin();
+      await UserUtils.confirmLogin('', null);
       userLogin.value = true;
       validTimer?.cancel();
       Get.back();

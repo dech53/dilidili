@@ -15,16 +15,16 @@ class FowardPic extends StatefulWidget {
 
 class _FowardPicState extends State<FowardPic> {
   late bool hasPics;
-  List<DynamicDrawItemModel> pics = [];
+  List<OpusPicsModel> pics = [];
 
   @override
   void initState() {
     super.initState();
     hasPics = widget.item.modules.moduleDynamic.major != null &&
-        widget.item.modules.moduleDynamic.major.draw != null &&
-        widget.item.modules.moduleDynamic.major.draw.items.isNotEmpty;
+        widget.item.modules.moduleDynamic.major.opus != null &&
+        widget.item.modules.moduleDynamic.major.opus.pics.isNotEmpty;
     if (hasPics) {
-      pics = widget.item.modules.moduleDynamic.major.draw.items;
+      pics = widget.item.modules.moduleDynamic.major.opus.pics;
     }
   }
 
@@ -46,8 +46,8 @@ class _FowardPicState extends State<FowardPic> {
     List<String> picList = [];
 
     if (len == 1) {
-      DynamicDrawItemModel pictureItem = pics.first;
-      picList.add(pictureItem.src!);
+      OpusPicsModel pictureItem = pics.first;
+      picList.add(pictureItem.url!);
       spanChilds.add(
         WidgetSpan(
           child: LayoutBuilder(
@@ -60,7 +60,7 @@ class _FowardPicState extends State<FowardPic> {
                       ? pictureItem.height! / pictureItem.width!
                       : 9 / 16);
               return Hero(
-                tag: pictureItem.src!,
+                tag: pictureItem.url!,
                 placeholderBuilder:
                     (BuildContext context, Size heroSize, Widget child) {
                   return child;
@@ -76,7 +76,7 @@ class _FowardPicState extends State<FowardPic> {
                       children: [
                         Positioned.fill(
                           child: NetworkImgLayer(
-                            src: pictureItem.src,
+                            src: pictureItem.url,
                             width: maxWidth / 2,
                             height: height,
                           ),
@@ -101,7 +101,7 @@ class _FowardPicState extends State<FowardPic> {
     if (len > 1) {
       List<Widget> list = [];
       for (var i = 0; i < len; i++) {
-        picList.add(pics[i].src!);
+        picList.add(pics[i].url!);
       }
       for (var i = 0; i < len; i++) {
         list.add(
@@ -122,7 +122,7 @@ class _FowardPicState extends State<FowardPic> {
                       if (isLong) ...[
                         Positioned.fill(
                           child: NetworkImgLayer(
-                            src: pics[i].src,
+                            src: pics[i].url,
                             width: maxWidth / 2,
                             height: height,
                             origAspectRatio:
@@ -138,7 +138,7 @@ class _FowardPicState extends State<FowardPic> {
                         ),
                       ] else ...[
                         NetworkImgLayer(
-                          src: pics[i].src,
+                          src: pics[i].url,
                           width: maxWidth,
                           height: maxWidth,
                           origAspectRatio:

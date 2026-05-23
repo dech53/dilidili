@@ -15,7 +15,7 @@ class VideoReplyController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _sortType = ReplySortType.values[0];
+    _sortType = ReplySortType.values[1];
     sortTypeTitle.value = _sortType.titles;
     sortTypeLabel.value = _sortType.labels;
   }
@@ -25,9 +25,9 @@ class VideoReplyController extends GetxController {
   int currentPage = 0;
   RxString noMore = ''.obs;
   RxList<ReplyItemModel> replyList = <ReplyItemModel>[].obs;
-  ReplySortType _sortType = ReplySortType.time;
-  RxString sortTypeTitle = ReplySortType.time.titles.obs;
-  RxString sortTypeLabel = ReplySortType.time.labels.obs;
+  ReplySortType _sortType = ReplySortType.like;
+  RxString sortTypeTitle = ReplySortType.like.titles.obs;
+  RxString sortTypeLabel = ReplySortType.like.labels.obs;
   int? aid;
   String? replyLevel;
   RxInt count = 0.obs;

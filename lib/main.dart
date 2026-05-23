@@ -16,11 +16,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:media_kit/media_kit.dart';
 import 'app.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await LiquidGlassWidgets.initialize();
   await ScreenUtil.ensureScreenSize();
   MediaKit.ensureInitialized();
   await SystemChrome.setPreferredOrientations(
@@ -111,9 +113,6 @@ void main() async {
     Color defaultColor =
         colorThemeTypes[setting.get(SettingBoxKey.customColor, defaultValue: 0)]
             ['color'];
-    // 是否动态取色
-    bool isDynamicColor =
-        setting.get(SettingBoxKey.dynamicColor, defaultValue: true);
     ColorScheme lightColorScheme = ColorScheme.fromSeed(
       seedColor: defaultColor,
       brightness: Brightness.light,

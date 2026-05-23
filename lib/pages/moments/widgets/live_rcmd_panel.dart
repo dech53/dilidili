@@ -2,6 +2,7 @@ import 'package:dilidili/common/constants.dart';
 import 'package:dilidili/common/widgets/badge.dart';
 import 'package:dilidili/common/widgets/network_img_layer.dart';
 import 'package:dilidili/model/dynamics/result.dart';
+import 'package:dilidili/pages/moments/controller.dart';
 import 'package:dilidili/utils/num_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -10,6 +11,10 @@ import 'package:get/get.dart';
 import 'rich_node_panel.dart';
 
 Widget liveRcmdPanel(item, context, {floor = 1}) {
+  final MomentsController momentsController =
+      Get.isRegistered<MomentsController>()
+          ? Get.find<MomentsController>()
+          : Get.put(MomentsController());
   TextStyle authorStyle =
       TextStyle(color: Theme.of(context).colorScheme.primary);
   DynamicLiveModel liveRcmd = item.modules.moduleDynamic.major.liveRcmd;
@@ -24,7 +29,10 @@ Widget liveRcmdPanel(item, context, {floor = 1}) {
             GestureDetector(
               onTap: () => Get.toNamed(
                   '/member/mid=${item.modules.moduleAuthor.mid}',
-                  arguments: {'face': item.modules.moduleAuthor.face,'mid': item.modules.moduleAuthor.mid.toString()}),
+                  arguments: {
+                    'face': item.modules.moduleAuthor.face,
+                    'mid': item.modules.moduleAuthor.mid.toString()
+                  }),
               child: Text(
                 '@${item.modules.moduleAuthor.name}',
                 style: authorStyle,
@@ -60,62 +68,59 @@ Widget liveRcmdPanel(item, context, {floor = 1}) {
         const SizedBox(height: 6),
       ],
       GestureDetector(
-        onTap: () {},
+        onTap: () => momentsController.pushDetail(item, floor),
+        behavior: HitTestBehavior.translucent,
         child: Padding(
           padding: floor == 1
               ? const EdgeInsets.only(left: 12, right: 12)
               : EdgeInsets.zero,
           child: LayoutBuilder(
             builder: (BuildContext context, BoxConstraints boxConstraints) {
-              final double width = (boxConstraints.maxWidth -
-                      StyleString.cardSpace *
-                          6 /
-                          MediaQuery.textScalerOf(context).scale(1.0)) /
-                  2;
-              return Container(
+              final double coverWidth =
+                  (boxConstraints.maxWidth - StyleString.cardSpace * 2) / 2;
+              final double coverHeight = coverWidth / StyleString.aspectRatio;
+              return ConstrainedBox(
                 constraints: const BoxConstraints(minHeight: 88),
-                height: width / StyleString.aspectRatio,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     ClipRRect(
                       borderRadius: BorderRadius.circular(8.r),
-                      child: AspectRatio(
-                        aspectRatio: StyleString.aspectRatio,
-                        child: LayoutBuilder(
-                          builder: (BuildContext context,
-                              BoxConstraints boxConstraints) {
-                            return Stack(
-                              children: [
-                                Hero(
-                                  tag: liveRcmd.roomId.toString(),
-                                  child: NetworkImgLayer(
-                                    type: floor == 1 ? 'emote' : null,
-                                    width: width,
-                                    height: width / StyleString.aspectRatio,
-                                    src: item.modules.moduleDynamic.major
-                                        .liveRcmd.cover,
+                      child: SizedBox(
+                        width: coverWidth,
+                        height: coverHeight,
+                        child: Stack(
+                          children: [
+                            Hero(
+                              tag: liveRcmd.roomId.toString(),
+                              child: NetworkImgLayer(
+                                type: floor == 1 ? 'emote' : null,
+                                width: coverWidth,
+                                height: coverHeight,
+                                src: item
+                                    .modules.moduleDynamic.major.liveRcmd.cover,
+                              ),
+                            ),
+                            Positioned(
+                              top: 6,
+                              right: 6,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  PBadge(
+                                    text: watchedShow['text_large'],
+                                    stack: 'normal',
+                                    type: 'gray',
                                   ),
-                                ),
-                                PBadge(
-                                  text: watchedShow['text_large'],
-                                  top: 6,
-                                  right: 56,
-                                  bottom: null,
-                                  left: null,
-                                  type: 'gray',
-                                ),
-                                PBadge(
-                                  text: liveStatus == 1 ? '直播中' : '直播结束',
-                                  top: 6,
-                                  right: 6,
-                                  bottom: null,
-                                  left: null,
-                                ),
-                              ],
-                            );
-                          },
+                                  PBadge(
+                                    text: liveStatus == 1 ? '直播中' : '直播结束',
+                                    stack: 'normal',
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -127,12 +132,13 @@ Widget liveRcmdPanel(item, context, {floor = 1}) {
                           children: [
                             Text(
                               item.modules.moduleDynamic.major.liveRcmd.title,
-                              maxLines: 1,
+                              maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
                             6.verticalSpace,
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
+                            Wrap(
+                              spacing: 10,
+                              runSpacing: 4,
                               children: [
                                 Text(
                                   item.modules.moduleDynamic.major.liveRcmd
@@ -146,7 +152,6 @@ Widget liveRcmdPanel(item, context, {floor = 1}) {
                                         Theme.of(context).colorScheme.outline,
                                   ),
                                 ),
-                                const SizedBox(width: 10),
                                 Text(
                                   watchedShow['text_large'],
                                   style: TextStyle(

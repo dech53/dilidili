@@ -96,21 +96,25 @@ class DioInstance {
       extra}) async {
     print(path);
     print(param);
-    final Options options = Options();
-    ResponseType resType = ResponseType.json;
+    final Options requestOptions = options ?? Options();
     if (extra != null) {
-      resType = extra!['resType'] ?? ResponseType.json;
+      requestOptions.responseType =
+          extra!['resType'] ?? requestOptions.responseType ?? ResponseType.json;
       if (extra['ua'] != null) {
-        options.headers = {'user-agent': headerUa(type: extra['ua'])};
+        requestOptions.headers = {
+          ...?requestOptions.headers,
+          'user-agent': headerUa(type: extra['ua']),
+        };
       }
+    } else {
+      requestOptions.responseType ??= ResponseType.json;
     }
-    options.responseType = resType;
     return dio.get(
       path,
       queryParameters: param,
       data: data,
       cancelToken: cancelToken,
-      options: options,
+      options: requestOptions,
     );
   }
 

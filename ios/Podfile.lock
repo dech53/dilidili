@@ -1,4 +1,6 @@
 PODS:
+  - appscheme (1.0.4):
+    - Flutter
   - auto_orientation (0.0.1):
     - Flutter
   - device_info_plus (0.0.1):
@@ -6,6 +8,10 @@ PODS:
   - Flutter (1.0.0)
   - flutter_localization (0.0.1):
     - Flutter
+  - gt3_flutter_plugin (0.0.9):
+    - Flutter
+    - GT3Captcha-iOS
+  - GT3Captcha-iOS (0.15.9)
   - isar_flutter_libs (1.0.0):
     - Flutter
   - media_kit_libs_ios_video (1.0.4):
@@ -49,10 +55,12 @@ PODS:
     - FlutterMacOS
 
 DEPENDENCIES:
+  - appscheme (from `.symlinks/plugins/appscheme/ios`)
   - auto_orientation (from `.symlinks/plugins/auto_orientation/ios`)
   - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
   - Flutter (from `Flutter`)
   - flutter_localization (from `.symlinks/plugins/flutter_localization/ios`)
+  - gt3_flutter_plugin (from `.symlinks/plugins/gt3_flutter_plugin/ios`)
   - isar_flutter_libs (from `.symlinks/plugins/isar_flutter_libs/ios`)
   - media_kit_libs_ios_video (from `.symlinks/plugins/media_kit_libs_ios_video/ios`)
   - media_kit_video (from `.symlinks/plugins/media_kit_video/ios`)
@@ -72,7 +80,13 @@ DEPENDENCIES:
   - webview_cookie_manager (from `.symlinks/plugins/webview_cookie_manager/ios`)
   - webview_flutter_wkwebview (from `.symlinks/plugins/webview_flutter_wkwebview/darwin`)
 
+SPEC REPOS:
+  trunk:
+    - GT3Captcha-iOS
+
 EXTERNAL SOURCES:
+  appscheme:
+    :path: ".symlinks/plugins/appscheme/ios"
   auto_orientation:
     :path: ".symlinks/plugins/auto_orientation/ios"
   device_info_plus:
@@ -81,6 +95,8 @@ EXTERNAL SOURCES:
     :path: Flutter
   flutter_localization:
     :path: ".symlinks/plugins/flutter_localization/ios"
+  gt3_flutter_plugin:
+    :path: ".symlinks/plugins/gt3_flutter_plugin/ios"
   isar_flutter_libs:
     :path: ".symlinks/plugins/isar_flutter_libs/ios"
   media_kit_libs_ios_video:
@@ -119,10 +135,13 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/webview_flutter_wkwebview/darwin"
 
 SPEC CHECKSUMS:
+  appscheme: d1cf187ffe3bba230f327535e004044b021d14d8
   auto_orientation: a1600c9ed72e6e96982fb4e1214463343342432a
   device_info_plus: 21fcca2080fbcd348be798aa36c3e5ed849eefbe
-  Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
+  Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
   flutter_localization: 72299fb6cb4e51cae587bd953ed0b958040b71e6
+  gt3_flutter_plugin: 37090e5fa66ff2a52939eb9d208fc36fa49d36e5
+  GT3Captcha-iOS: aeb6fed2e8594099821430a89208679e5a55b740
   isar_flutter_libs: 9fc2cfb928c539e1b76c481ba5d143d556d94920
   media_kit_libs_ios_video: 5a18affdb97d1f5d466dc79988b13eff6c5e2854
   media_kit_video: 1746e198cb697d1ffb734b1d05ec429d1fcd1474
@@ -142,6 +161,6 @@ SPEC CHECKSUMS:
   webview_cookie_manager: d63a76cabdf42a7ea3d92768ac67d4853a1367f8
   webview_flutter_wkwebview: 1821ceac936eba6f7984d89a9f3bcb4dea99ebb2
 
-PODFILE CHECKSUM: 4305caec6b40dde0ae97be1573c53de1882a07e5
+PODFILE CHECKSUM: 9f8ffca2c5343849128e72fac9b24f60c634ed95
 
 COCOAPODS: 1.16.2

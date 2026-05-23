@@ -45,7 +45,7 @@ class _OwnerFollowListState extends State<OwnerFollowList>
             followUpGroup('onLoad');
           });
         }
-      },
+      }
     );
   }
 

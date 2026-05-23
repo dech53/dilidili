@@ -1,6 +1,7 @@
 import 'package:dilidili/common/reply_type.dart';
 import 'package:dilidili/common/skeleton/video_reply.dart';
 import 'package:dilidili/common/widgets/http_error.dart';
+import 'package:dilidili/pages/video/detail/controller.dart';
 import 'package:dilidili/pages/video/reply/controller.dart';
 import 'package:dilidili/pages/video/reply/widgets/reply_item.dart';
 import 'package:easy_debounce/easy_throttle.dart';
@@ -83,6 +84,20 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
         }
       },
     );
+  }
+
+  // 展示二级回复
+  void replyReply(replyItem, currentReply, loadMore) {
+    final VideoDetailController videoDetailCtr =
+        Get.find<VideoDetailController>(tag: heroTag);
+    if (replyItem != null) {
+      videoDetailCtr.oid.value = replyItem.oid;
+      videoDetailCtr.fRpid = replyItem.rpid!;
+      videoDetailCtr.firstFloor = replyItem;
+      print("got repltitem data is oid=${replyItem.oid},fRpid=${replyItem.rpid!},ff=${replyItem}");
+      videoDetailCtr.showReplyReplyPanel(
+          replyItem.oid, replyItem.rpid!, replyItem, currentReply, loadMore);
+    }
   }
 
   void _showFab() {
@@ -215,6 +230,10 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
                                             .replyList[index],
                                         showReplyRow: true,
                                         replyLevel: replyLevel,
+                                        replyReply: (replyItem, currentReply,
+                                                loadMore) =>
+                                            replyReply(replyItem, currentReply,
+                                                loadMore),
                                         replyType: ReplyType.video,
                                       );
                                     }

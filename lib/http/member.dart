@@ -141,11 +141,24 @@ class MemberHttp {
         'features': 'itemOpusStyle'
       },
     );
+
     if (res.data['code'] == 0) {
-      return {
-        'status': true,
-        'data': MomentsDataModel.fromJson(res.data['data']),
-      };
+      try {
+        final data = MomentsDataModel.fromJson(res.data['data']);
+        return {
+          'status': true,
+          'data': data,
+        };
+      } catch (e, st) {
+        print('memberMoment fromJson error: $e');
+        print(st);
+        print(res.data['data']);
+        return {
+          'status': false,
+          'data': null,
+          'msg': '动态数据解析失败: $e',
+        };
+      }
     } else {
       Map errMap = {
         -352: '风控校验失败，请检查登录状态',

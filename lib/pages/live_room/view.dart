@@ -89,7 +89,6 @@ class _LiveRoomPageState extends State<LiveRoomPage>
 
   @override
   void dispose() {
-    dPlayerController.dispose();
     _scrollController.dispose();
     fabAnimationCtr.dispose();
     super.dispose();

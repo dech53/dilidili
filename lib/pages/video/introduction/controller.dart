@@ -184,7 +184,8 @@ class VideoIntroController extends GetxController {
 
   // 一键三连
   Future actionOneThree() async {
-    if (userInfo == null) {
+    final String? localUserId = prefs.getString("DedeUserID");
+    if (localUserId == null || localUserId.isEmpty) {
       SmartDialog.showToast('账号未登录');
       return;
     }
@@ -207,7 +208,11 @@ class VideoIntroController extends GetxController {
   // 获取投币状态
   Future queryHasCoinVideo() async {
     var result = await VideoHttp.hasCoinVideo(bvid: bvid);
-    hasCoin.value = result["data"]['multiply'] == 0 ? false : true;
+    if (result['status'] && result['data'] is Map) {
+      hasCoin.value = result["data"]['multiply'] == 0 ? false : true;
+    } else {
+      hasCoin.value = false;
+    }
   }
 
   // 获取收藏状态

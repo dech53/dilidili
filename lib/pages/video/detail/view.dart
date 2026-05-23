@@ -46,12 +46,26 @@ class _VideoPageState extends State<VideoPage>
   RxBool isShowing = true.obs;
   // late int mid;
   late Future _futureBuilderFuture;
+  PageRoute<dynamic>? _route;
 
   @override
   void dispose() {
-    if (dPlayerController != null) {}
+    dPlayerController?.removeStatusLister(playerListener);
+    VideoPage.routeObserver.unsubscribe(this);
     WidgetsBinding.instance.removeObserver(this);
+    _extendNestCtr.removeListener(_onExtendedNestedScroll);
+    _extendNestCtr.dispose();
+    appbarStream.close();
     super.dispose();
+  }
+
+  void _onExtendedNestedScroll() {
+    final double offset = _extendNestCtr.position.pixels;
+    vdCtr.sheetHeight.value =
+        Get.size.height - videoHeight - statusBarHeight + offset;
+    if (!appbarStream.isClosed) {
+      appbarStream.add(offset);
+    }
   }
 
   @override
@@ -75,15 +89,21 @@ class _VideoPageState extends State<VideoPage>
     dPlayerController?.seekTo(vdCtr.defaultST);
     dPlayerController?.play();
     dPlayerController?.addStatusLister(playerListener);
-    appbarStream.add(0);
+    if (!appbarStream.isClosed) {
+      appbarStream.add(0);
+    }
     super.didPopNext();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    VideoPage.routeObserver
-        .subscribe(this, ModalRoute.of(context)! as PageRoute);
+    final ModalRoute<dynamic>? route = ModalRoute.of(context);
+    if (route is PageRoute<dynamic> && route != _route) {
+      VideoPage.routeObserver.unsubscribe(this);
+      _route = route;
+      VideoPage.routeObserver.subscribe(this, route);
+    }
   }
 
   @override
@@ -111,14 +131,7 @@ class _VideoPageState extends State<VideoPage>
 
   appbarStreamListen() {
     appbarStream = StreamController<double>.broadcast();
-    _extendNestCtr.addListener(
-      () {
-        final double offset = _extendNestCtr.position.pixels;
-        vdCtr.sheetHeight.value =
-            Get.size.height - videoHeight - statusBarHeight + offset;
-        appbarStream.add(offset);
-      },
-    );
+    _extendNestCtr.addListener(_onExtendedNestedScroll);
   }
 
   @override
@@ -254,7 +267,7 @@ class _VideoPageState extends State<VideoPage>
                           style: ButtonStyle(
                             padding: MaterialStateProperty.all(EdgeInsets.zero),
                           ),
-                          onPressed: ()=>vdCtr.showShootDanmakuSheet(),
+                          onPressed: () => vdCtr.showShootDanmakuSheet(),
                           child:
                               const Text('发弹幕', style: TextStyle(fontSize: 12)),
                         ),
@@ -322,6 +335,7 @@ class _VideoPageState extends State<VideoPage>
         children: [
           Scaffold(
             resizeToAvoidBottomInset: false,
+            key: vdCtr.scaffoldKey,
             appBar: PreferredSize(
               preferredSize: const Size.fromHeight(0),
               child: StreamBuilder(

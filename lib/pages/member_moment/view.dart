@@ -83,7 +83,7 @@ class _MemberMomentPageState extends State<MemberMomentPage>
                 }
               } else {
                 return HttpError(
-                  errMsg: snapshot.data['msg'],
+                  errMsg: '数据解析失败',
                   fn: () {},
                 );
               }

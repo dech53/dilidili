@@ -1,5 +1,18 @@
 import 'dart:convert';
 
+int? asInt(dynamic value) {
+  if (value == null) {
+    return null;
+  }
+  if (value is int) {
+    return value;
+  }
+  if (value is num) {
+    return value.toInt();
+  }
+  return int.tryParse(value.toString());
+}
+
 class MomentsDataModel {
   MomentsDataModel({
     this.hasMore,
@@ -50,21 +63,21 @@ class MomentItemModel {
 class ItemOrigModel {
   ItemOrigModel({
     this.basic,
-    this.isStr,
+    this.idStr,
     this.modules,
     this.type,
     this.visible,
   });
 
   Map? basic;
-  String? isStr;
+  String? idStr;
   ItemModulesModel? modules;
   String? type;
   bool? visible;
 
   ItemOrigModel.fromJson(Map<String, dynamic> json) {
     basic = json['basic'];
-    isStr = json['is_str'];
+    idStr = json['id_str'];
     modules = ItemModulesModel.fromJson(json['modules']);
     type = json['type'];
     visible = json['visible'];
@@ -140,11 +153,12 @@ class ModuleAuthorModel {
     following = json['following'];
     jumpUrl = json['jump_url'];
     label = json['label'];
-    mid = json['mid'];
+    mid = asInt(json['mid']);
     name = json['name'];
     pubAction = json['pub_action'];
     pubTime = json['pub_time'];
-    pubTs = json['pub_ts'] == 0 ? null : json['pub_ts'];
+    final parsedPubTs = asInt(json['pub_ts']);
+    pubTs = parsedPubTs == null || parsedPubTs == 0 ? null : parsedPubTs;
     type = json['type'];
     vip = json['vip'];
   }
@@ -244,17 +258,15 @@ class Vote {
   int? voteId;
 
   Vote.fromJson(Map<String, dynamic> json) {
-    choiceCnt = json['choice_cnt'];
+    choiceCnt = asInt(json['choice_cnt']);
     share = json['share'];
-    defaultShare = json['default_share'];
-    endTime = json['end_time'] is int
-        ? json['end_time']
-        : int.parse(json['end_time']);
-    joinNum = json['join_num'];
-    status = json['status'];
-    type = json['type'];
-    uid = json['uid'];
-    voteId = json['vote_id'];
+    defaultShare = asInt(json['default_share']);
+    endTime = asInt(json['end_time']);
+    joinNum = asInt(json['join_num']);
+    status = asInt(json['status']);
+    type = asInt(json['type']);
+    uid = asInt(json['uid']);
+    voteId = asInt(json['vote_id']);
   }
 }
 
@@ -321,13 +333,12 @@ class Reserve {
     desc1 = json['desc1'];
     desc2 = json['desc2'];
     jumpUrl = json['jump_url'];
-    reserveTotal = json['reserve_total'];
-    rid = json['rid'];
-    state = json['state'];
-    state = json['state'];
-    stype = json['stype'];
+    reserveTotal = asInt(json['reserve_total']);
+    rid = asInt(json['rid']);
+    state = asInt(json['state']);
+    stype = asInt(json['stype']);
     title = json['title'];
-    upMid = json['up_mid'];
+    upMid = asInt(json['up_mid']);
   }
 }
 
@@ -484,7 +495,7 @@ class DynamicArticle {
 
   factory DynamicArticle.fromJson(Map<String, dynamic> json) {
     return DynamicArticle(
-      id: json['id'],
+      id: asInt(json['id']),
       title: json['title'],
       jump_url: json['jump_url'],
       desc: json['desc'],
@@ -506,7 +517,7 @@ class DynamicTopicModel {
   String? name;
 
   DynamicTopicModel.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
+    id = asInt(json['id']);
     jumpUrl = json['jump_url'];
     name = json['name'];
   }
@@ -544,18 +555,18 @@ class DynamicArchiveModel {
   int? seasonId;
 
   DynamicArchiveModel.fromJson(Map<String, dynamic> json) {
-    aid = json['aid'] is String ? int.parse(json['aid']) : json['aid'];
+    aid = asInt(json['aid']);
     badge = json['badge'];
     bvid = json['bvid'] ?? json['epid'].toString() ?? ' ';
     cover = json['cover'];
-    disablePreview = json['disable_preview'];
+    disablePreview = asInt(json['disable_preview']);
     durationText = json['duration_text'];
     jumpUrl = json['jump_url'];
     stat = json['stat'] != null ? Stat.fromJson(json['stat']) : null;
     title = json['title'];
-    type = json['type'];
-    epid = json['epid'];
-    seasonId = json['season_id'];
+    type = asInt(json['type']);
+    epid = asInt(json['epid']);
+    seasonId = asInt(json['season_id']);
   }
 }
 
@@ -569,7 +580,7 @@ class DynamicDrawModel {
   List<DynamicDrawItemModel>? items;
 
   DynamicDrawModel.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
+    id = asInt(json['id']);
     // ignore: prefer_null_aware_operators
     items = json['items'] != null
         ? json['items']
@@ -653,14 +664,16 @@ class Emoji {
   });
 
   String? iconUrl;
+  String? gifUrl;
   double? size;
   String? text;
   int? type;
   Emoji.fromJson(Map<String, dynamic> json) {
     iconUrl = json['icon_url'];
+    gifUrl = json['gif_url'];
     size = json['size'].toDouble();
     text = json['text'];
-    type = json['type'];
+    type = asInt(json['type']);
   }
 }
 
@@ -690,9 +703,9 @@ class OpusPicsModel {
   String? url;
 
   OpusPicsModel.fromJson(Map<String, dynamic> json) {
-    width = json['width'];
-    height = json['height'];
-    size = json['size'] != null ? json['size'].toInt() : 0;
+    width = asInt(json['width']);
+    height = asInt(json['height']);
+    size = asInt(json['size']) ?? 0;
     src = json['src'];
     url = json['url'];
   }
@@ -712,11 +725,11 @@ class DynamicDrawItemModel {
   List? tags;
   int? width;
   DynamicDrawItemModel.fromJson(Map<String, dynamic> json) {
-    height = json['height'];
-    size = json['size'].toInt();
+    height = asInt(json['height']);
+    size = asInt(json['size']);
     src = json['src'];
     tags = json['tags'];
-    width = json['width'];
+    width = asInt(json['width']);
   }
 }
 
@@ -745,18 +758,18 @@ class DynamicLiveModel {
     if (json['content'] != null) {
       Map<String, dynamic> data = jsonDecode(json['content']);
 
-      type = data['type'];
+      type = asInt(data['type']);
       Map livePlayInfo = data['live_play_info'];
-      uid = livePlayInfo['uid'];
+      uid = asInt(livePlayInfo['uid']);
       parentAreaName = livePlayInfo['parent_area_name'];
-      roomId = livePlayInfo['room_id'];
+      roomId = asInt(livePlayInfo['room_id']);
       liveId = livePlayInfo['live_id'];
-      liveStatus = livePlayInfo['live_status'];
+      liveStatus = asInt(livePlayInfo['live_status']);
       cover = livePlayInfo['cover'];
-      online = livePlayInfo['online'];
+      online = asInt(livePlayInfo['online']);
       areaName = livePlayInfo['area_name'];
       title = livePlayInfo['title'];
-      liveStartTime = livePlayInfo['live_start_time'];
+      liveStartTime = asInt(livePlayInfo['live_start_time']);
       watchedShow = livePlayInfo['watched_show'];
     }
   }
@@ -790,10 +803,10 @@ class DynamicLive2Model {
     cover = json['cover'];
     descFirst = json['desc_first'];
     descSecond = json['desc_second'];
-    id = json['id'];
+    id = asInt(json['id']);
     jumpUrl = json['jump_url'];
-    liveState = json['liv_state'];
-    reserveType = json['reserve_type'];
+    liveState = asInt(json['liv_state']);
+    reserveType = asInt(json['reserve_type']);
     title = json['title'];
   }
 }
