@@ -164,13 +164,13 @@ class _ReadPageState extends State<ReadPage> {
 
   Widget _buildTextParagraph(ModuleParagraph paragraph) {
     return Container(
-      alignment: TextParser.getAlignment(paragraph.align),
+      alignment: TextHelper.getAlignment(paragraph.align),
       margin: const EdgeInsets.only(bottom: 10),
       child: SelectableText.rich(
         TextSpan(
           children: paragraph.text?.nodes?.map((node) {
                 //根据返回的json属性构建textspan
-                return TextParser.buildTextSpan(node, paragraph.align, context);
+                return TextHelper.buildTextSpan(node, paragraph.align, context);
               }).toList() ??
               [],
         ),

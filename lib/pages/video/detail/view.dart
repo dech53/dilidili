@@ -16,9 +16,11 @@ import 'package:dilidili/utils/storage.dart';
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:lottie/lottie.dart';
 
 class VideoPage extends StatefulWidget {
@@ -137,16 +139,14 @@ class _VideoPageState extends State<VideoPage>
   @override
   Widget build(BuildContext context) {
     final sizeContext = MediaQuery.sizeOf(context);
-    final _context = MediaQuery.of(context);
+    final mediaQuery = MediaQuery.of(context);
     late double defaultVideoHeight = sizeContext.width * 9 / 16;
     late RxDouble videoHeight = defaultVideoHeight.obs;
     final double pinnedHeaderHeight =
         statusBarHeight + kToolbarHeight + videoHeight.value;
 
-    // 竖屏
-    final bool isPortrait = _context.orientation == Orientation.portrait;
     // 横屏
-    final bool isLandscape = _context.orientation == Orientation.landscape;
+    final bool isLandscape = mediaQuery.orientation == Orientation.landscape;
     final Rx<bool> isFullScreen = dPlayerController?.isFullScreen ?? false.obs;
     // 全屏时高度撑满
     if (isLandscape || isFullScreen.value == true) {
@@ -232,91 +232,77 @@ class _VideoPageState extends State<VideoPage>
           border: Border(
             bottom: BorderSide(
               width: 1,
-              color: Theme.of(context).dividerColor.withOpacity(0.1),
+              color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
             ),
           ),
         ),
         child: Material(
+          color: Colors.transparent,
           child: Row(
             children: [
               Expanded(
-                child: Obx(
-                  () => TabBar(
-                    padding: EdgeInsets.zero,
-                    controller: vdCtr.tabCtr,
-                    labelStyle: const TextStyle(fontSize: 13),
-                    labelPadding: const EdgeInsets.symmetric(horizontal: 10.0),
-                    dividerColor: Colors.transparent,
-                    tabs: vdCtr.tabs
-                        .map((String name) => Tab(text: name))
-                        .toList(),
-                    onTap: (index) => vdCtr.onTapTabbar(index),
+                child: Padding(
+                  padding: EdgeInsets.only(left: 12.w, right: 8.w),
+                  child: Obx(
+                    () => _VideoDetailSegmentedTabs(
+                      tabs: vdCtr.tabs.toList(),
+                      selectedIndex: vdCtr.selectedTabIndex.value,
+                      onSelected: vdCtr.onTapTabbar,
+                    ),
                   ),
                 ),
               ),
-              Flexible(
-                flex: 1,
-                child: Center(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      const SizedBox(width: 8),
-                      SizedBox(
-                        height: 32,
-                        child: TextButton(
-                          style: ButtonStyle(
-                            padding: MaterialStateProperty.all(EdgeInsets.zero),
-                          ),
-                          onPressed: () => vdCtr.showShootDanmakuSheet(),
-                          child:
-                              const Text('发弹幕', style: TextStyle(fontSize: 12)),
-                        ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    height: 32,
+                    child: TextButton(
+                      style: ButtonStyle(
+                        padding: WidgetStateProperty.all(EdgeInsets.zero),
                       ),
-                      SizedBox(
-                        width: 38,
-                        height: 38,
-                        child: Obx(
-                          () => !vdCtr.isShowCover.value
-                              ? IconButton(
-                                  onPressed: () {
-                                    dPlayerController?.isOpenDanmu.value =
-                                        !(dPlayerController
-                                                ?.isOpenDanmu.value ??
-                                            false);
-                                  },
-                                  icon:
-                                      !(dPlayerController?.isOpenDanmu.value ??
-                                              false)
-                                          ? SvgPicture.asset(
-                                              'assets/images/video/danmu_close.svg',
-                                              // ignore: deprecated_member_use
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .outline,
-                                            )
-                                          : SvgPicture.asset(
-                                              'assets/images/video/danmu_open.svg',
-                                              // ignore: deprecated_member_use
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .primary,
-                                            ),
-                                )
-                              : IconButton(
-                                  icon: SvgPicture.asset(
-                                    'assets/images/video/danmu_close.svg',
-                                    // ignore: deprecated_member_use
-                                    color:
-                                        Theme.of(context).colorScheme.outline,
-                                  ),
-                                  onPressed: () {},
-                                ),
-                        ),
-                      ),
-                      const SizedBox(width: 18),
-                    ],
+                      onPressed: () => vdCtr.showShootDanmakuSheet(),
+                      child: const Text('发弹幕', style: TextStyle(fontSize: 12)),
+                    ),
                   ),
-                ),
+                  SizedBox(
+                    width: 38,
+                    height: 38,
+                    child: Obx(
+                      () => !vdCtr.isShowCover.value
+                          ? IconButton(
+                              onPressed: () {
+                                dPlayerController?.isOpenDanmu.value =
+                                    !(dPlayerController?.isOpenDanmu.value ??
+                                        false);
+                              },
+                              icon: !(dPlayerController?.isOpenDanmu.value ??
+                                      false)
+                                  ? SvgPicture.asset(
+                                      'assets/images/video/danmu_close.svg',
+                                      // ignore: deprecated_member_use
+                                      color:
+                                          Theme.of(context).colorScheme.outline,
+                                    )
+                                  : SvgPicture.asset(
+                                      'assets/images/video/danmu_open.svg',
+                                      // ignore: deprecated_member_use
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                    ),
+                            )
+                          : IconButton(
+                              icon: SvgPicture.asset(
+                                'assets/images/video/danmu_close.svg',
+                                // ignore: deprecated_member_use
+                                color: Theme.of(context).colorScheme.outline,
+                              ),
+                              onPressed: () {},
+                            ),
+                    ),
+                  ),
+                  SizedBox(width: 12.w),
+                ],
               ),
             ],
           ),
@@ -453,7 +439,7 @@ class _VideoPageState extends State<VideoPage>
                                     endIndent: 12,
                                     color: Theme.of(context)
                                         .dividerColor
-                                        .withOpacity(0.06),
+                                        .withValues(alpha: 0.06),
                                   ),
                                 ),
                                 if (vdCtr.videoType == SearchType.video)
@@ -497,5 +483,84 @@ class _VideoPageState extends State<VideoPage>
     await _extendNestCtr.animateTo(0,
         duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
     dPlayerController!.play();
+  }
+}
+
+class _VideoDetailSegmentedTabs extends StatelessWidget {
+  const _VideoDetailSegmentedTabs({
+    required this.tabs,
+    required this.selectedIndex,
+    required this.onSelected,
+  });
+
+  final List<String> tabs;
+  final int selectedIndex;
+  final ValueChanged<int> onSelected;
+
+  static const double _height = 32;
+  static const double _padding = 3;
+  static const LiquidGlassSettings _bottomNavigationGlassSettings =
+      LiquidGlassSettings(
+    thickness: 30,
+    blur: 3,
+    chromaticAberration: 0.3,
+    lightIntensity: 0.6,
+    refractiveIndex: 1.59,
+    saturation: 0.7,
+    ambientStrength: 1,
+    lightAngle: 0.7853981633974483,
+    glassColor: Color(0x3DFFFFFF),
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final int safeIndex = selectedIndex.clamp(0, tabs.length - 1);
+    final Color selectedColor = colorScheme.primary;
+    final Color unselectedColor = colorScheme.onSurface.withValues(alpha: 0.68);
+    final Color indicatorColor = colorScheme.primary.withValues(alpha: 0.32);
+    final LiquidShape capsuleShape =
+        LiquidRoundedSuperellipse(borderRadius: _height.r / 2);
+
+    return AdaptiveLiquidGlassLayer(
+      settings: _bottomNavigationGlassSettings,
+      quality: GlassQuality.standard,
+      shape: capsuleShape,
+      child: SizedBox(
+        height: _height.h,
+        child: AdaptiveGlass.grouped(
+          quality: GlassQuality.standard,
+          shape: capsuleShape,
+          child: GlassSegmentedControl(
+            segments: tabs,
+            selectedIndex: safeIndex,
+            onSegmentSelected: onSelected,
+            height: _height.h,
+            borderRadius: _height.r / 2,
+            padding: EdgeInsets.all(_padding.r),
+            backgroundColor: Colors.transparent,
+            indicatorColor: indicatorColor,
+            indicatorSettings: const LiquidGlassSettings(
+              glassColor: Colors.transparent,
+              lightIntensity: 0,
+              chromaticAberration: 0,
+              blur: 0,
+            ),
+            useOwnLayer: false,
+            quality: GlassQuality.standard,
+            selectedTextStyle: TextStyle(
+              color: selectedColor,
+              fontSize: 12.sp,
+              fontWeight: FontWeight.w700,
+            ),
+            unselectedTextStyle: TextStyle(
+              color: unselectedColor,
+              fontSize: 12.sp,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

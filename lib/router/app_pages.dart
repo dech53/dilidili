@@ -11,6 +11,7 @@ import 'package:dilidili/pages/live_room/view.dart';
 import 'package:dilidili/pages/login/view.dart';
 import 'package:dilidili/pages/member/view.dart';
 import 'package:dilidili/pages/moments/detail/view.dart';
+import 'package:dilidili/pages/opus/view.dart';
 import 'package:dilidili/pages/read/view.dart';
 import 'package:dilidili/pages/search/view.dart';
 import 'package:dilidili/pages/search_result/view.dart';
@@ -34,6 +35,8 @@ class Routes {
     CustomGetPage(name: '/member/:mid', page: () => const MemberPage()),
     CustomGetPage(name: '/search', page: () => const SearchPage()),
     CustomGetPage(name: '/searchResult', page: () => const SearchResultPage()),
+    // 专栏
+    CustomGetPage(name: '/opus', page: () => const OpusPage()),
     CustomGetPage(name: '/read', page: () => const ReadPage()),
     CustomGetPage(name: '/webview', page: () => const WebviewPage()),
     CustomGetPage(name: '/whisper', page: () => const WhisperPage()),

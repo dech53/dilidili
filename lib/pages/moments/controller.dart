@@ -162,8 +162,19 @@ class MomentsController extends GetxController {
         RegExp digitRegExp = RegExp(r'\d+');
         Iterable<Match> matches = digitRegExp.allMatches(jumpUrl);
         String number = matches.first.group(0)!;
-        Get.toNamed('/read',
-            parameters: {'title': title, 'id': number, 'articleType': 'read'});
+        if (jumpUrl.contains('read')) {
+          Get.toNamed('/read', parameters: {
+            'title': title,
+            'id': number,
+            'articleType': url.split('/')[1]
+          });
+        } else {
+          Get.toNamed('/opus', parameters: {
+            'title': title,
+            'id': number,
+            'articleType': 'opus'
+          });
+        }
         break;
       case 'DYNAMIC_TYPE_FORWARD':
         Get.toNamed('/momentsDetail?type=forward',

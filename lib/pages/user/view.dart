@@ -40,12 +40,6 @@ class _UserPageState extends State<UserPage> {
       appBar: AppBar(
         actions: [
           IconButton(
-            onPressed: () => Get.toNamed('/search'),
-            icon: const Icon(
-              Icons.search,
-            ),
-          ),
-          IconButton(
             onPressed: () => Get.toNamed('/setting', preventDuplicates: false),
             icon: const Icon(
               Icons.settings_outlined,

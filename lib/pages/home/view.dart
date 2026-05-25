@@ -36,6 +36,35 @@ class _HomePageState extends State<HomePage>
         _scrollController.position.maxScrollExtent) {}
   }
 
+  void _runAfterGlassMenuClosed(VoidCallback action) {
+    Future<void>.delayed(const Duration(milliseconds: 220), () {
+      if (!mounted) return;
+      action();
+    });
+  }
+
+  void _openCurrentUserSpace() {
+    if (!_homeController.userLogin.value) {
+      Get.toNamed('/loginPage');
+      return;
+    }
+
+    final userInfo = _homeController.userInfo;
+    if (userInfo == null || userInfo.mid == null) {
+      SmartDialog.showToast('用户信息加载中');
+      return;
+    }
+
+    Get.toNamed(
+      '/member/mid=${userInfo.mid}',
+      arguments: {
+        'face': userInfo.face,
+        'mid': userInfo.mid.toString(),
+      },
+      preventDuplicates: false,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -89,8 +118,91 @@ class _HomePageState extends State<HomePage>
       padding: EdgeInsets.fromLTRB(18.w, 8.h, 18.w, 2.h),
       child: Row(
         children: [
-          const HomeTabSelector(),
-          const Spacer(),
+          Obx(
+            () {
+              final bool hasAvatar = _homeController.userFace.value.isNotEmpty;
+              final bool isLogin = _homeController.userLogin.value;
+              return GlassMenu(
+                menuWidth: 180,
+                menuBorderRadius: 18,
+                quality: GlassQuality.standard,
+                triggerBuilder: (context, toggleMenu) => GlassButton.custom(
+                  label: '用户',
+                  width: actionButtonSize,
+                  height: actionButtonSize,
+                  useOwnLayer: true,
+                  quality: GlassQuality.standard,
+                  onTap: toggleMenu,
+                  child: hasAvatar
+                      ? NetworkImgLayer(
+                          width: avatarSize,
+                          height: avatarSize,
+                          type: 'avatar',
+                          src: _homeController.userFace.value,
+                        )
+                      : Icon(
+                          Icons.person_outline_rounded,
+                          size: 22.r,
+                          color: iconColor,
+                        ),
+                ),
+                items: isLogin
+                    ? [
+                        GlassMenuItem(
+                          title: '个人主页',
+                          icon: ClipOval(
+                            child: NetworkImgLayer(
+                              width: 20,
+                              height: 20,
+                              type: 'avatar',
+                              src: _homeController.userFace.value,
+                            ),
+                          ),
+                          onTap: () {
+                            _runAfterGlassMenuClosed(_openCurrentUserSpace);
+                          },
+                        ),
+                        GlassMenuItem(
+                          title: '观看记录',
+                          icon: const Icon(Icons.history_rounded),
+                          onTap: () {
+                            _runAfterGlassMenuClosed(
+                              () => Get.toNamed('/history'),
+                            );
+                          },
+                        ),
+                        GlassMenuItem(
+                          title: '我的收藏',
+                          icon: const Icon(Icons.star_border_rounded),
+                          onTap: () {
+                            _runAfterGlassMenuClosed(() => Get.toNamed('/fav'));
+                          },
+                        ),
+                        GlassMenuItem(
+                          title: '稍后再看',
+                          icon: const Icon(Icons.watch_later_outlined),
+                          onTap: () {
+                            _runAfterGlassMenuClosed(
+                              () => Get.toNamed('/later'),
+                            );
+                          },
+                        ),
+                      ]
+                    : [
+                        GlassMenuItem(
+                          title: '登录账号',
+                          icon: const Icon(Icons.login_rounded),
+                          onTap: () {
+                            _runAfterGlassMenuClosed(
+                              () => Get.toNamed('/loginPage'),
+                            );
+                          },
+                        ),
+                      ],
+              );
+            },
+          ),
+          8.horizontalSpace,
           Obx(
             () => GlassBadge(
               count: _homeController.unreadMsg.value,
@@ -114,37 +226,8 @@ class _HomePageState extends State<HomePage>
               ),
             ),
           ),
-          8.horizontalSpace,
-          Obx(
-            () {
-              final bool hasAvatar = _homeController.userFace.value.isNotEmpty;
-
-              return GlassButton.custom(
-                label: '用户',
-                width: actionButtonSize,
-                height: actionButtonSize,
-                useOwnLayer: true,
-                quality: GlassQuality.standard,
-                onTap: () {
-                  if (!_homeController.userLogin.value) {
-                    Get.toNamed('/loginPage');
-                  }
-                },
-                child: hasAvatar
-                    ? NetworkImgLayer(
-                        width: avatarSize,
-                        height: avatarSize,
-                        type: 'avatar',
-                        src: _homeController.userFace.value,
-                      )
-                    : Icon(
-                        Icons.more_horiz_rounded,
-                        size: 22.r,
-                        color: iconColor,
-                      ),
-              );
-            },
-          ),
+          const Spacer(),
+          const HomeTabSelector(),
         ],
       ),
     );
@@ -154,7 +237,7 @@ class _HomePageState extends State<HomePage>
 class HomeTabSelector extends StatelessWidget {
   const HomeTabSelector({super.key});
 
-  static const double _controlWidth = 202;
+  static const double _controlWidth = 208;
   static const double _controlHeight = 40;
   static const double _controlPadding = 3;
   static const LiquidGlassSettings _bottomNavigationGlassSettings =

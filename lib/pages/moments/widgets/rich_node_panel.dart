@@ -1,6 +1,5 @@
 import 'package:dilidili/common/widgets/network_img_layer.dart';
 import 'package:dilidili/http/search.dart';
-import 'package:dilidili/model/dynamics/result.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
@@ -33,6 +32,9 @@ InlineSpan richNode(item, context) {
       }
     }
     if (richTextNodes == null || richTextNodes.isEmpty) {
+      if (spanChilds.isNotEmpty) {
+        return TextSpan(children: spanChilds);
+      }
       return spacer;
     } else {
       for (var i in richTextNodes) {

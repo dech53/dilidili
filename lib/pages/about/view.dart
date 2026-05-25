@@ -28,7 +28,7 @@ class _AboutPageState extends State<AboutPage> {
               width: 150,
             ),
             Text(
-              'Dilidili',
+              'Lumo',
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 6),

@@ -1,21 +1,12 @@
 import 'package:dilidili/common/constants.dart';
 import 'package:dilidili/common/widgets/badge.dart';
 import 'package:dilidili/common/widgets/network_img_layer.dart';
-import 'package:dilidili/pages/gallery/gallery_viewer.dart';
-import 'package:dilidili/pages/gallery/hero_route.dart';
+import 'package:dilidili/pages/gallery/preview.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 void onPreviewImg(currentUrl, picList, initIndex, context) {
-  Navigator.of(context).push(
-    HeroRoute<void>(
-      builder: (BuildContext context) => GalleryViewer(
-        sources: picList,
-        initIndex: initIndex,
-        onPageChanged: (int pageIndex) {},
-      ),
-    ),
-  );
+  openGalleryPreview(context, sources: picList, initIndex: initIndex);
 }
 
 Widget picWidget(item, context) {

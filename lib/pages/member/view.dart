@@ -8,9 +8,9 @@ import 'package:dilidili/utils/storage.dart';
 import 'package:dilidili/utils/string_utils.dart';
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
 class MemberPage extends StatefulWidget {
   const MemberPage({super.key});
@@ -26,6 +26,7 @@ class _MemberPageState extends State<MemberPage>
   late MemberController _memberController;
   late Future _futureBuilderFuture;
   late TabController _tabController;
+  int _selectedTabIndex = 1;
   final ScrollController _extendNestCtr = ScrollController();
   late double statusBarHeight;
   final StreamController<bool> appbarStream =
@@ -44,6 +45,7 @@ class _MemberPageState extends State<MemberPage>
       vsync: this,
       initialIndex: 1,
     );
+    _tabController.addListener(_handleTabChanged);
     _extendNestCtr.addListener(
       () {
         final double offset = _extendNestCtr.position.pixels;
@@ -58,9 +60,26 @@ class _MemberPageState extends State<MemberPage>
 
   @override
   void dispose() {
+    _tabController.removeListener(_handleTabChanged);
+    _tabController.dispose();
     _extendNestCtr.removeListener(() {});
     appbarStream.close();
     super.dispose();
+  }
+
+  void _handleTabChanged() {
+    if (_selectedTabIndex == _tabController.index || !mounted) return;
+    setState(() {
+      _selectedTabIndex = _tabController.index;
+    });
+  }
+
+  void _selectTab(int index) {
+    if (_selectedTabIndex == index) return;
+    setState(() {
+      _selectedTabIndex = index;
+    });
+    _tabController.animateTo(index);
   }
 
   @override
@@ -161,20 +180,12 @@ class _MemberPageState extends State<MemberPage>
           onlyOneScrollInBody: true,
           body: Column(
             children: [
-              Material(
-                child: TabBar(
-                  controller: _tabController,
-                  padding: EdgeInsets.zero,
-                  labelStyle: const TextStyle(fontSize: 13),
-                  labelPadding: const EdgeInsets.symmetric(horizontal: 5.0),
-                  dividerColor: Colors.transparent,
-                  tabs: _memberController.tabs
-                      .map((e) => Tab(
-                            text: e['label'],
-                          ))
-                      .toList(),
-                  onTap: (index) {},
-                ),
+              _MemberGlassTabSelector(
+                selectedIndex: _selectedTabIndex,
+                tabs: _memberController.tabs
+                    .map<String>((e) => e['label'] as String)
+                    .toList(),
+                onSelected: _selectTab,
               ),
               Expanded(
                 child: TabBarView(
@@ -313,6 +324,92 @@ class _MemberPageState extends State<MemberPage>
             return ProfilePanel(ctr: _memberController, loadingStatus: true);
           }
         },
+      ),
+    );
+  }
+}
+
+class _MemberGlassTabSelector extends StatelessWidget {
+  const _MemberGlassTabSelector({
+    required this.selectedIndex,
+    required this.tabs,
+    required this.onSelected,
+  });
+
+  static const double _height = 38;
+  static const double _padding = 3;
+  static const LiquidGlassSettings _glassSettings = LiquidGlassSettings(
+    thickness: 30,
+    blur: 3,
+    chromaticAberration: 0.3,
+    lightIntensity: 0.6,
+    refractiveIndex: 1.59,
+    saturation: 0.7,
+    ambientStrength: 1,
+    lightAngle: 0.7853981633974483,
+    glassColor: Color(0x3DFFFFFF),
+  );
+
+  final int selectedIndex;
+  final List<String> tabs;
+  final ValueChanged<int> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    if (tabs.length < 2) return const SizedBox.shrink();
+
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final int safeIndex = selectedIndex.clamp(0, tabs.length - 1);
+    final Color selectedColor = colorScheme.primary;
+    final Color unselectedColor = colorScheme.onSurface.withValues(alpha: 0.68);
+    final Color indicatorColor = colorScheme.primary.withValues(alpha: 0.32);
+    const LiquidShape capsuleShape =
+        LiquidRoundedSuperellipse(borderRadius: _height / 2);
+
+    return Material(
+      color: colorScheme.surface,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+        child: AdaptiveLiquidGlassLayer(
+          settings: _glassSettings,
+          quality: GlassQuality.standard,
+          shape: capsuleShape,
+          child: SizedBox(
+            height: _height,
+            child: AdaptiveGlass.grouped(
+              quality: GlassQuality.standard,
+              shape: capsuleShape,
+              child: GlassSegmentedControl(
+                segments: tabs,
+                selectedIndex: safeIndex,
+                onSegmentSelected: onSelected,
+                height: _height,
+                borderRadius: _height / 2,
+                padding: const EdgeInsets.all(_padding),
+                backgroundColor: Colors.transparent,
+                indicatorColor: indicatorColor,
+                indicatorSettings: const LiquidGlassSettings(
+                  glassColor: Colors.transparent,
+                  lightIntensity: 0,
+                  chromaticAberration: 0,
+                  blur: 0,
+                ),
+                useOwnLayer: false,
+                quality: GlassQuality.standard,
+                selectedTextStyle: TextStyle(
+                  color: selectedColor,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                ),
+                unselectedTextStyle: TextStyle(
+                  color: unselectedColor,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

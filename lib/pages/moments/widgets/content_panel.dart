@@ -1,8 +1,7 @@
 import 'package:dilidili/common/widgets/badge.dart';
 import 'package:dilidili/common/widgets/network_img_layer.dart';
 import 'package:dilidili/model/dynamics/result.dart';
-import 'package:dilidili/pages/gallery/gallery_viewer.dart';
-import 'package:dilidili/pages/gallery/hero_route.dart';
+import 'package:dilidili/pages/gallery/preview.dart';
 import 'package:dilidili/pages/moments/widgets/rich_node_panel.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -23,6 +22,30 @@ class Content extends StatefulWidget {
 class _ContentState extends State<Content> {
   late bool hasPics;
   List<OpusPicsModel> pics = [];
+
+  bool get hasTopic => widget.item.modules.moduleDynamic.topic != null;
+
+  bool _hasVisibleText(dynamic text) {
+    return text is String && text.trim().isNotEmpty;
+  }
+
+  bool get hasRichContent {
+    try {
+      final dynamic moduleDynamic = widget.item.modules.moduleDynamic;
+      final dynamic desc = moduleDynamic.desc;
+      if (desc?.richTextNodes is List && desc.richTextNodes.isNotEmpty) {
+        return true;
+      }
+
+      final dynamic opus = moduleDynamic.major?.opus;
+      if (_hasVisibleText(opus?.title)) return true;
+      return opus?.summary?.richTextNodes is List &&
+          opus.summary.richTextNodes.isNotEmpty;
+    } catch (_) {
+      return false;
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -35,15 +58,7 @@ class _ContentState extends State<Content> {
   }
 
   void onPreviewImg(picList, initIndex, context) {
-    Navigator.of(context).push(
-      HeroRoute<void>(
-        builder: (BuildContext context) => GalleryViewer(
-          sources: picList,
-          initIndex: initIndex,
-          onPageChanged: (int pageIndex) {},
-        ),
-      ),
-    );
+    openGalleryPreview(context, sources: picList, initIndex: initIndex);
   }
 
   InlineSpan picsNodes() {
@@ -72,7 +87,7 @@ class _ContentState extends State<Content> {
                   return child;
                 },
                 child: GestureDetector(
-                  onTap: () => onPreviewImg(picList, 1, context),
+                  onTap: () => onPreviewImg(picList, 0, context),
                   child: Container(
                     padding: const EdgeInsets.only(top: 4),
                     constraints: BoxConstraints(maxHeight: maxHeight),
@@ -186,6 +201,11 @@ class _ContentState extends State<Content> {
 
   @override
   Widget build(BuildContext context) {
+    final bool showRichContent = hasRichContent;
+    if (!hasTopic && !showRichContent && !hasPics) {
+      return const SizedBox.shrink();
+    }
+
     TextStyle authorStyle =
         TextStyle(color: Theme.of(context).colorScheme.primary);
     return Container(
@@ -194,7 +214,7 @@ class _ContentState extends State<Content> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (widget.item.modules.moduleDynamic.topic != null) ...[
+          if (hasTopic) ...[
             GestureDetector(
               child: Text(
                 '#${widget.item.modules.moduleDynamic.topic.name}',
@@ -202,21 +222,22 @@ class _ContentState extends State<Content> {
               ),
             ),
           ],
-          IgnorePointer(
-            ignoring: widget.source == 'detail' ? false : true,
-            child: SelectableRegion(
-              magnifierConfiguration: const TextMagnifierConfiguration(),
-              focusNode: FocusNode(),
-              selectionControls: MaterialTextSelectionControls(),
-              child: Text.rich(
-                style: const TextStyle(height: 0),
-                richNode(widget.item, context),
-                maxLines: widget.source == 'detail' ? 999 : 3,
-                overflow: TextOverflow.ellipsis,
+          if (showRichContent)
+            IgnorePointer(
+              ignoring: widget.source == 'detail' ? false : true,
+              child: SelectableRegion(
+                magnifierConfiguration: const TextMagnifierConfiguration(),
+                focusNode: FocusNode(),
+                selectionControls: MaterialTextSelectionControls(),
+                child: Text.rich(
+                  style: const TextStyle(height: 0),
+                  richNode(widget.item, context),
+                  maxLines: widget.source == 'detail' ? 999 : 3,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ),
-          ),
-          if (hasPics ) ...[Text.rich(picsNodes())],
+          if (hasPics) ...[Text.rich(picsNodes())],
         ],
       ),
     );

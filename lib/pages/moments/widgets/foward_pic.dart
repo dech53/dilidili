@@ -1,8 +1,7 @@
 import 'package:dilidili/common/widgets/badge.dart';
 import 'package:dilidili/common/widgets/network_img_layer.dart';
 import 'package:dilidili/model/dynamics/result.dart';
-import 'package:dilidili/pages/gallery/gallery_viewer.dart';
-import 'package:dilidili/pages/gallery/hero_route.dart';
+import 'package:dilidili/pages/gallery/preview.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -29,15 +28,7 @@ class _FowardPicState extends State<FowardPic> {
   }
 
   void onPreviewImg(picList, initIndex, context) {
-    Navigator.of(context).push(
-      HeroRoute<void>(
-        builder: (BuildContext context) => GalleryViewer(
-          sources: picList,
-          initIndex: initIndex,
-          onPageChanged: (int pageIndex) {},
-        ),
-      ),
-    );
+    openGalleryPreview(context, sources: picList, initIndex: initIndex);
   }
 
   InlineSpan picsNodes() {
@@ -66,7 +57,7 @@ class _FowardPicState extends State<FowardPic> {
                   return child;
                 },
                 child: GestureDetector(
-                  onTap: () => onPreviewImg(picList, 1, context),
+                  onTap: () => onPreviewImg(picList, 0, context),
                   child: Container(
                     padding: const EdgeInsets.only(top: 4),
                     constraints: BoxConstraints(maxHeight: maxHeight),
@@ -190,8 +181,6 @@ class _FowardPicState extends State<FowardPic> {
 
   @override
   Widget build(BuildContext context) {
-    TextStyle authorStyle =
-        TextStyle(color: Theme.of(context).colorScheme.primary);
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(0, 0, 0, 6),

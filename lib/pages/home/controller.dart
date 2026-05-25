@@ -1,5 +1,6 @@
 import 'package:dilidili/http/user.dart';
 import 'package:dilidili/model/tab_type.dart';
+import 'package:dilidili/model/user/info.dart';
 import 'package:dilidili/utils/storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -16,7 +17,7 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
   RxString userFace = ''.obs;
   RxString userName = ''.obs;
   Box userInfoCache = SPStorage.userInfo;
-  var userInfo;
+  UserInfoData? userInfo;
 
   void onRefresh() {
     int index = tabController.index;
@@ -51,8 +52,8 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
     await getUnreadMsg();
     userInfo = userInfoCache.get('userInfoCache');
     userLogin.value = userInfo != null;
-    userFace.value = userInfo != null ? userInfo.face : '';
-    userName.value = userInfo != null ? userInfo.uname : '';
+    userFace.value = userInfo?.face ?? '';
+    userName.value = userInfo?.uname ?? '';
     tabController.animation!.addListener(() {
       if (tabController.indexIsChanging) {
         if (initialIndex.value != tabController.index) {

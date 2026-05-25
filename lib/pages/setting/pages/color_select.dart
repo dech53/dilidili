@@ -1,4 +1,5 @@
 import 'package:dilidili/model/color_type.dart';
+import 'package:dilidili/pages/theme/theme_provider.dart';
 import 'package:dilidili/utils/storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -42,111 +43,124 @@ class _ColorSelectPageState extends State<ColorSelectPage> {
         centerTitle: false,
         title: const Text('选择应用主题'),
       ),
-      body: ListView(
-        children: [
-          Obx(
-            () => RadioListTile(
-              value: 0,
-              title: const Text('动态取色'),
-              groupValue: ctr.type.value,
-              onChanged: (dynamic val) async {
-                ctr.type.value = 0;
-                ctr.setting.put(SettingBoxKey.dynamicColor, true);
-              },
-            ),
-          ),
-          Obx(
-            () => RadioListTile(
-              value: 1,
-              title: const Text('指定颜色'),
-              groupValue: ctr.type.value,
-              onChanged: (dynamic val) async {
-                ctr.type.value = 1;
-                ctr.setting.put(SettingBoxKey.dynamicColor, false);
-              },
-            ),
-          ),
-          Obx(
-            () {
-              int type = ctr.type.value;
-              return AnimatedOpacity(
-                opacity: type == 1 ? 1 : 0,
-                duration: const Duration(milliseconds: 200),
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 12, left: 12, right: 12),
-                  child: Wrap(
-                    alignment: WrapAlignment.center,
-                    spacing: 22,
-                    runSpacing: 18,
-                    children: [
-                      ...ctr.colorThemes.map(
-                        (e) {
-                          final index = ctr.colorThemes.indexOf(e);
-                          return GestureDetector(
-                            onTap: () {
-                              ctr.currentColor.value = index;
-                              ctr.setting.put(SettingBoxKey.customColor, index);
-                              Get.forceAppUpdate();
+      body: Obx(
+        () => RadioGroup<int>(
+          groupValue: ctr.type.value,
+          onChanged: (int? value) {
+            if (value != null) {
+              ctr.setThemeType(value);
+            }
+          },
+          child: ListView(
+            children: [
+              const RadioListTile<int>(
+                value: 0,
+                title: Text('动态取色'),
+              ),
+              const RadioListTile<int>(
+                value: 1,
+                title: Text('指定颜色'),
+              ),
+              Builder(
+                builder: (context) {
+                  int type = ctr.type.value;
+                  return AnimatedOpacity(
+                    opacity: type == 1 ? 1 : 0,
+                    duration: const Duration(milliseconds: 200),
+                    child: Padding(
+                      padding:
+                          const EdgeInsets.only(top: 12, left: 12, right: 12),
+                      child: Wrap(
+                        alignment: WrapAlignment.center,
+                        spacing: 22,
+                        runSpacing: 18,
+                        children: [
+                          ...ctr.colorThemes.map(
+                            (e) {
+                              final index = ctr.colorThemes.indexOf(e);
+                              return GestureDetector(
+                                onTap: () {
+                                  ctr.setCustomColor(index);
+                                },
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      width: 46,
+                                      height: 46,
+                                      decoration: BoxDecoration(
+                                        color:
+                                            e['color'].withValues(alpha: 0.8),
+                                        borderRadius: BorderRadius.circular(50),
+                                        border: Border.all(
+                                          width: 2,
+                                          color: ctr.currentColor.value == index
+                                              ? Colors.black
+                                              : e['color']
+                                                  .withValues(alpha: 0.8),
+                                        ),
+                                      ),
+                                      child: AnimatedOpacity(
+                                        opacity: ctr.currentColor.value == index
+                                            ? 1
+                                            : 0,
+                                        duration:
+                                            const Duration(milliseconds: 200),
+                                        child: const Icon(
+                                          Icons.done,
+                                          color: Colors.black,
+                                          size: 20,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 3),
+                                    Text(
+                                      e['label'],
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: ctr.currentColor.value != index
+                                            ? Theme.of(context)
+                                                .colorScheme
+                                                .outline
+                                            : null,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
                             },
-                            child: Column(
-                              children: [
-                                Container(
-                                  width: 46,
-                                  height: 46,
-                                  decoration: BoxDecoration(
-                                    color: e['color'].withOpacity(0.8),
-                                    borderRadius: BorderRadius.circular(50),
-                                    border: Border.all(
-                                      width: 2,
-                                      color: ctr.currentColor.value == index
-                                          ? Colors.black
-                                          : e['color'].withOpacity(0.8),
-                                    ),
-                                  ),
-                                  child: AnimatedOpacity(
-                                    opacity:
-                                        ctr.currentColor.value == index ? 1 : 0,
-                                    duration: const Duration(milliseconds: 200),
-                                    child: const Icon(
-                                      Icons.done,
-                                      color: Colors.black,
-                                      size: 20,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 3),
-                                Text(
-                                  e['label'],
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: ctr.currentColor.value != index
-                                        ? Theme.of(context).colorScheme.outline
-                                        : null,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      )
-                    ],
-                  ),
-                ),
-              );
-            },
+                          )
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
 }
 
 class ColorSelectController extends GetxController {
+  final ThemeController themeController = Get.find<ThemeController>();
   Box setting = SPStorage.setting;
   RxBool dynamicColor = true.obs;
   RxInt type = 0.obs;
   late final List<Map<String, dynamic>> colorThemes;
   RxInt currentColor = 0.obs;
+
+  void setThemeType(int value) {
+    type.value = value;
+    dynamicColor.value = value == 0;
+    themeController.setDynamicColor(dynamicColor.value);
+  }
+
+  void setCustomColor(int index) {
+    currentColor.value = index;
+    themeController.setCustomColor(index);
+  }
 
   @override
   void onInit() {

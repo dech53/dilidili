@@ -60,7 +60,7 @@ class DownloadUtils {
       final SaveResult result = await SaverGallery.saveImage(
         Uint8List.fromList(response.data),
         fileName: '$picName.$imgSuffix',
-        androidRelativePath: "Pictures/Dilidili",
+        androidRelativePath: "Pictures/Lumo",
         skipIfExists: true,
       );
       SmartDialog.dismiss();

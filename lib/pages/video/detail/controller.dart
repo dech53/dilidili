@@ -19,7 +19,6 @@ import 'package:ns_danmaku/ns_danmaku.dart';
 
 class VideoDetailController extends GetxController
     with GetSingleTickerProviderStateMixin {
-
   // 评论id 请求楼中楼评论使用
   int fRpid = 0;
   ReplyItemModel? firstFloor;
@@ -54,6 +53,7 @@ class VideoDetailController extends GetxController
   RxInt oid = 0.obs;
   late PlayUrlModel data;
   late TabController tabCtr;
+  RxInt selectedTabIndex = 0.obs;
   RxList<String> tabs = <String>['简介', '评论'].obs;
   late String videoUrl;
   late String audioUrl;
@@ -70,6 +70,14 @@ class VideoDetailController extends GetxController
       updateCover(argMap['pic']);
     }
     tabCtr = TabController(length: 2, vsync: this);
+    tabCtr.animation?.addListener(() {
+      final int index = tabCtr.indexIsChanging
+          ? tabCtr.index
+          : tabCtr.animation!.value.round().clamp(0, tabCtr.length - 1);
+      if (selectedTabIndex.value != index) {
+        selectedTabIndex.value = index;
+      }
+    });
     danmakuCid.value = cid.value;
     oid.value = IdUtils.bv2av(Get.arguments['bvid']!);
     headerControl = HeaderControl(
@@ -85,8 +93,6 @@ class VideoDetailController extends GetxController
       cover.value = videoItem['pic'] = pic;
     }
   }
-
-  
 
   showReplyReplyPanel(oid, fRpid, firstFloor, currentReply, loadMore) {
     replyReplyBottomSheetCtr =
@@ -151,10 +157,16 @@ class VideoDetailController extends GetxController
   void onControllerCreated(ScrollController controller) {
     replyScrollController = controller;
   }
+
   void onTapTabbar(int index) {
-    if (tabCtr.animation!.isCompleted && index == 1 && tabCtr.index == 1) {
+    if (selectedTabIndex.value == index && index == 1) {
       replyScrollController?.animateTo(0,
           duration: const Duration(milliseconds: 300), curve: Curves.ease);
+      return;
+    }
+    selectedTabIndex.value = index;
+    if (tabCtr.index != index) {
+      tabCtr.animateTo(index);
     }
   }
 
@@ -244,82 +256,86 @@ class VideoDetailController extends GetxController
   void showShootDanmakuSheet() {
     final TextEditingController textController = TextEditingController();
     bool isSending = false;
-    showDialog(context: Get.context!, builder: (BuildContext context){
-      return AlertDialog(
-          title: const Text('发送弹幕'),
-          content: StatefulBuilder(
-              builder: (BuildContext context, StateSetter setState) {
-            return TextField(
-              controller: textController,
-            );
-          }),
-          actions: [
-            TextButton(
-              onPressed: () => Get.back(),
-              child: Text(
-                '取消',
-                style: TextStyle(color: Theme.of(context).colorScheme.outline),
-              ),
-            ),
-            StatefulBuilder(
+    showDialog(
+        context: Get.context!,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('发送弹幕'),
+            content: StatefulBuilder(
                 builder: (BuildContext context, StateSetter setState) {
-              return TextButton(
-                onPressed: isSending
-                    ? null
-                    : () async {
-                        final String msg = textController.text;
-                        if (msg.isEmpty) {
-                          SmartDialog.showToast('弹幕内容不能为空');
-                          return;
-                        } else if (msg.length > 100) {
-                          SmartDialog.showToast('弹幕内容不能超过100个字符');
-                          return;
-                        }
-                        setState(() {
-                          isSending = true; // 开始发送，更新状态
-                        });
-                        //修改按钮文字
-                        // SmartDialog.showToast('弹幕发送中,\n$msg');
-                        final dynamic res = await DanmakaHttp.shootDanmaku(
-                          oid: cid.value,
-                          msg: textController.text,
-                          bvid: bvid,
-                          progress:
-                              dPlayerController.position.value.inMilliseconds,
-                          type: 1,
-                        );
-                        setState(() {
-                          isSending = false; // 发送结束，更新状态
-                        });
-                        if (res['status']) {
-                          SmartDialog.showToast('发送成功');
-                          // 发送成功，自动预览该弹幕，避免重新请求
-                          // TODO: 暂停状态下预览弹幕仍会移动与计时，可考虑添加到dmSegList或其他方式实现
-                          dPlayerController.danmakuController?.addItems([
-                            DanmakuItem(
-                              msg,
-                              color: Colors.white,
-                              time: dPlayerController
-                                  .position.value.inMilliseconds,
-                              type: DanmakuItemType.scroll,
-                              isSend: true,
-                            )
-                          ]);
-                          Get.back();
-                        } else {
-                          SmartDialog.showToast('发送失败，错误信息为${res['msg']}');
-                        }
-                      },
-                child: Text(isSending ? '发送中...' : '发送'),
+              return TextField(
+                controller: textController,
               );
-            })
-          ],
-        );
-    });
+            }),
+            actions: [
+              TextButton(
+                onPressed: () => Get.back(),
+                child: Text(
+                  '取消',
+                  style:
+                      TextStyle(color: Theme.of(context).colorScheme.outline),
+                ),
+              ),
+              StatefulBuilder(
+                  builder: (BuildContext context, StateSetter setState) {
+                return TextButton(
+                  onPressed: isSending
+                      ? null
+                      : () async {
+                          final String msg = textController.text;
+                          if (msg.isEmpty) {
+                            SmartDialog.showToast('弹幕内容不能为空');
+                            return;
+                          } else if (msg.length > 100) {
+                            SmartDialog.showToast('弹幕内容不能超过100个字符');
+                            return;
+                          }
+                          setState(() {
+                            isSending = true; // 开始发送，更新状态
+                          });
+                          //修改按钮文字
+                          // SmartDialog.showToast('弹幕发送中,\n$msg');
+                          final dynamic res = await DanmakaHttp.shootDanmaku(
+                            oid: cid.value,
+                            msg: textController.text,
+                            bvid: bvid,
+                            progress:
+                                dPlayerController.position.value.inMilliseconds,
+                            type: 1,
+                          );
+                          setState(() {
+                            isSending = false; // 发送结束，更新状态
+                          });
+                          if (res['status']) {
+                            SmartDialog.showToast('发送成功');
+                            // 发送成功，自动预览该弹幕，避免重新请求
+                            // TODO: 暂停状态下预览弹幕仍会移动与计时，可考虑添加到dmSegList或其他方式实现
+                            dPlayerController.danmakuController?.addItems([
+                              DanmakuItem(
+                                msg,
+                                color: Colors.white,
+                                time: dPlayerController
+                                    .position.value.inMilliseconds,
+                                type: DanmakuItemType.scroll,
+                                isSend: true,
+                              )
+                            ]);
+                            Get.back();
+                          } else {
+                            SmartDialog.showToast('发送失败，错误信息为${res['msg']}');
+                          }
+                        },
+                  child: Text(isSending ? '发送中...' : '发送'),
+                );
+              })
+            ],
+          );
+        });
   }
 
   @override
   void onClose() {
+    tabCtr.dispose();
     super.onClose();
     dPlayerController.dispose();
   }

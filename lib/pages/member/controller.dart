@@ -2,7 +2,6 @@ import 'package:dilidili/cache/shared_preferences_instance.dart';
 import 'package:dilidili/http/member.dart';
 import 'package:dilidili/http/user.dart';
 import 'package:dilidili/http/video.dart';
-import 'package:dilidili/model/member/folder_info.dart';
 import 'package:dilidili/model/member/member_info.dart';
 import 'package:dilidili/model/member_tab_type.dart';
 import 'package:dilidili/utils/storage.dart';

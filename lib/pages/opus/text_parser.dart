@@ -1,7 +1,21 @@
 import 'package:dilidili/model/read/opus.dart';
 import 'package:flutter/material.dart';
 
-class TextParser {
+class TextHelper {
+  static Color _parseWordColor(String? color, Color fallback) {
+    final String value = color?.trim() ?? '';
+    if (value.isEmpty) return fallback;
+
+    String hex = value;
+    if (hex.startsWith('#')) hex = hex.substring(1);
+    if (hex.startsWith('0x') || hex.startsWith('0X')) hex = hex.substring(2);
+    if (hex.length == 6) hex = 'FF$hex';
+    if (hex.length != 8) return fallback;
+
+    final int? parsedColor = int.tryParse(hex, radix: 16);
+    return parsedColor == null ? fallback : Color(parsedColor);
+  }
+
   static Alignment getAlignment(int? align) {
     switch (align) {
       case 1:
@@ -17,6 +31,7 @@ class TextParser {
 
   static TextSpan buildTextSpan(
       ModuleParagraphTextNode node, int? align, BuildContext context) {
+    // 获取node的所有key
     if (node.nodeType != null) {
       return TextSpan(
         text: node.word?.words ?? '',
@@ -27,10 +42,10 @@ class TextParser {
               ? FontWeight.bold
               : FontWeight.normal,
           height: align == 1 ? 2 : 1.5,
-          color: node.word?.color != null
-              ? Color(int.parse(node.word!.color!.substring(1, 7), radix: 16) +
-                  0xFF000000)
-              : Theme.of(context).colorScheme.onSurface,
+          color: _parseWordColor(
+            node.word?.color,
+            Theme.of(context).colorScheme.onBackground,
+          ),
         ),
       );
     } else {
@@ -46,11 +61,10 @@ class TextParser {
                   ? FontWeight.bold
                   : FontWeight.normal,
               height: align == 1 ? 2 : 1.5,
-              color: node.word?.color != null
-                  ? Color(
-                      int.parse(node.word!.color!.substring(1, 7), radix: 16) +
-                          0xFF000000)
-                  : Theme.of(context).colorScheme.onSurface,
+              color: _parseWordColor(
+                node.word?.color,
+                Theme.of(context).colorScheme.onBackground,
+              ),
             ),
           );
         default:

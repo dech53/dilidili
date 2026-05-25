@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:dilidili/pages/trend/controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -29,6 +28,7 @@ class _TrendPageState extends State<TrendPage>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       extendBody: true,
       extendBodyBehindAppBar: true,
@@ -62,6 +62,25 @@ class _TrendPageState extends State<TrendPage>
                   for (var i in _rankController.tabs) Tab(text: i['label'])
                 ],
                 isScrollable: true,
+                labelColor: Theme.of(context).colorScheme.primary,
+                unselectedLabelColor:
+                    Theme.of(context).colorScheme.onSurface.withValues(
+                          alpha: 0.68,
+                        ),
+                labelStyle: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                ),
+                unselectedLabelStyle: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+                indicator: _GlassPillTabIndicator(
+                  color: Theme.of(context).colorScheme.primary.withValues(
+                        alpha: 0.32,
+                      ),
+                ),
+                indicatorSize: TabBarIndicatorSize.label,
                 dividerColor: Colors.transparent,
                 enableFeedback: true,
                 splashBorderRadius: BorderRadius.circular(8),
@@ -86,6 +105,41 @@ class _TrendPageState extends State<TrendPage>
         ],
       ),
     );
+  }
+}
+
+class _GlassPillTabIndicator extends Decoration {
+  const _GlassPillTabIndicator({required this.color});
+
+  final Color color;
+
+  @override
+  BoxPainter createBoxPainter([VoidCallback? onChanged]) {
+    return _GlassPillTabIndicatorPainter(color);
+  }
+}
+
+class _GlassPillTabIndicatorPainter extends BoxPainter {
+  _GlassPillTabIndicatorPainter(this.color);
+
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Offset offset, ImageConfiguration configuration) {
+    final Size size = configuration.size ?? Size.zero;
+    if (size.isEmpty) return;
+
+    final double width = size.width + 18;
+    const double height = 5;
+    final double left = offset.dx + (size.width - width) / 2;
+    final double top = offset.dy + size.height - 8;
+    final RRect pill = RRect.fromRectAndRadius(
+      Rect.fromLTWH(left, top, width, height),
+      const Radius.circular(height / 2),
+    );
+
+    final Paint fillPaint = Paint()..color = color;
+    canvas.drawRRect(pill, fillPaint);
   }
 }
 

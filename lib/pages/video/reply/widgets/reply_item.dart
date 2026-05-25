@@ -1,12 +1,9 @@
-import 'dart:math';
-
 import 'package:dilidili/common/custom_toast.dart';
 import 'package:dilidili/common/reply_type.dart';
 import 'package:dilidili/common/widgets/badge.dart';
 import 'package:dilidili/common/widgets/network_img_layer.dart';
 import 'package:dilidili/model/reply/item.dart';
-import 'package:dilidili/pages/gallery/gallery_viewer.dart';
-import 'package:dilidili/pages/gallery/hero_route.dart';
+import 'package:dilidili/pages/gallery/preview.dart';
 import 'package:dilidili/pages/video/detail/controller.dart';
 import 'package:dilidili/pages/video/reply/widgets/zan.dart';
 import 'package:dilidili/utils/id_utils.dart';
@@ -665,15 +662,18 @@ InlineSpan buildContent(
     );
   }
 
-  void onPreviewImg(picList, initIndex, randomInt) {
-    Navigator.of(context).push(
-      HeroRoute<void>(
-        builder: (BuildContext context) => GalleryViewer(
-          sources: picList,
-          initIndex: initIndex,
-          onPageChanged: (int pageIndex) {},
-        ),
-      ),
+  String makePreviewHeroTag(int index) {
+    final Object replyId =
+        replyItem.rpidStr ?? replyItem.rpid ?? replyItem.hashCode;
+    return 'reply_img_${replyId}_$index';
+  }
+
+  void onPreviewImg(picList, heroTags, initIndex) {
+    openGalleryPreview(
+      context,
+      sources: picList,
+      heroTags: heroTags,
+      initIndex: initIndex,
     );
   }
 
@@ -933,11 +933,13 @@ InlineSpan buildContent(
   // 图片渲染
   if (content.pictures.isNotEmpty) {
     final List<String> picList = <String>[];
+    final List<Object> heroTags = <Object>[];
     final int len = content.pictures.length;
     spanChilds.add(const TextSpan(text: '\n'));
     if (len == 1) {
       Map pictureItem = content.pictures.first;
       picList.add(pictureItem['img_src']);
+      heroTags.add(makePreviewHeroTag(0));
       spanChilds.add(
         WidgetSpan(
           child: LayoutBuilder(
@@ -952,12 +954,10 @@ InlineSpan buildContent(
                         pictureItem['img_width']))
                     .truncateToDouble();
               } catch (_) {}
-              String randomInt = Random().nextInt(101).toString();
-
               return Hero(
-                tag: picList[0] + randomInt,
+                tag: heroTags[0],
                 child: GestureDetector(
-                  onTap: () => onPreviewImg(picList, 0, randomInt),
+                  onTap: () => onPreviewImg(picList, heroTags, 0),
                   child: Container(
                     padding: const EdgeInsets.only(top: 4),
                     constraints: BoxConstraints(maxHeight: maxHeight),
@@ -992,16 +992,16 @@ InlineSpan buildContent(
       List<Widget> list = [];
       for (var i = 0; i < len; i++) {
         picList.add(content.pictures[i]['img_src']);
+        heroTags.add(makePreviewHeroTag(i));
       }
       for (var i = 0; i < len; i++) {
-        String randomInt = Random().nextInt(101).toString();
         list.add(
           LayoutBuilder(
             builder: (context, BoxConstraints box) {
               return Hero(
-                tag: picList[i] + randomInt,
+                tag: heroTags[i],
                 child: GestureDetector(
-                  onTap: () => onPreviewImg(picList, i, randomInt),
+                  onTap: () => onPreviewImg(picList, heroTags, i),
                   child: NetworkImgLayer(
                       src: picList[i],
                       width: box.maxWidth,

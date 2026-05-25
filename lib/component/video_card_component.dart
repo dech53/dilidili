@@ -10,6 +10,7 @@ import 'package:dilidili/utils/string_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
 class VideoCardComponent extends StatelessWidget {
   final RcmdVideoItem video;
@@ -202,6 +203,8 @@ class VideoCardComponent extends StatelessWidget {
                               context: context,
                               useRootNavigator: true,
                               isScrollControlled: true,
+                              backgroundColor: Colors.transparent,
+                              barrierColor: Colors.black.withValues(alpha: 0.2),
                               builder: (context) {
                                 return MorePanel(
                                   videoItem: video,
@@ -290,55 +293,90 @@ class MorePanel extends StatelessWidget {
     );
   }
 
+  static const LiquidGlassSettings _glassSettings = LiquidGlassSettings(
+    thickness: 28,
+    blur: 12,
+    chromaticAberration: 0.25,
+    lightIntensity: 0.65,
+    refractiveIndex: 1.55,
+    saturation: 0.75,
+    ambientStrength: 1,
+    lightAngle: 0.7853981633974483,
+    glassColor: Color(0x3DFFFFFF),
+  );
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          InkWell(
-            onTap: () => Get.back(),
-            child: Container(
-              height: 35,
-              padding: const EdgeInsets.only(bottom: 2),
-              child: Center(
-                child: Container(
-                  width: 32,
-                  height: 3,
-                  decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.outline,
-                      borderRadius: const BorderRadius.all(Radius.circular(3))),
+    final double bottomPadding = MediaQuery.of(context).padding.bottom;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    const LiquidShape shape = LiquidRoundedSuperellipse(borderRadius: 24);
+
+    return AdaptiveLiquidGlassLayer(
+      settings: _glassSettings,
+      quality: GlassQuality.standard,
+      shape: shape,
+      child: AdaptiveGlass.grouped(
+        quality: GlassQuality.standard,
+        shape: shape,
+        child: Material(
+          color: Colors.transparent,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                InkWell(
+                  onTap: () => Get.back(),
+                  child: SizedBox(
+                    height: 38,
+                    child: Center(
+                      child: Container(
+                        width: 34,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: colorScheme.onSurface.withValues(
+                            alpha: 0.32,
+                          ),
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(3)),
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
+                ListTile(
+                  onTap: () async => await menuActionHandler('block'),
+                  minLeadingWidth: 0,
+                  leading: const Icon(Icons.block, size: 19),
+                  title: Text(
+                    '拉黑up主 「${videoItem.owner.name}」',
+                    style: Theme.of(context).textTheme.titleSmall,
+                  ),
+                ),
+                ListTile(
+                  onTap: () async => await menuActionHandler('watchLater'),
+                  minLeadingWidth: 0,
+                  leading: const Icon(Icons.watch_later_outlined, size: 19),
+                  title: Text(
+                    '添加至稍后再看',
+                    style: Theme.of(context).textTheme.titleSmall,
+                  ),
+                ),
+                ListTile(
+                  onTap: () => imageSaveDialog(
+                      context, videoItem, SmartDialog.dismiss),
+                  minLeadingWidth: 0,
+                  leading: const Icon(Icons.photo_outlined, size: 19),
+                  title: Text(
+                    '查看视频封面',
+                    style: Theme.of(context).textTheme.titleSmall,
+                  ),
+                ),
+                const SizedBox(height: 12),
+              ],
             ),
           ),
-          ListTile(
-            onTap: () async => await menuActionHandler('block'),
-            minLeadingWidth: 0,
-            leading: const Icon(Icons.block, size: 19),
-            title: Text(
-              '拉黑up主 「${videoItem.owner.name}」',
-              style: Theme.of(context).textTheme.titleSmall,
-            ),
-          ),
-          ListTile(
-            onTap: () async => await menuActionHandler('watchLater'),
-            minLeadingWidth: 0,
-            leading: const Icon(Icons.watch_later_outlined, size: 19),
-            title:
-                Text('添加至稍后再看', style: Theme.of(context).textTheme.titleSmall),
-          ),
-          ListTile(
-            onTap: () =>
-                imageSaveDialog(context, videoItem, SmartDialog.dismiss),
-            minLeadingWidth: 0,
-            leading: const Icon(Icons.photo_outlined, size: 19),
-            title:
-                Text('查看视频封面', style: Theme.of(context).textTheme.titleSmall),
-          ),
-          const SizedBox(height: 20),
-        ],
+        ),
       ),
     );
   }
