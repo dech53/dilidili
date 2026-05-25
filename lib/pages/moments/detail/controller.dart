@@ -43,8 +43,17 @@ class MomentsDetailController extends GetxController {
   }
 
   Future queryReplyList({reqType = 'init'}) async {
+    if (isLoadingMore) {
+      return;
+    }
+    isLoadingMore = true;
     if (reqType == 'init') {
       currentPage = 0;
+      noMore.value = '';
+    }
+    if (noMore.value == '没有更多了') {
+      isLoadingMore = false;
+      return;
     }
     var res = await ReplyHttp.replyList(
       oid: oid!,
@@ -101,11 +110,22 @@ class MomentsDetailController extends GetxController {
     replyList.clear();
     queryReplyList(reqType: 'init');
   }
+
+  // 上拉加载
+  Future onLoad() async {
+    queryReplyList(reqType: 'onLoad');
+  }
+
+
   // 根据jumpUrl获取动态html
   //存在问题无法获取到正确的oid导致无法加载评论
   reqHtmlByOpusId(int id) async {
     var res = await HtmlHttp.reqHtml(id, 'opus');
+    if (res == null || res['commentId'] == null) {
+      SmartDialog.showToast('动态评论 oid 解析失败');
+      return false;
+    }
     oid = res['commentId'];
-    SmartDialog.showToast("oid is ${oid.toString()}");
+    return true;
   }
 }

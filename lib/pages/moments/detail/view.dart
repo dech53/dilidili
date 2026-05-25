@@ -11,7 +11,6 @@ import 'package:dilidili/pages/moments/widgets/moments_panel.dart';
 import 'package:dilidili/pages/video/reply/widgets/reply_item.dart';
 import 'package:dilidili/pages/video/reply_reply/view.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 
 class MomentsDetail extends StatefulWidget {
@@ -110,6 +109,10 @@ class _MomentsDetailState extends State<MomentsDetail>
     fabAnimationCtr.forward();
     scrollController = _momentsDetailController.scrollController;
     scrollController.addListener(() {
+      if (scrollController.position.pixels >=
+          scrollController.position.maxScrollExtent - 300) {
+        _momentsDetailController.queryReplyList(reqType: 'onLoad');
+      }
       if (scrollController.offset > 55 && !_visibleTitle) {
         _visibleTitle = true;
         titleStreamC.add(true);

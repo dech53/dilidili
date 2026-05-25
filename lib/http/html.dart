@@ -1,8 +1,35 @@
+import 'dart:convert';
 import 'package:dilidili/http/dio_instance.dart';
+import 'package:dilidili/utils/log_utils.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 
 class HtmlHttp {
+  static Map<String, dynamic>? _parseInitialState(String html) {
+    final Match? match = RegExp(
+      r'window\.__INITIAL_STATE__=(\{.*?\});\(function',
+      dotAll: true,
+    ).firstMatch(html);
+    if (match == null) {
+      return null;
+    }
+    final dynamic data = jsonDecode(match.group(1)!);
+    return data is Map<String, dynamic> ? data : null;
+  }
+
+  static int? _parseInt(dynamic value) {
+    if (value == null) return null;
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    return int.tryParse(value.toString());
+  }
+
+  static String _normalImageUrl(String? src) {
+    if (src == null || src.isEmpty) return '';
+    final String url = src.split('@')[0];
+    return url.startsWith('//') ? 'https:$url' : url;
+  }
+
   // article
   static Future reqHtml(id, dynamicType) async {
     var response = await DioInstance.instance().get(
@@ -20,17 +47,30 @@ class HtmlHttp {
       );
     }
     try {
+      final Map<String, dynamic>? initialState =
+          _parseInitialState(response.data);
+      final Map? detail = initialState?['detail'];
+      final Map? basic = detail?['basic'];
+      final int? initialCommentId =
+          _parseInt(basic?['comment_id_str'] ?? basic?['rid_str']);
+
       Document rootTree = parse(response.data);
       // log(response.data.body.toString());
       Element body = rootTree.body!;
       Element appDom = body.querySelector('#app')!;
-      Element authorHeader = appDom.querySelector('.fixed-author-header')!;
+      Element? authorHeader = appDom.querySelector('.fixed-author-header') ??
+          appDom.querySelector('.opus-module-author');
       // 头像
-      String avatar = authorHeader.querySelector('img')!.attributes['src']!;
-      avatar = 'https:${avatar.split('@')[0]}';
+      String avatar = _normalImageUrl(
+        authorHeader?.querySelector('img')?.attributes['src'] ??
+            detail?['modules']?[0]?['module_author']?['face'],
+      );
       String uname = authorHeader
-          .querySelector('.fixed-author-header__author__name')!
-          .text;
+              ?.querySelector('.fixed-author-header__author__name')
+              ?.text ??
+          authorHeader?.querySelector('.opus-module-author__name')?.text ??
+          detail?['modules']?[0]?['module_author']?['name'] ??
+          '';
 
       // 动态详情
       Element opusDetail = appDom.querySelector('.opus-detail')!;
@@ -47,11 +87,13 @@ class HtmlHttp {
             .innerHtml;
       } catch (_) {}
 
-      String commentId = opusDetail
-          .querySelector('.bili-comment-container')!
-          .className
-          .split(' ')[1]
-          .split('-')[2];
+      int? commentId = initialCommentId;
+      final Element? commentContainer =
+          opusDetail.querySelector('.bili-comment-container');
+      if (commentId == null && commentContainer != null) {
+        commentId =
+            _parseInt(commentContainer.className.split(' ')[1].split('-')[2]);
+      }
       // List imgList = opusDetail.querySelectorAll('bili-album__preview__picture__img');
       return {
         'status': true,
@@ -59,10 +101,10 @@ class HtmlHttp {
         'uname': uname,
         'updateTime': updateTime,
         'content': (test ?? '') + opusContent,
-        'commentId': int.parse(commentId)
+        'commentId': commentId
       };
     } catch (err) {
-      print('err: $err');
+      Logutils.println('err: $err');
     }
   }
 
