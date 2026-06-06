@@ -65,25 +65,24 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
     scrollController = ScrollController();
     widget.onControllerCreated?.call(scrollController);
     fabAnimationCtr.forward();
-    scrollController.addListener(
-      () {
-        if (scrollController.position.pixels >=
-            scrollController.position.maxScrollExtent - 300) {
-          EasyThrottle.throttle('replylist', const Duration(milliseconds: 200),
-              () {
-            _videoReplyController.onLoad();
-          });
-        }
+    scrollController.addListener(_handleScroll);
+  }
 
-        final ScrollDirection direction =
-            scrollController.position.userScrollDirection;
-        if (direction == ScrollDirection.forward) {
-          _showFab();
-        } else if (direction == ScrollDirection.reverse) {
-          _hideFab();
-        }
-      },
-    );
+  void _handleScroll() {
+    if (scrollController.position.pixels >=
+        scrollController.position.maxScrollExtent - 300) {
+      EasyThrottle.throttle('replylist', const Duration(milliseconds: 200), () {
+        _videoReplyController.onLoad();
+      });
+    }
+
+    final ScrollDirection direction =
+        scrollController.position.userScrollDirection;
+    if (direction == ScrollDirection.forward) {
+      _showFab();
+    } else if (direction == ScrollDirection.reverse) {
+      _hideFab();
+    }
   }
 
   // 展示二级回复
@@ -94,7 +93,6 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
       videoDetailCtr.oid.value = replyItem.oid;
       videoDetailCtr.fRpid = replyItem.rpid!;
       videoDetailCtr.firstFloor = replyItem;
-      print("got repltitem data is oid=${replyItem.oid},fRpid=${replyItem.rpid!},ff=${replyItem}");
       videoDetailCtr.showReplyReplyPanel(
           replyItem.oid, replyItem.rpid!, replyItem, currentReply, loadMore);
     }
@@ -116,7 +114,7 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
 
   @override
   void dispose() {
-    scrollController.removeListener(() {});
+    scrollController.removeListener(_handleScroll);
     fabAnimationCtr.dispose();
     scrollController.dispose();
     super.dispose();
@@ -124,6 +122,7 @@ class _VideoReplyPanelState extends State<VideoReplyPanel>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return RefreshIndicator(
       onRefresh: () async {
         return await _videoReplyController.queryReplyList(type: 'init');

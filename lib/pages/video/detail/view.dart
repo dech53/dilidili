@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import 'package:dilidili/model/search_type.dart';
 import 'package:dilidili/pages/bangumi/introduction/view.dart';
 import 'package:dilidili/pages/damuku/view.dart';
@@ -42,6 +43,8 @@ class _VideoPageState extends State<VideoPage>
   late StreamController<double> appbarStream;
   final ScrollController _extendNestCtr = ScrollController();
   final double videoHeight = Get.size.width * 9 / 16;
+  bool _resumePlaybackOnReturn = false;
+  double _lastAppbarOffset = 0;
   late String bvid;
   // late int cid;
   late String heroTag;
@@ -63,6 +66,7 @@ class _VideoPageState extends State<VideoPage>
 
   void _onExtendedNestedScroll() {
     final double offset = _extendNestCtr.position.pixels;
+    _lastAppbarOffset = offset;
     vdCtr.sheetHeight.value =
         Get.size.height - videoHeight - statusBarHeight + offset;
     if (!appbarStream.isClosed) {
@@ -73,6 +77,7 @@ class _VideoPageState extends State<VideoPage>
   @override
   void didPushNext() async {
     if (dPlayerController != null) {
+      _resumePlaybackOnReturn = playerStatus.value == DPlayerStatus.playing;
       vdCtr.defaultST = dPlayerController!.position.value;
       videoIntroCtr.isPaused = true;
       dPlayerController!.removeStatusLister(playerListener);
@@ -85,14 +90,18 @@ class _VideoPageState extends State<VideoPage>
   @override
   void didPopNext() async {
     isShowing.value = true;
-    vdCtr.playerInit();
+    await vdCtr.playerInit(autoPlay: _resumePlaybackOnReturn);
     videoIntroCtr.isPaused = false;
     await Future.delayed(const Duration(milliseconds: 300));
     dPlayerController?.seekTo(vdCtr.defaultST);
-    dPlayerController?.play();
+    if (_resumePlaybackOnReturn) {
+      dPlayerController?.play();
+    } else {
+      playerStatus.value = DPlayerStatus.paused;
+    }
     dPlayerController?.addStatusLister(playerListener);
     if (!appbarStream.isClosed) {
-      appbarStream.add(0);
+      appbarStream.add(_lastAppbarOffset);
     }
     super.didPopNext();
   }
@@ -521,6 +530,21 @@ class _VideoDetailSegmentedTabs extends StatelessWidget {
     final Color indicatorColor = colorScheme.primary.withValues(alpha: 0.32);
     final LiquidShape capsuleShape =
         LiquidRoundedSuperellipse(borderRadius: _height.r / 2);
+
+    if (PlatformInfo.isIOS26OrHigher()) {
+      return SizedBox(
+        height: _height.h,
+        child: AdaptiveSegmentedControl(
+          labels: tabs,
+          selectedIndex: safeIndex,
+          onValueChanged: onSelected,
+          color: selectedColor,
+          height: _height.h,
+          textColor: unselectedColor,
+          selectedTextColor: Colors.white,
+        ),
+      );
+    }
 
     return AdaptiveLiquidGlassLayer(
       settings: _bottomNavigationGlassSettings,

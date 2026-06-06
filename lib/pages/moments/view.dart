@@ -1,3 +1,4 @@
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import 'package:custom_sliding_segmented_control/custom_sliding_segmented_control.dart';
 import 'package:dilidili/common/skeleton/dynamic_card.dart';
 import 'package:dilidili/common/widgets/http_error.dart';
@@ -27,6 +28,8 @@ class MomentsPage extends StatefulWidget {
 
 class _MomentsPageState extends State<MomentsPage>
     with AutomaticKeepAliveClientMixin {
+  static const List<String> _typeLabels = ['全部', '投稿', '番剧', '专栏'];
+
   final MomentsController _momentsController = Get.put(MomentsController());
   late Future _futureBuilderFuture;
   late Future _futureBuilderFutureUp;
@@ -273,6 +276,60 @@ class _MomentsPageState extends State<MomentsPage>
     super.dispose();
   }
 
+  Widget _buildTypeSelector(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final double? labelFontSize =
+        Theme.of(context).textTheme.labelMedium?.fontSize;
+    final int selectedIndex = _momentsController.initialValue.value
+        .clamp(0, _typeLabels.length - 1)
+        .toInt();
+
+    if (PlatformInfo.isIOS26OrHigher()) {
+      return SizedBox(
+        width: 210.w,
+        height: 34,
+        child: AdaptiveSegmentedControl(
+          labels: _typeLabels,
+          selectedIndex: selectedIndex,
+          onValueChanged: _momentsController.onSelectType,
+          color: colorScheme.primary,
+          height: 34,
+          textColor: colorScheme.onSurfaceVariant,
+          selectedTextColor: Colors.white,
+        ),
+      );
+    }
+
+    return Theme(
+      data: ThemeData(
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+      ),
+      child: CustomSlidingSegmentedControl<int>(
+        initialValue: selectedIndex,
+        children: {
+          for (final (index, label) in _typeLabels.indexed)
+            index: Text(
+              label,
+              style: TextStyle(fontSize: labelFontSize),
+            ),
+        },
+        padding: 13.0,
+        decoration: BoxDecoration(
+          color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.7),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        thumbDecoration: BoxDecoration(
+          color: colorScheme.surface,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        onValueChanged: _momentsController.onSelectType,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -293,61 +350,7 @@ class _MomentsPageState extends State<MomentsPage>
                     () => _momentsController.userLogin.value
                         ? Visibility(
                             visible: _momentsController.mid.value == -1,
-                            child: Theme(
-                              data: ThemeData(
-                                splashColor: Colors.transparent,
-                                highlightColor: Colors.transparent,
-                              ),
-                              child: CustomSlidingSegmentedControl<int>(
-                                initialValue:
-                                    _momentsController.initialValue.value,
-                                children: {
-                                  0: Text(
-                                    '全部',
-                                    style: TextStyle(
-                                        fontSize: Theme.of(context)
-                                            .textTheme
-                                            .labelMedium!
-                                            .fontSize),
-                                  ),
-                                  1: Text('投稿',
-                                      style: TextStyle(
-                                          fontSize: Theme.of(context)
-                                              .textTheme
-                                              .labelMedium!
-                                              .fontSize)),
-                                  2: Text('番剧',
-                                      style: TextStyle(
-                                          fontSize: Theme.of(context)
-                                              .textTheme
-                                              .labelMedium!
-                                              .fontSize)),
-                                  3: Text('专栏',
-                                      style: TextStyle(
-                                          fontSize: Theme.of(context)
-                                              .textTheme
-                                              .labelMedium!
-                                              .fontSize)),
-                                },
-                                padding: 13.0,
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .surfaceVariant
-                                      .withOpacity(0.7),
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                thumbDecoration: BoxDecoration(
-                                  color: Theme.of(context).colorScheme.surface,
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                duration: const Duration(milliseconds: 300),
-                                curve: Curves.easeInOut,
-                                onValueChanged: (v) {
-                                  _momentsController.onSelectType(v);
-                                },
-                              ),
-                            ),
+                            child: _buildTypeSelector(context),
                           )
                         : Text('动态',
                             style: Theme.of(context).textTheme.titleMedium),

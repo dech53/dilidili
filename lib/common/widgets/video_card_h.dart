@@ -1,3 +1,4 @@
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import 'package:dilidili/utils/image_save.dart';
 import 'package:dilidili/utils/num_utils.dart';
 import 'package:dilidili/utils/string_utils.dart';
@@ -407,6 +408,73 @@ class MorePanel extends StatelessWidget {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     const LiquidShape shape = LiquidRoundedSuperellipse(borderRadius: 24);
 
+    if (PlatformInfo.isIOS26OrHigher()) {
+      return AdaptiveBlurView(
+        blurStyle: BlurStyle.systemUltraThinMaterial,
+        borderRadius: const BorderRadius.all(Radius.circular(24)),
+        child: Material(
+          color: Colors.transparent,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                InkWell(
+                  onTap: () => Get.back(),
+                  child: SizedBox(
+                    height: 38,
+                    child: Center(
+                      child: Container(
+                        width: 34,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: colorScheme.onSurface.withValues(
+                            alpha: 0.32,
+                          ),
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(3)),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                _AdaptiveGlassMenuTile(
+                  onTap: () async => await menuActionHandler('block'),
+                  leading: const Icon(Icons.block, size: 19),
+                  title: Text(
+                    '拉黑up主 「${videoItem.owner.name}」',
+                    style: Theme.of(context).textTheme.titleSmall,
+                  ),
+                ),
+                _AdaptiveGlassMenuTile(
+                  onTap: () async => await menuActionHandler('watchLater'),
+                  leading: const Icon(Icons.watch_later_outlined, size: 19),
+                  title: Text(
+                    '添加至稍后再看',
+                    style: Theme.of(context).textTheme.titleSmall,
+                  ),
+                ),
+                _AdaptiveGlassMenuTile(
+                  onTap: () => imageSaveDialog(
+                    context,
+                    videoItem,
+                    SmartDialog.dismiss,
+                  ),
+                  leading: const Icon(Icons.photo_outlined, size: 19),
+                  title: Text(
+                    '查看视频封面',
+                    style: Theme.of(context).textTheme.titleSmall,
+                  ),
+                  showDivider: false,
+                ),
+                SizedBox(height: bottomPadding + 12),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
     return AdaptiveLiquidGlassLayer(
       settings: _glassSettings,
       quality: GlassQuality.standard,
@@ -475,6 +543,56 @@ class MorePanel extends StatelessWidget {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _AdaptiveGlassMenuTile extends StatelessWidget {
+  const _AdaptiveGlassMenuTile({
+    required this.leading,
+    required this.title,
+    required this.onTap,
+    this.showDivider = true,
+  });
+
+  final Widget leading;
+  final Widget title;
+  final VoidCallback onTap;
+  final bool showDivider;
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        height: 50,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        decoration: BoxDecoration(
+          border: showDivider
+              ? Border(
+                  bottom: BorderSide(
+                    color: colorScheme.onSurface.withValues(alpha: 0.08),
+                    width: 0.5,
+                  ),
+                )
+              : null,
+        ),
+        child: Row(
+          children: [
+            IconTheme(
+              data: IconThemeData(
+                color: colorScheme.onSurface,
+                size: 19,
+              ),
+              child: leading,
+            ),
+            const SizedBox(width: 12),
+            Expanded(child: title),
+          ],
         ),
       ),
     );

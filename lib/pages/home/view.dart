@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import 'package:dilidili/common/widgets/network_img_layer.dart';
 import 'package:dilidili/pages/home/controller.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,9 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage>
     with AutomaticKeepAliveClientMixin, TickerProviderStateMixin {
+  static const String _notificationIcon =
+      'assets/images/tab/notifications_none_rounded.png';
+
   final ScrollController _scrollController = ScrollController();
   final HomeController _homeController = Get.put(HomeController());
   List videoList = [];
@@ -43,6 +47,13 @@ class _HomePageState extends State<HomePage>
     });
   }
 
+  void _runAfterAdaptiveMenuClosed(VoidCallback action) {
+    Future<void>.delayed(const Duration(milliseconds: 320), () {
+      if (!mounted) return;
+      action();
+    });
+  }
+
   void _openCurrentUserSpace() {
     if (!_homeController.userLogin.value) {
       Get.toNamed('/loginPage');
@@ -63,6 +74,15 @@ class _HomePageState extends State<HomePage>
       },
       preventDuplicates: false,
     );
+  }
+
+  void _openNotifications() {
+    if (_homeController.userLogin.value) {
+      _homeController.unreadMsg.value = 0;
+      Get.toNamed('/whisper');
+    } else {
+      SmartDialog.showToast("用户未登录");
+    }
   }
 
   @override
@@ -112,6 +132,7 @@ class _HomePageState extends State<HomePage>
   Widget _buildTopActions(BuildContext context) {
     final Color iconColor = Theme.of(context).colorScheme.onSurface;
     final double actionButtonSize = 40.r;
+    const double adaptiveActionButtonSize = 44;
     final double avatarSize = 28.r;
 
     return Padding(
@@ -122,6 +143,82 @@ class _HomePageState extends State<HomePage>
             () {
               final bool hasAvatar = _homeController.userFace.value.isNotEmpty;
               final bool isLogin = _homeController.userLogin.value;
+              if (PlatformInfo.isIOS26OrHigher()) {
+                return AdaptivePopupMenuButton.image<String>(
+                  imageUrl: hasAvatar ? _homeController.userFace.value : null,
+                  size: adaptiveActionButtonSize,
+                  imageSize: avatarSize,
+                  tint: iconColor,
+                  fallbackIcon: 'person.crop.circle',
+                  fallbackMaterialIcon: Icons.person_outline_rounded,
+                  buttonStyle: PopupButtonStyle.glass,
+                  items: isLogin
+                      ? [
+                          const AdaptivePopupMenuItem<String>(
+                            label: '个人主页',
+                            icon: 'person.crop.circle',
+                            value: 'space',
+                          ),
+                          const AdaptivePopupMenuItem<String>(
+                            label: '观看记录',
+                            icon: 'clock.arrow.circlepath',
+                            value: 'history',
+                          ),
+                          const AdaptivePopupMenuItem<String>(
+                            label: '我的收藏',
+                            icon: 'star',
+                            value: 'fav',
+                          ),
+                          const AdaptivePopupMenuItem<String>(
+                            label: '稍后再看',
+                            icon: 'clock',
+                            value: 'later',
+                          ),
+                          const AdaptivePopupMenuItem<String>(
+                            label: '离线缓存',
+                            icon: 'arrow.down.circle',
+                            value: 'downloads',
+                          ),
+                        ]
+                      : [
+                          const AdaptivePopupMenuItem<String>(
+                            label: '登录账号',
+                            icon: 'person.crop.circle.badge.plus',
+                            value: 'login',
+                          ),
+                        ],
+                  onSelected: (_, entry) {
+                    switch (entry.value) {
+                      case 'space':
+                        _runAfterAdaptiveMenuClosed(_openCurrentUserSpace);
+                        break;
+                      case 'history':
+                        _runAfterAdaptiveMenuClosed(
+                          () => Get.toNamed('/history'),
+                        );
+                        break;
+                      case 'fav':
+                        _runAfterAdaptiveMenuClosed(() => Get.toNamed('/fav'));
+                        break;
+                      case 'later':
+                        _runAfterAdaptiveMenuClosed(
+                          () => Get.toNamed('/later'),
+                        );
+                        break;
+                      case 'downloads':
+                        _runAfterAdaptiveMenuClosed(
+                          () => Get.toNamed('/downloads'),
+                        );
+                        break;
+                      case 'login':
+                        _runAfterAdaptiveMenuClosed(
+                          () => Get.toNamed('/loginPage'),
+                        );
+                        break;
+                    }
+                  },
+                );
+              }
               return GlassMenu(
                 menuWidth: 180,
                 menuBorderRadius: 18,
@@ -187,6 +284,15 @@ class _HomePageState extends State<HomePage>
                             );
                           },
                         ),
+                        GlassMenuItem(
+                          title: '离线缓存',
+                          icon: const Icon(Icons.download_done_rounded),
+                          onTap: () {
+                            _runAfterGlassMenuClosed(
+                              () => Get.toNamed('/downloads'),
+                            );
+                          },
+                        ),
                       ]
                     : [
                         GlassMenuItem(
@@ -204,27 +310,47 @@ class _HomePageState extends State<HomePage>
           ),
           8.horizontalSpace,
           Obx(
-            () => GlassBadge(
-              count: _homeController.unreadMsg.value,
-              child: GlassButton(
-                label: '通知',
-                width: actionButtonSize,
-                height: actionButtonSize,
-                iconSize: 21.r,
-                iconColor: iconColor,
-                useOwnLayer: true,
-                quality: GlassQuality.standard,
-                icon: const Icon(Icons.notifications_none_rounded),
-                onTap: () {
-                  if (_homeController.userLogin.value) {
-                    _homeController.unreadMsg.value = 0;
-                    Get.toNamed('/whisper');
-                  } else {
-                    SmartDialog.showToast("用户未登录");
-                  }
-                },
-              ),
-            ),
+            () {
+              if (PlatformInfo.isIOS26OrHigher()) {
+                return AdaptiveBadge(
+                  count: _homeController.unreadMsg.value,
+                  child: AdaptiveButton.child(
+                    onPressed: _openNotifications,
+                    style: AdaptiveButtonStyle.glass,
+                    size: AdaptiveButtonSize.large,
+                    minSize: const Size(
+                      adaptiveActionButtonSize,
+                      adaptiveActionButtonSize,
+                    ),
+                    padding: EdgeInsets.zero,
+                    borderRadius: const BorderRadius.all(
+                      Radius.circular(adaptiveActionButtonSize / 2),
+                    ),
+                    useSmoothRectangleBorder: false,
+                    child: ImageIcon(
+                      const AssetImage(_notificationIcon),
+                      size: 20.r,
+                      color: iconColor,
+                    ),
+                  ),
+                );
+              }
+
+              return GlassBadge(
+                count: _homeController.unreadMsg.value,
+                child: GlassButton(
+                  label: '通知',
+                  width: actionButtonSize,
+                  height: actionButtonSize,
+                  iconSize: 21.r,
+                  iconColor: iconColor,
+                  useOwnLayer: true,
+                  quality: GlassQuality.standard,
+                  icon: const Icon(Icons.notifications_none_rounded),
+                  onTap: _openNotifications,
+                ),
+              );
+            },
           ),
           const Spacer(),
           const HomeTabSelector(),
@@ -282,6 +408,22 @@ class HomeTabSelector extends StatelessWidget {
           .toList();
       final LiquidShape capsuleShape =
           LiquidRoundedSuperellipse(borderRadius: _controlHeight.r / 2);
+
+      if (PlatformInfo.isIOS26OrHigher()) {
+        return SizedBox(
+          width: _controlWidth.w,
+          height: _controlHeight.h,
+          child: AdaptiveSegmentedControl(
+            labels: labels,
+            selectedIndex: selectedIndex,
+            onValueChanged: (index) => _selectTab(homeController, index),
+            color: selectedColor,
+            height: _controlHeight.h,
+            textColor: unselectedColor,
+            selectedTextColor: Colors.white,
+          ),
+        );
+      }
 
       return AdaptiveLiquidGlassLayer(
         settings: _bottomNavigationGlassSettings,

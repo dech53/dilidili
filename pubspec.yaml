@@ -74,7 +74,7 @@ dependencies:
   webview_flutter: ^4.11.0
   hive_flutter: ^1.1.0
   hive: ^2.2.3
-  webview_cookie_manager: ^2.0.6
+  webview_cookie_manager_flutter: ^3.0.1
   isar_flutter_libs: ^3.1.0+1
   flutter_launcher_icons: ^0.14.3
   package_info_plus: ^8.3.0
@@ -85,7 +85,6 @@ dependencies:
   flutter_localization: ^0.3.2
   saver_gallery: ^4.0.1
   permission_handler: ^12.0.0+1
-  status_bar_control: ^3.2.1
   device_info_plus: ^11.3.0
   # 弹幕
   ns_danmaku:
@@ -106,6 +105,8 @@ dependencies:
   encrypt: ^5.0.3
   uuid: ^4.5.2
   liquid_glass_widgets: ^0.5.0
+  adaptive_platform_ui:
+    path: third_party/adaptive_platform_ui
   
 dev_dependencies:
   flutter_test:
@@ -150,6 +151,7 @@ flutter:
   assets:
     - assets/
     - assets/images/
+    - assets/images/tab/
     - assets/images/lv/
     - assets/images/logo/
     - assets/images/live/

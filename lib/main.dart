@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dilidili/common/custom_toast.dart';
 import 'package:dilidili/http/dio_instance.dart';
+import 'package:dilidili/pages/download/controller.dart';
 import 'package:dilidili/pages/theme/theme_provider.dart';
 import 'package:dilidili/pages/search/view.dart';
 import 'package:dilidili/pages/video/detail/view.dart';
@@ -29,6 +30,7 @@ void main() async {
   await SPStorage.init();
   await DioInstance.instance().getBuvid();
   await DioInstance.initDio();
+  Get.put(DownloadController(), permanent: true);
   if (Platform.isAndroid) {
     try {
       late List modes;

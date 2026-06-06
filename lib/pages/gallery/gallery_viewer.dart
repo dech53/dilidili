@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dilidili/pages/gallery/custom_dismissible.dart';
 import 'package:dilidili/pages/gallery/interactive_viewer_boundary.dart';
@@ -6,12 +7,12 @@ import 'package:dilidili/utils/download.dart';
 import 'package:dilidili/utils/method_channel.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:status_bar_control/status_bar_control.dart';
 
 class GalleryViewer<T> extends StatefulWidget {
   const GalleryViewer({
@@ -88,8 +89,10 @@ class _GalleryViewerState extends State<GalleryViewer>
 
   setStatusBar() async {
     if (Platform.isIOS || Platform.isAndroid) {
-      await StatusBarControl.setHidden(true,
-          animation: StatusBarAnimation.FADE);
+      await SystemChrome.setEnabledSystemUIMode(
+        SystemUiMode.manual,
+        overlays: [SystemUiOverlay.bottom],
+      );
     }
   }
 
@@ -115,7 +118,10 @@ class _GalleryViewerState extends State<GalleryViewer>
     _transformationController!.dispose();
     _animationController.dispose();
     try {
-      StatusBarControl.setHidden(false, animation: StatusBarAnimation.FADE);
+      SystemChrome.setEnabledSystemUIMode(
+        SystemUiMode.manual,
+        overlays: SystemUiOverlay.values,
+      );
     } catch (_) {}
     super.dispose();
   }
@@ -296,98 +302,174 @@ class _GalleryViewerState extends State<GalleryViewer>
               },
             ),
           ),
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              padding: EdgeInsets.fromLTRB(
-                  12, 8, 20, MediaQuery.of(context).padding.bottom + 8),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.transparent,
-                    Colors.black.withValues(alpha: 0.3),
-                  ],
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  GlassButton(
-                    label: '关闭',
-                    width: 44,
-                    height: 44,
-                    iconSize: 22,
-                    iconColor: Colors.white,
-                    settings: _controlGlassSettings,
-                    useOwnLayer: true,
-                    quality: GlassQuality.standard,
-                    icon: const Icon(Icons.close_rounded),
-                    onTap: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                  widget.sources.length > 1
-                      ? _GalleryGlassPageIndicator(
-                          text: "${currentIndex + 1}/${widget.sources.length}",
-                          settings: _controlGlassSettings,
-                        )
-                      : const Spacer(),
-                  GlassMenu(
-                    menuWidth: 170,
-                    menuBorderRadius: 18,
-                    glassSettings: _controlGlassSettings,
-                    quality: GlassQuality.standard,
-                    triggerBuilder: (context, toggleMenu) => GlassButton(
-                      label: '更多',
-                      width: 44,
-                      height: 44,
-                      iconSize: 22,
-                      iconColor: Colors.white,
-                      settings: _controlGlassSettings,
-                      useOwnLayer: true,
-                      quality: GlassQuality.standard,
-                      icon: const Icon(Icons.more_horiz_rounded),
-                      onTap: toggleMenu,
-                    ),
-                    items: [
-                      GlassMenuItem(
-                        title: '分享图片',
-                        icon: const Icon(Icons.ios_share_rounded),
-                        onTap: () {
-                          final String imgUrl =
-                              widget.sources[currentIndex].toString();
-                          _runAfterGlassMenuClosed(() => onShareImg(imgUrl));
-                        },
-                      ),
-                      GlassMenuItem(
-                        title: '复制图片',
-                        icon: const Icon(Icons.copy_rounded),
-                        onTap: () {
-                          final String imgUrl =
-                              widget.sources[currentIndex].toString();
-                          _runAfterGlassMenuClosed(() => onCopyImg(imgUrl));
-                        },
-                      ),
-                      GlassMenuItem(
-                        title: '保存图片',
-                        icon: const Icon(Icons.download_rounded),
-                        onTap: () {
-                          final String imgUrl =
-                              widget.sources[currentIndex].toString();
-                          _runAfterGlassMenuClosed(
-                            () => DownloadUtils.downloadImg(imgUrl),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+          _buildBottomControls(context),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBottomControls(BuildContext context) {
+    return Positioned(
+      bottom: 0,
+      left: 0,
+      right: 0,
+      child: Container(
+        padding: EdgeInsets.fromLTRB(
+          12,
+          8,
+          20,
+          MediaQuery.of(context).padding.bottom + 8,
+        ),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Colors.transparent,
+              Colors.black.withValues(alpha: 0.3),
+            ],
+          ),
+        ),
+        child: PlatformInfo.isIOS26OrHigher()
+            ? _buildAdaptiveBottomControls(context)
+            : _buildGlassBottomControls(context),
+      ),
+    );
+  }
+
+  Widget _buildGlassBottomControls(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        GlassButton(
+          label: '关闭',
+          width: 44,
+          height: 44,
+          iconSize: 22,
+          iconColor: Colors.white,
+          settings: _controlGlassSettings,
+          useOwnLayer: true,
+          quality: GlassQuality.standard,
+          icon: const Icon(Icons.close_rounded),
+          onTap: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        widget.sources.length > 1
+            ? _GalleryGlassPageIndicator(
+                text: "${currentIndex + 1}/${widget.sources.length}",
+                settings: _controlGlassSettings,
+              )
+            : const Spacer(),
+        GlassMenu(
+          menuWidth: 170,
+          menuBorderRadius: 18,
+          glassSettings: _controlGlassSettings,
+          quality: GlassQuality.standard,
+          triggerBuilder: (context, toggleMenu) => GlassButton(
+            label: '更多',
+            width: 44,
+            height: 44,
+            iconSize: 22,
+            iconColor: Colors.white,
+            settings: _controlGlassSettings,
+            useOwnLayer: true,
+            quality: GlassQuality.standard,
+            icon: const Icon(Icons.more_horiz_rounded),
+            onTap: toggleMenu,
+          ),
+          items: [
+            GlassMenuItem(
+              title: '分享图片',
+              icon: const Icon(Icons.ios_share_rounded),
+              onTap: () {
+                final String imgUrl = widget.sources[currentIndex].toString();
+                _runAfterGlassMenuClosed(() => onShareImg(imgUrl));
+              },
             ),
+            GlassMenuItem(
+              title: '复制图片',
+              icon: const Icon(Icons.copy_rounded),
+              onTap: () {
+                final String imgUrl = widget.sources[currentIndex].toString();
+                _runAfterGlassMenuClosed(() => onCopyImg(imgUrl));
+              },
+            ),
+            GlassMenuItem(
+              title: '保存图片',
+              icon: const Icon(Icons.download_rounded),
+              onTap: () {
+                final String imgUrl = widget.sources[currentIndex].toString();
+                _runAfterGlassMenuClosed(
+                  () => DownloadUtils.downloadImg(imgUrl),
+                );
+              },
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAdaptiveBottomControls(BuildContext context) {
+    return MediaQuery(
+      data: MediaQuery.of(context).copyWith(
+        platformBrightness: Brightness.dark,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          AdaptiveButton.sfSymbol(
+            onPressed: () => Navigator.of(context).pop(),
+            sfSymbol: const SFSymbol('xmark', size: 20, color: Colors.white),
+            style: AdaptiveButtonStyle.glass,
+            size: AdaptiveButtonSize.large,
+            minSize: const Size(44, 44),
+            padding: EdgeInsets.zero,
+            borderRadius: const BorderRadius.all(Radius.circular(22)),
+            useSmoothRectangleBorder: false,
+          ),
+          widget.sources.length > 1
+              ? _GalleryAdaptivePageIndicator(
+                  text: "${currentIndex + 1}/${widget.sources.length}",
+                )
+              : const Spacer(),
+          AdaptivePopupMenuButton.icon<String>(
+            icon: 'ellipsis',
+            tint: Colors.white,
+            size: 44,
+            buttonStyle: PopupButtonStyle.glass,
+            items: const [
+              AdaptivePopupMenuItem<String>(
+                label: '分享图片',
+                icon: 'square.and.arrow.up',
+                value: 'share',
+              ),
+              AdaptivePopupMenuItem<String>(
+                label: '复制图片',
+                icon: 'doc.on.doc',
+                value: 'copy',
+              ),
+              AdaptivePopupMenuItem<String>(
+                label: '保存图片',
+                icon: 'arrow.down.to.line',
+                value: 'save',
+              ),
+            ],
+            onSelected: (_, entry) {
+              final String imgUrl = widget.sources[currentIndex].toString();
+              switch (entry.value) {
+                case 'share':
+                  onShareImg(imgUrl);
+                  break;
+                case 'copy':
+                  onCopyImg(imgUrl);
+                  break;
+                case 'save':
+                  DownloadUtils.downloadImg(imgUrl);
+                  break;
+              }
+            },
           ),
         ],
       ),
@@ -564,6 +646,39 @@ class _GalleryGlassPageIndicator extends StatelessWidget {
                   fontWeight: FontWeight.w600,
                   decoration: TextDecoration.none,
                 ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _GalleryAdaptivePageIndicator extends StatelessWidget {
+  const _GalleryAdaptivePageIndicator({
+    required this.text,
+  });
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return AdaptiveBlurView(
+      blurStyle: BlurStyle.systemUltraThinMaterial,
+      borderRadius: const BorderRadius.all(Radius.circular(20)),
+      child: SizedBox(
+        height: 36,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          child: Center(
+            child: Text(
+              text,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                decoration: TextDecoration.none,
               ),
             ),
           ),

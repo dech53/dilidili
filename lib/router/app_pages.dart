@@ -1,5 +1,7 @@
 import 'package:dilidili/pages/about/view.dart';
 import 'package:dilidili/pages/blacklist/index.dart';
+import 'package:dilidili/pages/download/view.dart';
+import 'package:dilidili/pages/download/verify_player.dart';
 import 'package:dilidili/pages/fan/view.dart';
 import 'package:dilidili/pages/fav/view.dart';
 import 'package:dilidili/pages/fav_detail/view.dart';
@@ -54,6 +56,9 @@ class Routes {
     CustomGetPage(name: '/subDetail', page: () => const SubDetailPage()),
     CustomGetPage(name: '/fan', page: () => const FansPage()),
     CustomGetPage(name: '/later', page: () => const LaterPage()),
+    CustomGetPage(name: '/downloads', page: () => const DownloadPage()),
+    CustomGetPage(
+        name: '/downloadVerify', page: () => const DownloadVerifyPlayerPage()),
     CustomGetPage(name: '/styleSetting', page: () => const StyleSetting()),
     CustomGetPage(name: '/colorSetting', page: () => const ColorSelectPage()),
     CustomGetPage(name: '/privacySetting', page: () => const PrivacySetting()),

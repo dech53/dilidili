@@ -1,6 +1,6 @@
 import 'package:dilidili/http/dio_instance.dart';
 import 'package:dilidili/http/static/api_string.dart';
-import 'package:webview_cookie_manager/webview_cookie_manager.dart';
+import 'package:webview_cookie_manager_flutter/webview_cookie_manager.dart';
 
 class SetCookie {
   static set() async {

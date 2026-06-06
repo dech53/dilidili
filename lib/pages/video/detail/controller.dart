@@ -232,6 +232,7 @@ class VideoDetailController extends GetxController
     audio,
     seekToTime,
     duration,
+    bool autoPlay = true,
   }) async {
     await dPlayerController.setDataSource(
       DataSource(
@@ -248,6 +249,7 @@ class VideoDetailController extends GetxController
       duration: duration ?? Duration(milliseconds: data.timeLength ?? 0),
       bvid: bvid,
       cid: cid.value,
+      autoPlay: autoPlay,
     );
     dPlayerController.headerControl = headerControl;
   }

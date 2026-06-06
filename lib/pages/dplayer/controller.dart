@@ -14,7 +14,6 @@ import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:ns_danmaku/danmaku_controller.dart';
 import 'package:screen_brightness/screen_brightness.dart';
-import 'package:status_bar_control/status_bar_control.dart';
 
 class DPlayerController extends GetxController {
   Timer? _timerForSeek;
@@ -307,6 +306,7 @@ class DPlayerController extends GetxController {
     Duration seekTo = Duration.zero,
     String bvid = '',
     int cid = 0,
+    bool autoPlay = true,
   }) async {
     dataStatus.status.value = DataStatus.loading;
     _direction.value = direction ?? 'horizontal';
@@ -318,7 +318,11 @@ class DPlayerController extends GetxController {
     updateDurationSecond();
     dataStatus.status.value = DataStatus.loaded;
     startListeners();
-    await play(duration: duration);
+    if (autoPlay) {
+      await play(duration: duration);
+    } else {
+      playerStatus.status.value = DPlayerStatus.paused;
+    }
   }
 
   /// 设置倍速
@@ -396,7 +400,6 @@ class DPlayerController extends GetxController {
           httpHeaders: dataSource.httpHeaders, start: seekTo),
       play: false,
     );
-    await player.play();
     return player;
   }
 
@@ -495,7 +498,6 @@ class DPlayerController extends GetxController {
   // 全屏
   Future<void> triggerFullScreen({bool status = true}) async {
     FullScreenMode mode = FullScreenModeCode.fromCode(0)!;
-    await StatusBarControl.setHidden(true, animation: StatusBarAnimation.FADE);
     if (!isFullScreen.value && status) {
       /// 按照视频宽高比决定全屏方向
       toggleFullScreen(true);
@@ -509,7 +511,6 @@ class DPlayerController extends GetxController {
         await landScape();
       }
     } else if (isFullScreen.value && !status) {
-      StatusBarControl.setHidden(false, animation: StatusBarAnimation.FADE);
       await exitFullScreen();
       await verticalScreen();
       toggleFullScreen(false);

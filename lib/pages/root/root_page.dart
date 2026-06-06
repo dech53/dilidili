@@ -1,3 +1,4 @@
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import 'package:dilidili/common/widgets/network_img_layer.dart';
 import 'package:dilidili/pages/home/view.dart';
 import 'package:dilidili/pages/moments/view.dart';
@@ -18,6 +19,21 @@ class RootPage extends StatefulWidget {
 }
 
 class _RootPageState extends State<RootPage> {
+  static const String _homeIcon = 'assets/images/tab/home.png';
+  static const String _homeOutlinedIcon = 'assets/images/tab/home_outlined.png';
+  static const String _trendingUpIcon = 'assets/images/tab/trending_up.png';
+  static const String _trendingUpOutlinedIcon =
+      'assets/images/tab/trending_up_outlined.png';
+  static const String _motionPhotosOnIcon =
+      'assets/images/tab/motion_photos_on.png';
+  static const String _motionPhotosOnOutlinedIcon =
+      'assets/images/tab/motion_photos_on_outlined.png';
+  static const String _personIcon = 'assets/images/tab/person.png';
+  static const String _personOutlineIcon =
+      'assets/images/tab/person_outline.png';
+  static const String _searchRoundedIcon =
+      'assets/images/tab/search_rounded.png';
+
   @override
   void dispose() async {
     await SPStorage.close();
@@ -52,19 +68,33 @@ class _RootPageState extends State<RootPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      extendBody: true,
-      appBar: AppBar(
-        elevation: 0,
-        toolbarHeight: 0,
-        scrolledUnderElevation: 0,
-        backgroundColor: Theme.of(context).colorScheme.surface,
+    if (!PlatformInfo.isIOS26OrHigher()) {
+      return Scaffold(
+        extendBody: true,
+        appBar: AppBar(
+          elevation: 0,
+          toolbarHeight: 0,
+          scrolledUnderElevation: 0,
+          backgroundColor: Theme.of(context).colorScheme.surface,
+        ),
+        bottomNavigationBar: _buildGlassBottomBar(context),
+        body: _buildBody(),
+      );
+    }
+
+    return Obx(
+      () => AdaptiveScaffold(
+        bottomNavigationBar: _buildAdaptiveBottomBar(context),
+        minimizeBehavior: TabBarMinimizeBehavior.never,
+        body: _buildBody(),
       ),
-      bottomNavigationBar: _buildGlassBottomBar(context),
-      body: LazyLoadIndexedStack(
-        index: _index,
-        children: const [HomePage(), TrendPage(), MomentsPage(), UserPage()],
-      ),
+    );
+  }
+
+  Widget _buildBody() {
+    return LazyLoadIndexedStack(
+      index: _index,
+      children: const [HomePage(), TrendPage(), MomentsPage(), UserPage()],
     );
   }
 
@@ -72,7 +102,6 @@ class _RootPageState extends State<RootPage> {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final Color selectedColor = colorScheme.primary;
     final Color unselectedColor = colorScheme.onSurface.withValues(alpha: 0.68);
-    
 
     return Obx(
       () => GlassBottomBar(
@@ -135,6 +164,180 @@ class _RootPageState extends State<RootPage> {
         }).toList(),
       ),
     );
+  }
+
+  AdaptiveBottomNavigationBar _buildAdaptiveBottomBar(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final Color selectedColor = colorScheme.primary;
+    final Color unselectedColor = colorScheme.onSurface.withValues(alpha: 0.68);
+
+    return AdaptiveBottomNavigationBar(
+      items: _adaptiveNavigationItems(),
+      selectedIndex: _pageIndexToNavigationIndex(_index),
+      onTap: _onNavigationTap,
+      selectedItemColor: selectedColor,
+      unselectedItemColor: unselectedColor,
+      bottomNavigationBar: _buildMaterialNavigationBar(
+        context,
+        selectedColor,
+        unselectedColor,
+      ),
+    );
+  }
+
+  List<AdaptiveNavigationDestination> _adaptiveNavigationItems() {
+    final Object userIcon = _userNavigationIcon(
+      fallbackIcon: _personOutlineIcon,
+    );
+    final Object selectedUserIcon = _userNavigationIcon(
+      fallbackIcon: _personIcon,
+    );
+
+    return [
+      const AdaptiveNavigationDestination(
+        icon: AssetImage(_homeOutlinedIcon),
+        selectedIcon: AssetImage(_homeIcon),
+        label: '首页',
+      ),
+      const AdaptiveNavigationDestination(
+        icon: AssetImage(_trendingUpOutlinedIcon),
+        selectedIcon: AssetImage(_trendingUpIcon),
+        label: '排行榜',
+        addSpacerAfter: true,
+      ),
+      const AdaptiveNavigationDestination(
+        icon: AssetImage(_searchRoundedIcon),
+        label: '搜索',
+        isSearch: true,
+      ),
+      const AdaptiveNavigationDestination(
+        icon: AssetImage(_motionPhotosOnOutlinedIcon),
+        selectedIcon: AssetImage(_motionPhotosOnIcon),
+        label: '动态',
+      ),
+      AdaptiveNavigationDestination(
+        icon: userIcon,
+        selectedIcon: selectedUserIcon,
+        label: '我的',
+      ),
+    ];
+  }
+
+  Object _userNavigationIcon({required String fallbackIcon}) {
+    if (!_rootController.userLogin.value) return AssetImage(fallbackIcon);
+
+    final String face = _rootController.userInfo.face;
+    if (face.isEmpty) return AssetImage(fallbackIcon);
+
+    return NetworkImage(face);
+  }
+
+  Widget _buildMaterialNavigationBar(
+    BuildContext context,
+    Color selectedColor,
+    Color unselectedColor,
+  ) {
+    return NavigationBar(
+      selectedIndex: _pageIndexToNavigationIndex(_index),
+      onDestinationSelected: _onNavigationTap,
+      indicatorColor: selectedColor.withValues(alpha: 0.18),
+      destinations: [
+        _materialAssetDestination(
+          icon: _homeOutlinedIcon,
+          selectedIcon: _homeIcon,
+          label: '首页',
+        ),
+        _materialAssetDestination(
+          icon: _trendingUpOutlinedIcon,
+          selectedIcon: _trendingUpIcon,
+          label: '排行榜',
+        ),
+        const NavigationDestination(
+          icon: ImageIcon(AssetImage(_searchRoundedIcon)),
+          selectedIcon: ImageIcon(AssetImage(_searchRoundedIcon)),
+          label: '搜索',
+        ),
+        _materialAssetDestination(
+          icon: _motionPhotosOnOutlinedIcon,
+          selectedIcon: _motionPhotosOnIcon,
+          label: '动态',
+        ),
+        NavigationDestination(
+          icon: _materialUserIcon(
+            fallbackIcon: Icons.person_outline,
+            color: unselectedColor,
+          ),
+          selectedIcon: _materialUserIcon(
+            fallbackIcon: Icons.person,
+            color: selectedColor,
+          ),
+          label: '我的',
+        ),
+      ],
+    );
+  }
+
+  NavigationDestination _materialAssetDestination({
+    required String icon,
+    required String selectedIcon,
+    required String label,
+  }) {
+    return NavigationDestination(
+      icon: ImageIcon(AssetImage(icon)),
+      selectedIcon: ImageIcon(AssetImage(selectedIcon)),
+      label: label,
+    );
+  }
+
+  Widget _materialUserIcon({
+    required IconData fallbackIcon,
+    required Color color,
+  }) {
+    if (!_rootController.userLogin.value) {
+      return ImageIcon(
+        AssetImage(
+          fallbackIcon == Icons.person ? _personIcon : _personOutlineIcon,
+        ),
+      );
+    }
+
+    final String face = _rootController.userInfo.face;
+    if (face.isEmpty) {
+      return ImageIcon(
+        AssetImage(
+          fallbackIcon == Icons.person ? _personIcon : _personOutlineIcon,
+        ),
+      );
+    }
+
+    return SizedBox(
+      width: 25,
+      height: 25,
+      child: ClipOval(
+        child: Image.network(
+          face,
+          fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) => Icon(fallbackIcon, color: color),
+        ),
+      ),
+    );
+  }
+
+  int _pageIndexToNavigationIndex(int pageIndex) {
+    return pageIndex >= 2 ? pageIndex + 1 : pageIndex;
+  }
+
+  void _onNavigationTap(int navigationIndex) {
+    if (navigationIndex == 2) {
+      Get.toNamed('/search');
+      return;
+    }
+
+    final int pageIndex =
+        navigationIndex > 2 ? navigationIndex - 1 : navigationIndex;
+    setState(() {
+      _index = pageIndex;
+    });
   }
 
   // Widget _getBottomNavigator(BuildContext context) {
