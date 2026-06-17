@@ -150,7 +150,7 @@ class ModuleAuthorModel {
 
   ModuleAuthorModel.fromJson(Map<String, dynamic> json) {
     face = json['face'];
-    following = json['following'];
+    following = json['following'] == true || json['following'] == 1;
     jumpUrl = json['jump_url'];
     label = json['label'];
     mid = asInt(json['mid']);
@@ -763,7 +763,7 @@ class DynamicLiveModel {
       uid = asInt(livePlayInfo['uid']);
       parentAreaName = livePlayInfo['parent_area_name'];
       roomId = asInt(livePlayInfo['room_id']);
-      liveId = livePlayInfo['live_id'];
+      liveId = livePlayInfo['live_id']?.toString();
       liveStatus = asInt(livePlayInfo['live_status']);
       cover = livePlayInfo['cover'];
       online = asInt(livePlayInfo['online']);

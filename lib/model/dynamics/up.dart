@@ -72,8 +72,8 @@ class LiveUserItem {
     face = json['face'];
     isReserveRecall = json['is_reserve_recall'];
     jumpUrl = json['jump_url'];
-    mid = json['mid'];
-    roomId = json['room_id'];
+    mid = int.tryParse(json['mid'].toString());
+    roomId = int.tryParse(json['room_id'].toString());
     title = json['title'];
     uname = json['uname'];
   }
@@ -117,7 +117,7 @@ class MyInfo {
 
   MyInfo.fromJson(Map<String, dynamic> json) {
     face = json['face'];
-    mid = json['mid'];
+    mid = int.tryParse(json['mid'].toString());
     name = json['name'];
   }
 }

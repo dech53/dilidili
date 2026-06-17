@@ -22,21 +22,23 @@ class _RcmdPageState extends State<RcmdPage>
   void initState() {
     super.initState();
     _futureBuilderFuture = _rcmdController.queryRcmdFeed('init');
-    ScrollController scrollController = _rcmdController.scrollController;
-    scrollController.addListener(
-      () {
-        if (scrollController.position.pixels >=
-            scrollController.position.maxScrollExtent - 200) {
-          _rcmdController.isLoadingMore = true;
-          _rcmdController.onLoad();
-        }
-      },
-    );
+    _rcmdController.scrollController.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    final ScrollController scrollController = _rcmdController.scrollController;
+    if (!scrollController.hasClients || _rcmdController.isLoadingMore) {
+      return;
+    }
+    if (scrollController.position.pixels >=
+        scrollController.position.maxScrollExtent - 200) {
+      _rcmdController.onLoad();
+    }
   }
 
   @override
   void dispose() {
-    _rcmdController.scrollController.removeListener(() {});
+    _rcmdController.scrollController.removeListener(_onScroll);
     super.dispose();
   }
 
@@ -91,7 +93,6 @@ class _RcmdPageState extends State<RcmdPage>
                         fn: () {
                           setState(
                             () {
-                              _rcmdController.isLoadingMore = true;
                               _futureBuilderFuture =
                                   _rcmdController.queryRcmdFeed('init');
                             },

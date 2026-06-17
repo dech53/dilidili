@@ -108,4 +108,11 @@ class SSearchController extends GetxController {
     );
     submit();
   }
+  
+  onClearHis() {
+    historyList.value = [];
+    historyCacheList = [];
+    historyList.refresh();
+    histiryWord.put('cacheList', []);
+  }
 }

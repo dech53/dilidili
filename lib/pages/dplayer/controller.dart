@@ -6,6 +6,7 @@ import 'package:dilidili/pages/dplayer/models/data_source.dart';
 import 'package:dilidili/pages/dplayer/models/data_status.dart';
 import 'package:dilidili/pages/dplayer/models/fullscreen_mode.dart';
 import 'package:dilidili/pages/dplayer/models/play_status.dart';
+import 'package:dilidili/pages/dplayer/services/ios_now_playing.dart';
 import 'package:dilidili/pages/dplayer/utils/fullscreen.dart';
 import 'package:dilidili/pages/video/detail/play/ao_output.dart';
 import 'package:flutter/material.dart';
@@ -75,6 +76,8 @@ class DPlayerController extends GetxController {
   String _bvid = '';
   int _cid = 0;
   int _heartDuration = 0;
+  IosNowPlayingMetadata? _nowPlayingMetadata;
+  int _lastNowPlayingProgressSecond = -1;
 
   Timer? _timer;
   //主控制器
@@ -132,6 +135,12 @@ class DPlayerController extends GetxController {
           element(event);
         }
         makeHeartBeat(event.inSeconds);
+        final int currentSecond = event.inSeconds;
+        if (currentSecond != _lastNowPlayingProgressSecond &&
+            currentSecond % 5 == 0) {
+          _lastNowPlayingProgressSecond = currentSecond;
+          unawaited(_syncNowPlayingPlayback());
+        }
       }),
       videoPlayerController!.stream.playing.listen(
         (event) {
@@ -148,6 +157,7 @@ class DPlayerController extends GetxController {
           if (videoPlayerController!.state.position.inSeconds != 0) {
             makeHeartBeat(positionSeconds.value, type: 'status');
           }
+          unawaited(_syncNowPlayingPlayback());
         },
       ),
       videoPlayerController!.stream.completed.listen((event) {
@@ -160,10 +170,13 @@ class DPlayerController extends GetxController {
           }
         }
         makeHeartBeat(positionSeconds.value, type: 'status');
+        unawaited(_syncNowPlayingPlayback());
       }),
       videoPlayerController!.stream.duration.listen((event) {
         if (event > Duration.zero) {
           duration.value = event;
+          updateDurationSecond();
+          unawaited(_syncNowPlayingMetadata());
         }
       }),
       videoPlayerController!.stream.buffer.listen((event) {
@@ -312,16 +325,21 @@ class DPlayerController extends GetxController {
     _direction.value = direction ?? 'horizontal';
     _bvid = bvid;
     _cid = cid;
+    _lastNowPlayingProgressSecond = -1;
     _videoPlayerController = await _createVideoController(
         dataSource, PlaylistMode.none, true, seekTo);
     _duration.value = duration ?? _videoPlayerController!.state.duration;
     updateDurationSecond();
     dataStatus.status.value = DataStatus.loaded;
     startListeners();
+    unawaited(IosNowPlayingService.instance.configure());
+    _registerNowPlayingCommandHandler();
+    unawaited(_syncNowPlayingMetadata());
     if (autoPlay) {
       await play(duration: duration);
     } else {
       playerStatus.status.value = DPlayerStatus.paused;
+      unawaited(_syncNowPlayingPlayback());
     }
   }
 
@@ -422,6 +440,7 @@ class DPlayerController extends GetxController {
         await _videoPlayerController?.dispose();
         _videoPlayerController = null;
       }
+      await IosNowPlayingService.instance.clear();
       resetBrightness();
       super.dispose();
     } catch (e) {
@@ -445,6 +464,7 @@ class DPlayerController extends GetxController {
   Future<void> pause({bool notify = true, bool isInterrupt = false}) async {
     await _videoPlayerController?.pause();
     playerStatus.status.value = DPlayerStatus.paused;
+    unawaited(_syncNowPlayingPlayback());
   }
 
   Future<void> play(
@@ -455,6 +475,7 @@ class DPlayerController extends GetxController {
       _duration.value = duration;
       updateDurationSecond();
     }
+    unawaited(_syncNowPlayingPlayback());
   }
 
   /// 跳转至指定位置
@@ -475,9 +496,72 @@ class DPlayerController extends GetxController {
         _timerForSeek?.cancel();
         _timerForSeek ??= _startSeekTimer(position);
       }
+      unawaited(_syncNowPlayingPlayback());
     } catch (err) {
       print('Error while seeking: $err');
     }
+  }
+
+  void setNowPlayingMetadata(IosNowPlayingMetadata metadata) {
+    _nowPlayingMetadata = metadata.copyWith(
+      duration:
+          duration.value > Duration.zero ? duration.value : metadata.duration,
+      position: position.value,
+      status: playerStatus.status.value,
+      playbackRate: playbackSpeed,
+    );
+    unawaited(_syncNowPlayingMetadata());
+  }
+
+  void _registerNowPlayingCommandHandler() {
+    IosNowPlayingService.instance.setCommandHandler(
+      IosNowPlayingCommandHandler(
+        onPlay: () => play(),
+        onPause: () => pause(),
+        onTogglePlayPause: () async {
+          if (playerStatus.status.value == DPlayerStatus.playing) {
+            await pause();
+          } else {
+            await play();
+          }
+        },
+        onSeek: (Duration target) => seekTo(target),
+        onSkip: (Duration offset) async {
+          await seekTo(position.value + offset);
+          if (playerStatus.status.value == DPlayerStatus.playing) {
+            await play();
+          }
+        },
+      ),
+    );
+  }
+
+  Future<void> _syncNowPlayingMetadata() async {
+    final IosNowPlayingMetadata? metadata = _nowPlayingMetadata;
+    if (metadata == null) {
+      return;
+    }
+    await IosNowPlayingService.instance.update(
+      metadata.copyWith(
+        duration:
+            duration.value > Duration.zero ? duration.value : metadata.duration,
+        position: position.value,
+        status: playerStatus.status.value,
+        playbackRate: playbackSpeed,
+      ),
+    );
+  }
+
+  Future<void> _syncNowPlayingPlayback() async {
+    if (_nowPlayingMetadata == null) {
+      return;
+    }
+    await IosNowPlayingService.instance.updatePlayback(
+      duration: duration.value,
+      position: position.value,
+      status: playerStatus.status.value,
+      playbackRate: playbackSpeed,
+    );
   }
 
   Timer? _startSeekTimer(Duration position) {

@@ -8,7 +8,7 @@ import 'package:get/get.dart';
 class RcmdController extends GetxController {
   final ScrollController scrollController = ScrollController();
   late RxList<dynamic> videoList;
-  bool isLoadingMore = true;
+  bool isLoadingMore = false;
   int _currentPage = 0;
   RxInt crossAxisCount = 2.obs;
 
@@ -19,40 +19,32 @@ class RcmdController extends GetxController {
   }
 
   Future queryRcmdFeed(type) async {
-    if (isLoadingMore == false) {
-      return;
+    if (isLoadingMore) {
+      return {'status': true, 'data': <RcmdVideoItem>[]};
     }
+    isLoadingMore = true;
     if (type == 'onRefresh') {
       _currentPage = Random().nextInt(1000);
     }
-    late final Map<String, dynamic> res;
-    res = await VideoHttp.rcmdVideoList(
-      freshIdx: _currentPage,
-      ps: 20,
-    );
-    if (res['status']) {
-      if (type == 'init') {
-        if (videoList.isNotEmpty) {
-          videoList.addAll(res['data']);
-        } else {
+    try {
+      final Map<String, dynamic> res = await VideoHttp.rcmdVideoList(
+        freshIdx: _currentPage,
+        ps: 20,
+      );
+      if (res['status']) {
+        if (type == 'init') {
           videoList.value = res['data'];
+        } else if (type == 'onRefresh') {
+          videoList.value = res['data'];
+        } else if (type == 'onLoad') {
+          videoList.addAll(res['data']);
         }
-      } else if (type == 'onRefresh') {
-        videoList.value = res['data'];
-      } else if (type == 'onLoad') {
-        videoList.addAll(res['data']);
+        _currentPage += 1;
       }
-      _currentPage += 1;
-      if (res['data'].length > 1 && videoList.length < 10) {
-        queryRcmdFeed('onLoad');
-      }
+      return res;
+    } finally {
+      isLoadingMore = false;
     }
-    _currentPage += 1;
-    if (res['data'].length > 1 && videoList.length < 10) {
-      queryRcmdFeed('onLoad');
-    }
-    isLoadingMore = false;
-    return res;
   }
 
   void animateToTop() async {
@@ -67,12 +59,11 @@ class RcmdController extends GetxController {
 
   // 下拉刷新
   Future onRefresh() async {
-    isLoadingMore = true;
-    queryRcmdFeed('onRefresh');
+    return queryRcmdFeed('onRefresh');
   }
 
   // 上拉加载
   Future onLoad() async {
-    queryRcmdFeed('onLoad');
+    return queryRcmdFeed('onLoad');
   }
 }

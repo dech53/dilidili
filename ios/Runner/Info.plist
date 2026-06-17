@@ -26,6 +26,10 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>audio</string>
+	</array>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
@@ -50,6 +54,12 @@
     <key>NSAllowsArbitraryLoads</key>
     <true/>
 </dict>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>用于连接本机 Flutter 调试工具。</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_dartobservatory._tcp</string>
+	</array>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>用于访问相册，以便选择和保存图片。</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>

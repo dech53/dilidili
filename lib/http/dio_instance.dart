@@ -1,15 +1,19 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:dilidili/http/http_methods.dart';
 import 'package:dilidili/http/static/api_string.dart';
 import 'package:dilidili/utils/file_utils.dart';
+import 'package:dilidili/utils/storage.dart';
 import 'package:dio/dio.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:uuid/uuid.dart';
 
 class DioInstance {
   static DioInstance? _instance;
   static String? buvid;
+  static final Random _random = Random();
   DioInstance._();
   static DioInstance instance() {
     return _instance ??= DioInstance._();
@@ -45,8 +49,26 @@ class DioInstance {
     dio.interceptors.add(cookieManager);
     final List<Cookie> cookie = await cookieManager.cookieJar
         .loadForRequest(Uri.parse(ApiString.baseUrl));
-    cookie.add(
-        Cookie('buvid3', '2C79183B-D96A-5418-7EFB-2AC765933C8706972infoc'));
+    Cookie? existingBuvid3Cookie;
+    for (final Cookie item in cookie) {
+      if (item.name == 'buvid3' && item.value.isNotEmpty) {
+        existingBuvid3Cookie = item;
+        break;
+      }
+    }
+
+    if (existingBuvid3Cookie != null) {
+      buvid = existingBuvid3Cookie.value;
+      await SPStorage.localCache.put(LocalCacheKey.buvid3, buvid);
+    } else {
+      final Cookie buvid3Cookie =
+          _createBuvid3Cookie(await instance().getBuvid());
+      await cookieManager.cookieJar.saveFromResponse(
+        Uri.parse(ApiString.mainUrl),
+        [buvid3Cookie],
+      );
+      cookie.add(buvid3Cookie);
+    }
     final String cookieString = cookie
         .map((Cookie cookie) => '${cookie.name}=${cookie.value}')
         .join('; ');
@@ -68,22 +90,31 @@ class DioInstance {
   }
 
   Future<String> getBuvid() async {
-    if (buvid != null) {
+    if (buvid != null && buvid!.isNotEmpty) {
       return buvid!;
     }
-    if (buvid == null) {
-      try {
-        var result = await DioInstance.instance().get(
-          path: "${ApiString.baseUrl}/x/frontend/finger/spi",
-        );
-        buvid = result.data["data"]["b_3"].toString();
-      } catch (e) {
-        // 处理请求错误
-        buvid = '';
-        print("Error fetching buvid: $e");
-      }
+
+    final dynamic cachedBuvid = SPStorage.localCache.get(LocalCacheKey.buvid3);
+    if (cachedBuvid is String && cachedBuvid.isNotEmpty) {
+      buvid = cachedBuvid;
+      return buvid!;
     }
+
+    buvid = _generateBuvid3();
+    await SPStorage.localCache.put(LocalCacheKey.buvid3, buvid);
     return buvid!;
+  }
+
+  static Cookie _createBuvid3Cookie(String value) {
+    return Cookie('buvid3', value)
+      ..domain = '.bilibili.com'
+      ..path = '/'
+      ..httpOnly = false;
+  }
+
+  static String _generateBuvid3() {
+    final String suffix = _random.nextInt(100000).toString().padLeft(5, '0');
+    return '${const Uuid().v4().toUpperCase()}${suffix}infoc';
   }
 
   //get请求

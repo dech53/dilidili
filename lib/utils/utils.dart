@@ -23,6 +23,17 @@ class Utils {
     return base64.encode(randomBytes);
   }
 
+  // 时间戳转时间
+  static tampToSeektime(number) {
+    int hours = number ~/ 60;
+    int minutes = number % 60;
+
+    String formattedHours = hours.toString().padLeft(2, '0');
+    String formattedMinutes = minutes.toString().padLeft(2, '0');
+
+    return '$formattedHours:$formattedMinutes';
+  }
+
   static List<int> generateRandomBytes(int minLength, int maxLength) {
     return List<int>.generate(random.nextInt(maxLength - minLength + 1),
         (_) => random.nextInt(0x60) + 0x20);

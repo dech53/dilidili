@@ -5,6 +5,7 @@ import 'package:dilidili/http/static/api_string.dart';
 import 'package:dilidili/http/video.dart';
 import 'package:dilidili/model/nav_user_info.dart';
 import 'package:dilidili/model/user/fav_folder.dart';
+import 'package:dilidili/model/video/ai.dart';
 import 'package:dilidili/model/video/video_basic_info.dart';
 import 'package:dilidili/model/video/video_tag.dart';
 import 'package:dilidili/pages/video/detail/controller.dart';
@@ -38,6 +39,7 @@ class VideoIntroController extends GetxController {
   PersistentBottomSheetController? bottomSheetController;
   // 是否收藏
   RxBool hasFav = false.obs;
+  late ModelResult modelResult;
   // up mid
   // int mid = int.parse(Get.arguments['mid']!);
   Rx<UserCardInfo> userInfo = UserCardInfo().obs;
@@ -127,6 +129,23 @@ class VideoIntroController extends GetxController {
     }
   }
 
+  // ai总结
+  Future aiConclusion() async {
+    SmartDialog.showLoading(msg: '正在生成ai总结');
+    final res = await VideoHttp.aiConclusion(
+      bvid: bvid,
+      cid: lastPlayCid.value,
+      upMid: videoDetail.value.owner!.mid!,
+    );
+    SmartDialog.dismiss();
+    if (res['status']) {
+      modelResult = res['data'].modelResult;
+    } else {
+      SmartDialog.showToast("当前视频暂不支持AI视频总结");
+    }
+    return res;
+  }
+
   //查询视频信息
   Future queryVideoIntro() async {
     var tagResult = await VideoHttp.videoTag(bvid: bvid);
@@ -142,6 +161,11 @@ class VideoIntroController extends GetxController {
           Get.find<VideoDetailController>(tag: heroTag);
       videoDetailCtr.tabs.value = ['简介', '评论 ${result['data']?.stat?.reply}'];
       videoDetailCtr.cover.value = result['data'].pic ?? '';
+      videoDetailCtr.updateNowPlayingMetadata(
+        title: videoDetail.value.title,
+        artist: videoDetail.value.owner?.name,
+        coverUrl: videoDetail.value.pic,
+      );
     }
 
     await queryUserInfo();

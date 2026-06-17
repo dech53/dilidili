@@ -45,6 +45,7 @@ class SPStorage {
       userID = userInfo.get('userInfoCache').mid.toString();
     }
   }
+
   static Future<void> close() async {
     // user.compact();
     // user.close();
@@ -58,7 +59,6 @@ class SPStorage {
     setting.close();
   }
 }
-
 
 class SettingBoxKey {
   /// 播放器
@@ -149,6 +149,7 @@ class LocalCacheKey {
       //
       wbiKeys = 'wbiKeys',
       timeStamp = 'timeStamp',
+      buvid3 = 'buvid3',
 
       // 弹幕相关设置 屏蔽类型 显示区域 透明度 字体大小 弹幕时间 描边粗细
       danmakuBlockType = 'danmakuBlockType',

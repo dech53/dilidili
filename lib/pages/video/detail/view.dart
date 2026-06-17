@@ -107,6 +107,16 @@ class _VideoPageState extends State<VideoPage>
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.paused ||
+        state == AppLifecycleState.hidden ||
+        state == AppLifecycleState.resumed) {
+      vdCtr.updateNowPlayingMetadata();
+    }
+  }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final ModalRoute<dynamic>? route = ModalRoute.of(context);

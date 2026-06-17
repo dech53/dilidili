@@ -9,6 +9,7 @@ import 'package:dilidili/model/video/quality.dart';
 import 'package:dilidili/model/video/url.dart';
 import 'package:dilidili/pages/dplayer/controller.dart';
 import 'package:dilidili/pages/dplayer/models/data_source.dart';
+import 'package:dilidili/pages/dplayer/services/ios_now_playing.dart';
 import 'package:dilidili/pages/video/detail/widgets/header_control.dart';
 import 'package:dilidili/pages/video/reply_reply/view.dart';
 import 'package:dilidili/utils/id_utils.dart';
@@ -34,6 +35,8 @@ class VideoDetailController extends GetxController
   RxBool enableHA = false.obs;
   RxBool isShowCover = true.obs;
   RxString cover = ''.obs;
+  String _nowPlayingTitle = '';
+  String? _nowPlayingArtist;
   RxDouble sheetHeight = 0.0.obs;
   ScrollController? replyScrollController;
   late VideoItem firstVideo;
@@ -91,6 +94,43 @@ class VideoDetailController extends GetxController
   void updateCover(String? pic) {
     if (pic != null) {
       cover.value = videoItem['pic'] = pic;
+    }
+  }
+
+  void updateNowPlayingMetadata({
+    String? title,
+    String? artist,
+    String? coverUrl,
+  }) {
+    if (title != null && title.isNotEmpty) {
+      _nowPlayingTitle = title;
+    }
+    if (artist != null && artist.isNotEmpty) {
+      _nowPlayingArtist = artist;
+    }
+    if (coverUrl != null && coverUrl.isNotEmpty) {
+      updateCover(coverUrl);
+    }
+
+    dPlayerController.setNowPlayingMetadata(
+      IosNowPlayingMetadata(
+        id: '$bvid:${cid.value}',
+        title: _nowPlayingTitle.isNotEmpty ? _nowPlayingTitle : bvid,
+        artist: _nowPlayingArtist,
+        artworkUrl: cover.value.isNotEmpty ? cover.value : null,
+        duration: _nowPlayingDuration,
+        position: dPlayerController.position.value,
+        status: dPlayerController.playerStatus.status.value,
+        playbackRate: dPlayerController.playbackSpeed,
+      ),
+    );
+  }
+
+  Duration get _nowPlayingDuration {
+    try {
+      return Duration(milliseconds: data.timeLength ?? 0);
+    } catch (_) {
+      return dPlayerController.duration.value;
     }
   }
 
@@ -252,6 +292,7 @@ class VideoDetailController extends GetxController
       autoPlay: autoPlay,
     );
     dPlayerController.headerControl = headerControl;
+    updateNowPlayingMetadata();
   }
 
   /// 发送弹幕

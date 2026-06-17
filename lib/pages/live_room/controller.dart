@@ -10,6 +10,7 @@ import 'package:dilidili/model/live/room_info.dart';
 import 'package:dilidili/model/live/room_info_h5.dart';
 import 'package:dilidili/pages/dplayer/controller.dart';
 import 'package:dilidili/pages/dplayer/models/data_source.dart';
+import 'package:dilidili/pages/dplayer/services/ios_now_playing.dart';
 import 'package:dilidili/pages/live_room/utils/dsocket.dart';
 import 'package:dilidili/utils/live.dart';
 import 'package:dilidili/utils/storage.dart';
@@ -30,7 +31,7 @@ class LiveRoomController extends GetxController {
   Box userInfoCache = SPStorage.userInfo;
   int userId = 0;
   int currentQn = LiveQuality.values.last.code;
-  late String buvid;
+  String buvid = '';
   DSocket? dSocket;
   List<String> danmuHostList = [];
   String token = '';
@@ -50,6 +51,7 @@ class LiveRoomController extends GetxController {
     var res = await LiveHttp.liveRoomInfoH5(roomId: roomId);
     if (res['status']) {
       roomInfoH5.value = res['data'];
+      updateNowPlayingMetadata();
     }
     return res;
   }
@@ -123,6 +125,40 @@ class LiveRoomController extends GetxController {
         },
       ),
     );
+    updateNowPlayingMetadata();
+  }
+
+  void updateNowPlayingMetadata() {
+    final RoomInfo? roomInfo = roomInfoH5.value.roomInfo;
+    final BaseInfo? baseInfo = roomInfoH5.value.anchorInfo?.baseInfo;
+    final String? title = _nonEmpty(roomInfo?.title);
+    final String? uname = _nonEmpty(baseInfo?.uname);
+    final String? face = _normalizeImageUrl(baseInfo?.face);
+    final String resolvedTitle =
+        title ?? (uname != null ? '$uname的直播间' : '直播间 $roomId');
+
+    dPlayerController.setNowPlayingMetadata(
+      IosNowPlayingMetadata(
+        id: 'live:$roomId',
+        title: resolvedTitle,
+        artist: uname,
+        artworkUrl: face,
+      ),
+    );
+  }
+
+  String? _normalizeImageUrl(String? url) {
+    final String? trimmed = _nonEmpty(url);
+    if (trimmed == null) return null;
+    return trimmed.startsWith('//') ? 'https:$trimmed' : trimmed;
+  }
+
+  String? _nonEmpty(String? value) {
+    final String? trimmed = value?.trim();
+    if (trimmed == null || trimmed.isEmpty) {
+      return null;
+    }
+    return trimmed;
   }
 
   void initSocket() async {
@@ -195,12 +231,13 @@ class LiveRoomController extends GetxController {
   }
 
   void joinRoom() async {
+    buvid = buvid.isNotEmpty ? buvid : await DioInstance.instance().getBuvid();
     var joinData = LiveUtils.encodeData(
       json.encode({
         "uid": userId,
         "roomid": roomId,
         "protover": 3,
-        "buvid": '2C79183B-D96A-5418-7EFB-2AC765933C8706972infoc',
+        "buvid": buvid,
         "platform": "web",
         "type": 2,
         "key": token,
@@ -252,8 +289,8 @@ class LiveRoomController extends GetxController {
     roomId = int.parse(Get.parameters['roomid']!);
     if (Get.arguments != null) {
       liveItem = Get.arguments['liveItem'];
-      DioInstance.instance().getBuvid().then((value) => buvid = value);
     }
+    DioInstance.instance().getBuvid().then((value) => buvid = value);
     final userInfo = userInfoCache.get('userInfoCache');
     if (userInfo != null && userInfo.mid != null) {
       userId = userInfo.mid;

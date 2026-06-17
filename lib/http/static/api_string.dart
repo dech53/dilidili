@@ -230,6 +230,14 @@ class ApiString {
   static const String getCaptcha = '/x/passport-login/captcha?source=main_web';
   static const getWebKey = '/x/passport-login/web/key';
   // web端密码登录
-  static const String loginInByWebPwd =
-      '/x/passport-login/web/login';
+  static const String loginInByWebPwd = '/x/passport-login/web/login';
+
+  // AI总结
+  /// https://api.bilibili.com/x/web-interface/view/conclusion/get?
+  /// bvid=BV1ju4y1s7kn&
+  /// cid=1296086601&
+  /// up_mid=4641697&
+  /// w_rid=1607c6c5a4a35a1297e31992220900ae&
+  /// wts=1697033079
+  static const String aiConclusion = '/x/web-interface/view/conclusion/get';
 }

@@ -19,7 +19,7 @@ class LiveRoomPage extends StatefulWidget {
 }
 
 class _LiveRoomPageState extends State<LiveRoomPage>
-    with TickerProviderStateMixin {
+    with TickerProviderStateMixin, WidgetsBindingObserver {
   final LiveRoomController _liveRoomController = Get.put(LiveRoomController());
   late Future? _futureBuilder;
   late Future? _futureBuilderFuture;
@@ -34,6 +34,7 @@ class _LiveRoomPageState extends State<LiveRoomPage>
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     videoSourceInit();
     _futureBuilderFuture = _liveRoomController.queryLiveInfo();
     _scrollController.addListener(_onScroll);
@@ -67,6 +68,16 @@ class _LiveRoomPageState extends State<LiveRoomPage>
     });
   }
 
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.paused ||
+        state == AppLifecycleState.hidden ||
+        state == AppLifecycleState.resumed) {
+      _liveRoomController.updateNowPlayingMetadata();
+    }
+  }
+
   void _scrollToBottom() {
     if (_scrollController.hasClients) {
       _scrollController
@@ -89,6 +100,7 @@ class _LiveRoomPageState extends State<LiveRoomPage>
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _scrollController.dispose();
     fabAnimationCtr.dispose();
     super.dispose();
@@ -260,7 +272,8 @@ class _LiveRoomPageState extends State<LiveRoomPage>
                                 '/member/mid=${_liveRoomController.roomInfoH5.value.roomInfo?.uid}',
                                 arguments: {
                                   'mid': _liveRoomController
-                                      .roomInfoH5.value.roomInfo?.uid.toString(),
+                                      .roomInfoH5.value.roomInfo?.uid
+                                      .toString(),
                                   'face': _liveRoomController.roomInfoH5.value
                                       .anchorInfo!.baseInfo!.face
                                 },

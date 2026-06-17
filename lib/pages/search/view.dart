@@ -113,7 +113,7 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
                           .copyWith(fontWeight: FontWeight.bold),
                     ),
                     TextButton(
-                      onPressed: () {},
+                      onPressed: () => _searchController.onClearHis(),
                       child: const Text('清空'),
                     )
                   ],

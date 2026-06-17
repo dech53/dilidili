@@ -5,6 +5,7 @@ import 'package:dilidili/model/nav_user_info.dart';
 import 'package:dilidili/model/rcmd_video.dart';
 import 'package:dilidili/model/root_data.dart';
 import 'package:dilidili/model/user/fav_folder.dart';
+import 'package:dilidili/model/video/ai.dart';
 import 'package:dilidili/model/video/hot_video.dart';
 import 'package:dilidili/model/video/related_video.dart';
 import 'package:dilidili/model/video/url.dart';
@@ -146,7 +147,7 @@ class VideoHttp {
             (dynamic data) => HotVideoItemList.fromJson(data),
           ).data.list!,
         );
-        return {'status': true, 'data': list}; 
+        return {'status': true, 'data': list};
       } else {
         return {'status': false, 'data': [], 'msg': res.data['message']};
       }
@@ -422,6 +423,29 @@ class VideoHttp {
       return {'status': true, 'data': res.data['data']};
     } else {
       return {'status': false, 'data': [], 'msg': res.data['message']};
+    }
+  }
+
+  static Future aiConclusion({
+    String? bvid,
+    int? cid,
+    int? upMid,
+  }) async {
+    var res = await DioInstance.instance().get(
+      path: ApiString.baseUrl + ApiString.aiConclusion,
+      param: await WbiUtils.getWbi({
+        'bvid': bvid,
+        'cid': cid,
+        'up_mid': upMid,
+      }),
+    );
+    if (res.data['code'] == 0 && res.data['data']['code'] == 0) {
+      return {
+        'status': true,
+        'data': AiConclusionModel.fromJson(res.data['data']),
+      };
+    } else {
+      return {'status': false, 'data': []};
     }
   }
 }

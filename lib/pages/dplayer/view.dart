@@ -221,6 +221,7 @@ class _DPlayerState extends State<DPlayer> with TickerProviderStateMixin {
             key: ValueKey(_.videoFit.value),
             controls: NoVideoControls,
             controller: widget.controller.videoController!,
+            pauseUponEnteringBackgroundMode: false,
             resumeUponEnteringForegroundMode: true,
             alignment: widget.alignment!,
             subtitleViewConfiguration: const SubtitleViewConfiguration(

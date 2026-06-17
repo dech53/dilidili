@@ -63,8 +63,16 @@ class ReplyItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       child: InkWell(
-        onTap: () {},
-        onLongPress: () {},
+        onTap: () {
+          if (replySave!) {
+            return;
+          }
+          if (replyReply != null) {
+            replyReply!(replyItem, null, replyItem!.replies!.isNotEmpty);
+          }
+        },
+        onLongPress: () {
+        },
         child: Container(
           padding: const EdgeInsets.fromLTRB(12, 14, 8, 5),
           decoration: BoxDecoration(
