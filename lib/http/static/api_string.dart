@@ -7,6 +7,7 @@ class ApiString {
   static const String baseUrl = "https://api.bilibili.com";
   static const String live_base = "https://api.live.bilibili.com";
   static const String passportUrl = "https://passport.bilibili.com";
+  static const String messageBaseUrl = 'https://message.bilibili.com';
   static const String getRcmdVideo = "/x/web-interface/wbi/index/top/feed/rcmd";
   static const String getRelatedVideo = "/x/web-interface/archive/related";
   static const String navInterface = "/x/web-interface/nav";
@@ -240,4 +241,12 @@ class ApiString {
   /// w_rid=1607c6c5a4a35a1297e31992220900ae&
   /// wts=1697033079
   static const String aiConclusion = '/x/web-interface/view/conclusion/get';
+
+  /// 系统通知
+  static const String messageSystemAPi = '/x/sys-msg/query_unified_notify';
+  // 系统通知 个人
+  static const String userMessageSystemAPi = '/x/sys-msg/query_user_notify';
+
+  /// 系统通知标记已读
+  static const String systemMarkRead = '/x/sys-msg/update_cursor';
 }

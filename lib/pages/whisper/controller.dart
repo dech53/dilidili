@@ -43,38 +43,46 @@ class WhisperController extends GetxController {
 
   Future querySessionList(String? type) async {
     if (isLoading) return;
-    var res = await MsgHttp.sessionList(
-        endTs: type == 'onLoad' ? sessionList.last.sessionTs! : null);
-    if (res['data'].sessionList != null && res['data'].sessionList.isNotEmpty) {
-      await queryAccountList(res['data'].sessionList);
-      Map<int, dynamic> accountMap = {};
-      for (var j in accountList) {
-        accountMap[j.mid!] = j;
-      }
-      for (var i in res['data'].sessionList) {
-        var accountInfo = accountMap[i.talkerId];
-        if (accountInfo != null) {
-          i.accountInfo = accountInfo;
+    isLoading = true;
+    try {
+      final int? endTs = type == 'onLoad' && sessionList.isNotEmpty
+          ? sessionList.last.sessionTs
+          : null;
+      var res = await MsgHttp.sessionList(endTs: endTs);
+      if (res['status'] &&
+          res['data'].sessionList != null &&
+          res['data'].sessionList.isNotEmpty) {
+        await queryAccountList(res['data'].sessionList);
+        Map<int, dynamic> accountMap = {};
+        for (var j in accountList) {
+          accountMap[j.mid!] = j;
+        }
+        for (var i in res['data'].sessionList) {
+          var accountInfo = accountMap[i.talkerId];
+          if (accountInfo != null) {
+            i.accountInfo = accountInfo;
+          }
         }
       }
-    }
-    if (res['status'] && res['data'].sessionList != null) {
-      if (type == 'onLoad') {
-        sessionList.addAll(res['data'].sessionList);
-      } else {
-        sessionList.value = res['data'].sessionList;
+      if (res['status'] && res['data'].sessionList != null) {
+        if (type == 'onLoad') {
+          sessionList.addAll(res['data'].sessionList);
+        } else {
+          sessionList.value = res['data'].sessionList;
+        }
       }
+      return res;
+    } finally {
+      isLoading = false;
     }
-    isLoading = false;
-    return res;
   }
 
   Future onRefresh() async {
-    querySessionList('onRefresh');
+    return querySessionList('onRefresh');
   }
 
   Future onLoad() async {
-    querySessionList('onLoad');
+    return querySessionList('onLoad');
   }
 
   Future queryAccountList(sessionList) async {

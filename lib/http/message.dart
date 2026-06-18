@@ -5,6 +5,7 @@ import 'package:dilidili/http/dio_instance.dart';
 import 'package:dilidili/http/static/api_string.dart';
 import 'package:dilidili/model/message/account.dart';
 import 'package:dilidili/model/message/session.dart';
+import 'package:dilidili/model/message/system.dart';
 import 'package:dilidili/utils/wbi_utils.dart';
 
 class MsgHttp {
@@ -194,5 +195,75 @@ class MsgHttp {
       }
     }
     return s.join();
+  }
+
+  static Future messageSystem() async {
+    var res = await DioInstance.instance().get(
+        path: ApiString.messageBaseUrl + ApiString.messageSystemAPi,
+        param: {
+          'csrf': await DioInstance.instance().getCsrf(),
+          'page_size': 20,
+          'build': 0,
+          'mobi_app': 'web',
+        });
+    if (res.data['code'] == 0) {
+      try {
+        return {
+          'status': true,
+          'data': res.data['data']['system_notify_list']
+              .map<MessageSystemModel>((e) => MessageSystemModel.fromJson(e))
+              .toList(),
+        };
+      } catch (err) {
+        return {'status': false, 'date': [], 'msg': err.toString()};
+      }
+    } else {
+      return {'status': false, 'date': [], 'msg': res.data['message']};
+    }
+  }
+
+  static Future messageSystemAccount() async {
+    var res = await DioInstance.instance().get(
+        path: ApiString.messageBaseUrl + ApiString.userMessageSystemAPi,
+        param: {
+          'csrf': await DioInstance.instance().getCsrf(),
+          'page_size': 20,
+          'build': 0,
+          'mobi_app': 'web',
+        });
+    if (res.data['code'] == 0) {
+      try {
+        return {
+          'status': true,
+          'data': res.data['data']['system_notify_list']
+              .map<MessageSystemModel>((e) => MessageSystemModel.fromJson(e))
+              .toList(),
+        };
+      } catch (err) {
+        return {'status': false, 'date': [], 'msg': err.toString()};
+      }
+    } else {
+      return {'status': false, 'date': [], 'msg': res.data['message']};
+    }
+  }
+
+  // 系统消息标记已读
+  static Future systemMarkRead(int cursor) async {
+    String csrf = await DioInstance.instance().getCsrf();
+    var res = await DioInstance.instance()
+        .get(path: ApiString.messageBaseUrl + ApiString.systemMarkRead, param: {
+      'csrf': csrf,
+      'cursor': cursor,
+    });
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+      };
+    } else {
+      return {
+        'status': false,
+        'msg': res.data['message'],
+      };
+    }
   }
 }

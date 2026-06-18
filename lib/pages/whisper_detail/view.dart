@@ -73,11 +73,13 @@ class _WhisperDetailPageState extends State<WhisperDetailPage>
               GestureDetector(
                 onTap: () => Get.toNamed(
                     '/member/mid=${_whisperDetailController.mid}',
-                    arguments: {'face': _whisperDetailController.face,
-                      'mid': _whisperDetailController.mid.toString()}),
+                    arguments: {
+                      'face': _whisperDetailController.face,
+                      'mid': _whisperDetailController.mid.toString()
+                    }),
                 child: Row(
                   children: <Widget>[
-                    Container(
+                    SizedBox(
                       width: 34,
                       height: 34,
                       child: CircleAvatar(
@@ -123,19 +125,16 @@ class _WhisperDetailPageState extends State<WhisperDetailPage>
                                 alignment: Alignment.topCenter,
                                 child: ListView.separated(
                                   itemCount: messageList.length,
-                                  shrinkWrap: true,
+                                  padding: const EdgeInsets.all(12),
                                   reverse: true,
                                   itemBuilder: (_, int i) {
                                     return ChatCard(
                                       item: messageList[i],
-                                      e_infos: _whisperDetailController.eInfos,
+                                      eInfos: _whisperDetailController.eInfos,
                                     );
                                   },
-                                  separatorBuilder: (_, int i) {
-                                    return i == 0
-                                        ? const SizedBox(height: 20)
-                                        : const SizedBox.shrink();
-                                  },
+                                  separatorBuilder: (_, int i) =>
+                                      const SizedBox(height: 12),
                                 ),
                               ),
                       );
@@ -163,7 +162,7 @@ class _WhisperDetailPageState extends State<WhisperDetailPage>
                 border: Border(
                   top: BorderSide(
                     width: 1,
-                    color: Colors.grey.withOpacity(0.15),
+                    color: Colors.grey.withValues(alpha: 0.15),
                   ),
                 ),
               ),
@@ -193,7 +192,7 @@ class _WhisperDetailPageState extends State<WhisperDetailPage>
                         color: Theme.of(context)
                             .colorScheme
                             .outline
-                            .withOpacity(0.05),
+                            .withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(40.0),
                       ),
                       child: TextField(
