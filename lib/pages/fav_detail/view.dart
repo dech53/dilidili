@@ -167,14 +167,17 @@ class _FavDetailPageState extends State<FavDetailPage> {
                               ),
                             ),
                             const SizedBox(height: 4),
-                            Text(
-                              _favDetailController.item!.upper!.name!,
-                              style: TextStyle(
-                                  fontSize: Theme.of(context)
-                                      .textTheme
-                                      .labelSmall!
-                                      .fontSize,
-                                  color: Theme.of(context).colorScheme.outline),
+                            Obx(
+                              () => Text(
+                                _favDetailController.upperName.value,
+                                style: TextStyle(
+                                    fontSize: Theme.of(context)
+                                        .textTheme
+                                        .labelSmall!
+                                        .fontSize,
+                                    color:
+                                        Theme.of(context).colorScheme.outline),
+                              ),
                             )
                           ],
                         ),

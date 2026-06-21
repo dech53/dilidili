@@ -107,6 +107,8 @@ dependencies:
   liquid_glass_widgets: ^0.5.0
   adaptive_platform_ui:
     path: third_party/adaptive_platform_ui
+  flutter_material_design_icons: ^3.1.0+7447
+  material_new_shapes: ^1.0.0
   
 dev_dependencies:
   flutter_test:
@@ -156,6 +158,11 @@ flutter:
     - assets/images/logo/
     - assets/images/live/
     - assets/images/video/
+
+  fonts:
+    - family: digital_id_num
+      fonts:
+        - asset: assets/fonts/digital_id_num.ttf
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

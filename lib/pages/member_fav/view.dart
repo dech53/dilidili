@@ -9,7 +9,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class FavoritePage extends StatefulWidget {
-  const FavoritePage({super.key});
+  const FavoritePage({
+    super.key,
+    required this.mid,
+  });
+
+  final int mid;
 
   @override
   State<FavoritePage> createState() => _FavoritePageState();
@@ -19,13 +24,17 @@ class _FavoritePageState extends State<FavoritePage>
     with AutomaticKeepAliveClientMixin {
   late FavoriteController _favoriteController;
   late Future _futureBuilder;
-  late int mid;
 
   @override
   void initState() {
     super.initState();
-    mid = int.parse(Get.arguments['mid']!);
-    _favoriteController = Get.put(FavoriteController(), tag: mid.toString());
+    final String tag = widget.mid.toString();
+    _favoriteController = Get.isRegistered<FavoriteController>(tag: tag)
+        ? Get.find<FavoriteController>(tag: tag)
+        : Get.put(
+            FavoriteController(mid: widget.mid),
+            tag: tag,
+          );
     _futureBuilder = _favoriteController.queryFavFolder();
   }
 

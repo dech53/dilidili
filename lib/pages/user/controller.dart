@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'package:dilidili/http/user.dart';
+import 'package:dilidili/model/user/history.dart';
 import 'package:dilidili/model/user/stat.dart';
 import 'package:dilidili/utils/storage.dart';
 import 'package:dilidili/http/login.dart';
 import 'package:dilidili/utils/user.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_material_design_icons/flutter_material_design_icons.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:dilidili/model/user/info.dart';
@@ -33,6 +35,9 @@ class UserPageController extends GetxController {
   // 用户状态 动态、关注、粉丝
   Rx<UserStat> userStat = UserStat().obs;
   Timer? validTimer;
+  RxBool historyLoadingState = false.obs;
+  RxList<HisListItem> historyList = <HisListItem>[].obs;
+  RxnString historyError = RxnString();
 
   List list = [
     {
@@ -41,9 +46,9 @@ class UserPageController extends GetxController {
       'onTap': () => Get.toNamed('/history'),
     },
     {
-      'icon': Icons.star_border,
-      'title': '我的收藏',
-      'onTap': () => Get.toNamed('/fav'),
+      'icon': MdiIcons.folderDownloadOutline,
+      'title': '离线缓存',
+      'onTap': () => Get.toNamed('/downloads'),
     },
     {
       'icon': Icons.subscriptions_outlined,
@@ -78,6 +83,7 @@ class UserPageController extends GetxController {
     if (userInfoCache.get('userInfoCache') != null) {
       userInfo.value = userInfoCache.get('userInfoCache');
       userLogin.value = true;
+      queryHistory();
     }
   }
 
@@ -123,6 +129,9 @@ class UserPageController extends GetxController {
         userInfo.value = res['data'];
         userInfoCache.put('userInfoCache', res['data']);
         userLogin.value = true;
+        if (!historyLoadingState.value && historyList.isEmpty) {
+          unawaited(queryHistory());
+        }
       } else {
         resetUserInfo();
       }
@@ -166,5 +175,37 @@ class UserPageController extends GetxController {
     userStat.value = UserStat();
     userInfoCache.delete('userInfoCache');
     userLogin.value = false;
+    historyLoadingState.value = false;
+    historyList.clear();
+    historyError.value = null;
+  }
+
+  Future<dynamic> queryHistory() async {
+    if (!userLogin.value) {
+      return {'status': false, 'msg': '账号未登录', 'code': -101};
+    }
+    final bool isInitialLoad = historyList.isEmpty;
+    if (isInitialLoad) {
+      historyLoadingState.value = true;
+    }
+    historyError.value = null;
+    try {
+      final res = await UserHttp.historyList(0, 0);
+      if (res['status']) {
+        historyList.assignAll(res['data'].list?.take(20) ?? const <HisListItem>[]);
+      } else {
+        historyError.value = res['msg']?.toString() ?? '获取观看记录失败';
+      }
+      return res;
+    } catch (error) {
+      return {
+        'status': false,
+        'msg': historyError.value.toString(),
+      };
+    } finally {
+      if (isInitialLoad) {
+        historyLoadingState.value = false;
+      }
+    }
   }
 }

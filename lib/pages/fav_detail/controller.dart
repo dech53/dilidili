@@ -10,6 +10,7 @@ class FavDetailController extends GetxController {
   int? mediaId;
   FavFolderItemData? item;
   RxString title = ''.obs;
+  RxString upperName = ''.obs;
   RxInt mediaCount = 0.obs;
   late String heroTag;
   bool isLoadingMore = false;
@@ -21,8 +22,10 @@ class FavDetailController extends GetxController {
 
   @override
   void onInit() {
+    super.onInit();
     item = Get.arguments['favFolderItem'];
     title.value = item!.title!;
+    upperName.value = item?.upper?.name ?? '';
     heroTag = Get.arguments['heroTag']!;
     isOwner = Get.arguments['isOwner']!;
     mediaId = int.parse(Get.arguments['mediaId']!);
@@ -40,10 +43,15 @@ class FavDetailController extends GetxController {
       mediaId: mediaId!,
     );
     if (res['status']) {
-      favInfo.value = res['data'].info;
+      final Map info = res['data'].info ?? {};
+      favInfo.value = info;
+      final dynamic upper = info['upper'];
+      if (upper is Map && upper['name'] != null) {
+        upperName.value = upper['name'].toString();
+      }
       if (currentPage == 1 && type == 'init') {
         favList.value = res['data'].medias;
-        mediaCount.value = res['data'].info['media_count'];
+        mediaCount.value = info['media_count'] ?? 0;
       } else if (type == 'onLoad') {
         favList.addAll(res['data'].medias);
       }

@@ -3,16 +3,13 @@ import 'package:dilidili/model/dynamics/result.dart';
 import 'package:get/get.dart';
 
 class MemberMomentController extends GetxController {
+  MemberMomentController({required this.mid});
+
   RxList<MomentItemModel> momentsList = <MomentItemModel>[].obs;
   String offset = '';
-  late int mid;
+  final int mid;
   int count = 0;
   bool hasMore = true;
-  @override
-  void onInit() {
-    super.onInit();
-    mid = int.parse(Get.arguments['mid']!);
-  }
 
   Future getMemberDynamic(type) async {
     if (type == 'onRefresh') {

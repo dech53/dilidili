@@ -8,7 +8,9 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 
 class FavoriteController extends GetxController {
-  late int mid;
+  FavoriteController({required this.mid});
+
+  final int mid;
   late int ownerMid;
   Rx<FavFolderData> favFolderData = FavFolderData().obs;
   RxList<FavFolderItemData> favFolderList = <FavFolderItemData>[].obs;
@@ -22,7 +24,6 @@ class FavoriteController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    mid = int.parse(Get.arguments['mid'] ?? '-1');
     userInfo = userInfoCache.get('userInfoCache');
     ownerMid = userInfo != null ? userInfo!.mid! : -1;
     isOwner.value = mid == -1 || mid == ownerMid;

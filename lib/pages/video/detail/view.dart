@@ -28,8 +28,8 @@ class VideoPage extends StatefulWidget {
   const VideoPage({super.key});
   @override
   State<VideoPage> createState() => _VideoPageState();
-  static final RouteObserver<PageRoute> routeObserver =
-      RouteObserver<PageRoute>();
+  static final RouteObserver<GetPageRoute<dynamic>> routeObserver =
+      RouteObserver<GetPageRoute<dynamic>>();
 }
 
 class _VideoPageState extends State<VideoPage>
@@ -51,7 +51,7 @@ class _VideoPageState extends State<VideoPage>
   RxBool isShowing = true.obs;
   // late int mid;
   late Future _futureBuilderFuture;
-  PageRoute<dynamic>? _route;
+  GetPageRoute<dynamic>? _route;
 
   @override
   void dispose() {
@@ -120,7 +120,7 @@ class _VideoPageState extends State<VideoPage>
   void didChangeDependencies() {
     super.didChangeDependencies();
     final ModalRoute<dynamic>? route = ModalRoute.of(context);
-    if (route is PageRoute<dynamic> && route != _route) {
+    if (route is GetPageRoute<dynamic> && route != _route) {
       VideoPage.routeObserver.unsubscribe(this);
       _route = route;
       VideoPage.routeObserver.subscribe(this, route);

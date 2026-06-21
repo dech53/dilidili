@@ -5,6 +5,7 @@ class ApiString {
   static const String searchSuggestUrl = '/main/suggest';
   static const String mainUrl = 'https://www.bilibili.com';
   static const String baseUrl = "https://api.bilibili.com";
+  static const String appBaseUrl = 'https://app.bilibili.com';
   static const String live_base = "https://api.live.bilibili.com";
   static const String passportUrl = "https://passport.bilibili.com";
   static const String messageBaseUrl = 'https://message.bilibili.com';
@@ -35,6 +36,8 @@ class ApiString {
       '/xlive/web-interface/v1/webMain/getMoreRecList';
   //用户信息
   static const String memberInfo = '/x/space/wbi/acc/info';
+  static const String memberSpace = '/x/v2/space';
+  static const String spaceBangumi = '/x/v2/space/bangumi';
   //用户关注数和粉丝数
   static const String userStat = '/x/relation/stat';
   //用户获赞数、播放数
@@ -201,6 +204,7 @@ class ApiString {
   // vmid 用户id pn 页码 ps 每页个数，最大50 order: desc
   // order_type 排序规则 最近访问传空，最常访问传 attention
   static const String followings = '/x/relation/followings';
+  static const String followedUp = '/x/relation/followings/followed_upper';
   // 获取指定分组下的up
   static const String followUpGroup = '/x/relation/tag';
   // 设置Up主分组
@@ -209,11 +213,7 @@ class ApiString {
 
   /// 申请二维码(TV端)
   static const getTVCode =
-      'https://passport.snm0516.aisee.tv/x/passport-tv-login/qrcode/auth_code';
-
-  /// cookie转access_key
-  static const cookieToKey =
-      'https://passport.bilibili.com/x/passport-tv-login/h5/qrcode/confirm';
+      'https://passport.bilibili.com/x/passport-tv-login/qrcode/auth_code';
 
   ///扫码登录（TV端）
   static const qrcodePoll =

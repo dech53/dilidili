@@ -70,7 +70,7 @@ class Basic {
     commentType = json['comment_type'];
     ridStr = json['rid_str'];
     title = json['title'];
-    uid = json['uid'];
+    uid = parseInt(json['uid']);
   }
 }
 
@@ -159,7 +159,7 @@ class ModuleAuthor {
 
   ModuleAuthor.fromJson(Map<String, dynamic> json) {
     face = json['face'];
-    mid = json['mid'];
+    mid = parseInt(json['mid']);
     name = json['name'];
     pubTime = json['pub_time'];
   }
@@ -252,12 +252,12 @@ class Pic {
   double? scale;
 
   Pic.fromJson(Map<String, dynamic> json) {
-    height = json['height'];
-    size = json['size'];
+    height = parseInt(json['height']);
+    size = parseDouble(json['size']);
     url = json['url'];
-    width = json['width'];
-    aspectRatio = json['width'] / json['height'];
-    scale = customDivision(json['width'], 600);
+    width = parseInt(json['width']);
+    aspectRatio = width != null && height != null ? width! / height! : null;
+    scale = width != null ? customDivision(width!, 600) : null;
   }
 }
 
@@ -482,4 +482,18 @@ double customDivision(int a, int b) {
   } else {
     return 1.0;
   }
+}
+
+int? parseInt(dynamic value) {
+  if (value == null) return null;
+  if (value is int) return value;
+  if (value is num) return value.toInt();
+  return int.tryParse(value.toString());
+}
+
+double? parseDouble(dynamic value) {
+  if (value == null) return null;
+  if (value is double) return value;
+  if (value is num) return value.toDouble();
+  return double.tryParse(value.toString());
 }

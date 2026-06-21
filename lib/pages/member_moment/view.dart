@@ -3,13 +3,17 @@ import 'package:dilidili/common/widgets/http_error.dart';
 import 'package:dilidili/model/dynamics/result.dart';
 import 'package:dilidili/pages/member_moment/controller.dart';
 import 'package:dilidili/pages/moments/widgets/moments_panel.dart';
-import 'package:dilidili/utils/string_utils.dart';
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class MemberMomentPage extends StatefulWidget {
-  const MemberMomentPage({super.key});
+  const MemberMomentPage({
+    super.key,
+    required this.mid,
+  });
+
+  final int mid;
 
   @override
   State<MemberMomentPage> createState() => _MemberMomentPageState();
@@ -19,14 +23,17 @@ class _MemberMomentPageState extends State<MemberMomentPage>
     with AutomaticKeepAliveClientMixin {
   late MemberMomentController _memberMomentController;
   late Future _futureBuilderFuture;
-  late int mid;
 
   @override
   void initState() {
     super.initState();
-    mid = int.parse(Get.arguments['mid']!);
-    _memberMomentController =
-        Get.put(MemberMomentController(), tag: mid.toString());
+    final String tag = widget.mid.toString();
+    _memberMomentController = Get.isRegistered<MemberMomentController>(tag: tag)
+        ? Get.find<MemberMomentController>(tag: tag)
+        : Get.put(
+            MemberMomentController(mid: widget.mid),
+            tag: tag,
+          );
     _futureBuilderFuture =
         _memberMomentController.getMemberDynamic('onRefresh');
   }

@@ -221,7 +221,7 @@ class LoginPageController extends GetxController {
     var res = await LoginHttp.getWebQrcode();
     validSeconds.value = 180;
     if (res['status']) {
-      qrcodeKey = res['data']['qrcode_key'];
+      qrcodeKey = res['data']['auth_code'];
       validTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
         if (validSeconds.value > 0) {
           validSeconds.value--;
@@ -246,7 +246,15 @@ class LoginPageController extends GetxController {
     try {
       var res = await LoginHttp.queryWebQrcodeStatus(qrcodeKey);
       if (res['status']) {
-        await UserUtils.confirmLogin('', null);
+        await LoginHttp.saveTvLoginCookies(
+          res['data']['cookie_info']?['cookies'],
+        );
+        await UserUtils.confirmLogin(
+          '',
+          null,
+          syncWebCookie: false,
+          accessKey: res['data']['access_token'],
+        );
         stopWebQrcodePolling();
         Get.back();
       }

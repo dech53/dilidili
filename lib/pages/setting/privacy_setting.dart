@@ -1,4 +1,3 @@
-import 'package:dilidili/http/member.dart';
 import 'package:dilidili/utils/storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
@@ -15,7 +14,7 @@ class PrivacySetting extends StatefulWidget {
 class _PrivacySettingState extends State<PrivacySetting> {
   bool userLogin = false;
   Box userInfoCache = SPStorage.userInfo;
-  var userInfo;
+  dynamic userInfo;
 
   @override
   void initState() {
@@ -53,16 +52,6 @@ class _PrivacySettingState extends State<PrivacySetting> {
             dense: false,
             title: Text('黑名单管理', style: titleStyle),
             subtitle: Text('已拉黑用户', style: subTitleStyle),
-          ),
-          ListTile(
-            onTap: () {
-              if (!userLogin) {
-                SmartDialog.showToast('请先登录');
-              }
-              MemberHttp.cookieToKey();
-            },
-            dense: false,
-            title: Text('刷新access_key', style: titleStyle),
           ),
         ],
       ),

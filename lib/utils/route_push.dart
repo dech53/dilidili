@@ -19,8 +19,14 @@ class RoutePush {
           return;
         }
         final BangumiInfoModel bangumiDetail = result['data'];
-        final EpisodeItem episode = bangumiDetail.episodes!.first;
-        final int epId = episode.id!;
+        final List<EpisodeItem> episodes = bangumiDetail.episodes!;
+        final EpisodeItem episode = epId == null
+            ? episodes.first
+            : episodes.firstWhere(
+                (item) => item.id == epId,
+                orElse: () => episodes.first,
+              );
+        final int resolvedEpId = episode.id!;
         final int cid = episode.cid!;
         final String bvid = episode.bvid!;
         final String cover = episode.cover!;
@@ -29,7 +35,7 @@ class RoutePush {
           'videoType': SearchType.media_bangumi,
           'bvid': bvid,
           'cid': cid.toString(),
-          'epId': epId.toString(),
+          'epId': resolvedEpId.toString(),
           // 'bangumiItem': bangumiDetail,
         };
         arguments['heroTag'] = heroTag ?? StringUtils.makeHeroTag(cid);

@@ -1,7 +1,6 @@
 import 'package:dilidili/http/user.dart';
 import 'package:dilidili/pages/home/controller.dart';
 import 'package:dilidili/pages/moments/controller.dart';
-import 'package:dilidili/pages/root/controller.dart';
 import 'package:dilidili/pages/user/controller.dart';
 import 'package:dilidili/utils/cookie.dart';
 import 'package:dilidili/utils/storage.dart';
@@ -27,9 +26,16 @@ class UserUtils {
     }
   }
 
-  static confirmLogin(url, controller) async {
+  static confirmLogin(
+    url,
+    controller, {
+    bool syncWebCookie = true,
+    String? accessKey,
+  }) async {
     try {
-      await SetCookie.set();
+      if (syncWebCookie) {
+        await SetCookie.set();
+      }
       final result = await UserHttp.userInfo();
       if (result['status'] && result['data'].isLogin) {
         SmartDialog.showToast('登录成功');
@@ -39,6 +45,12 @@ class UserUtils {
             userInfoCache = await Hive.openBox('userInfo');
           }
           await userInfoCache.put('userInfoCache', result['data']);
+          if (accessKey != null && accessKey.isNotEmpty) {
+            await SPStorage.localCache.put(LocalCacheKey.accessKey, {
+              'mid': result['data'].mid,
+              'value': accessKey,
+            });
+          }
           final HomeController homeCtr = Get.find<HomeController>();
           final UserPageController userCtr = Get.find<UserPageController>();
           userCtr.userInfo.value = result['data'];

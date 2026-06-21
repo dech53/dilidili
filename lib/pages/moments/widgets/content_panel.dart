@@ -1,245 +1,101 @@
-import 'package:dilidili/common/widgets/badge.dart';
-import 'package:dilidili/common/widgets/network_img_layer.dart';
-import 'package:dilidili/model/dynamics/result.dart';
-import 'package:dilidili/pages/gallery/preview.dart';
+import 'package:dilidili/pages/moments/widgets/dynamic_image_grid.dart';
 import 'package:dilidili/pages/moments/widgets/rich_node_panel.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class Content extends StatefulWidget {
-  dynamic item;
-  String? source;
-  Content({
+class Content extends StatelessWidget {
+  const Content({
     super.key,
     this.item,
     this.source,
   });
 
-  @override
-  State<Content> createState() => _ContentState();
-}
-
-class _ContentState extends State<Content> {
-  late bool hasPics;
-  List<OpusPicsModel> pics = [];
-
-  bool get hasTopic => widget.item.modules.moduleDynamic.topic != null;
-
-  bool _hasVisibleText(dynamic text) {
-    return text is String && text.trim().isNotEmpty;
-  }
-
-  bool get hasRichContent {
-    try {
-      final dynamic moduleDynamic = widget.item.modules.moduleDynamic;
-      final dynamic desc = moduleDynamic.desc;
-      if (desc?.richTextNodes is List && desc.richTextNodes.isNotEmpty) {
-        return true;
-      }
-
-      final dynamic opus = moduleDynamic.major?.opus;
-      if (_hasVisibleText(opus?.title)) return true;
-      return opus?.summary?.richTextNodes is List &&
-          opus.summary.richTextNodes.isNotEmpty;
-    } catch (_) {
-      return false;
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    hasPics = widget.item.modules.moduleDynamic.major != null &&
-        widget.item.modules.moduleDynamic.major.opus != null &&
-        widget.item.modules.moduleDynamic.major.opus.pics.isNotEmpty;
-    if (hasPics) {
-      pics = widget.item.modules.moduleDynamic.major.opus.pics;
-    }
-  }
-
-  void onPreviewImg(picList, initIndex, context) {
-    openGalleryPreview(context, sources: picList, initIndex: initIndex);
-  }
-
-  InlineSpan picsNodes() {
-    List<InlineSpan> spanChilds = [];
-    int len = pics.length;
-    List<String> picList = [];
-
-    if (len == 1) {
-      OpusPicsModel pictureItem = pics.first;
-      picList.add(pictureItem.url!);
-      spanChilds.add(
-        WidgetSpan(
-          child: LayoutBuilder(
-            builder: (context, BoxConstraints box) {
-              double maxWidth = box.maxWidth.truncateToDouble();
-              double maxHeight = box.maxWidth * 0.6;
-              double height = maxWidth *
-                  0.5 *
-                  (pictureItem.height != null && pictureItem.width != null
-                      ? pictureItem.height! / pictureItem.width!
-                      : 9 / 16);
-              return Hero(
-                tag: pictureItem.url!,
-                placeholderBuilder:
-                    (BuildContext context, Size heroSize, Widget child) {
-                  return child;
-                },
-                child: GestureDetector(
-                  onTap: () => onPreviewImg(picList, 0, context),
-                  child: Container(
-                    padding: const EdgeInsets.only(top: 4),
-                    constraints: BoxConstraints(maxHeight: maxHeight),
-                    width: box.maxWidth / 2,
-                    height: height,
-                    child: Stack(
-                      children: [
-                        Positioned.fill(
-                          child: NetworkImgLayer(
-                            src: pictureItem.url,
-                            width: maxWidth / 2,
-                            height: height,
-                          ),
-                        ),
-                        height > Get.size.height * 0.9
-                            ? const PBadge(
-                                text: '长图',
-                                right: 8,
-                                bottom: 8,
-                              )
-                            : const SizedBox(),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-      );
-    }
-    if (len > 1) {
-      List<Widget> list = [];
-      for (var i = 0; i < len; i++) {
-        picList.add(pics[i].url!);
-      }
-      for (var i = 0; i < len; i++) {
-        list.add(
-          LayoutBuilder(
-            builder: (context, BoxConstraints box) {
-              double maxWidth = box.maxWidth.truncateToDouble();
-              double height = maxWidth *
-                  (pics[i].height != null && pics[i].width != null
-                      ? pics[i].height! / pics[i].width!
-                      : 9 / 16);
-              return Hero(
-                tag: picList[i],
-                child: GestureDetector(
-                  onTap: () => onPreviewImg(picList, i, context),
-                  child: Stack(
-                    children: [
-                      Positioned.fill(
-                        child: NetworkImgLayer(
-                          src: pics[i].url,
-                          width: maxWidth,
-                          height: height,
-                          origAspectRatio:
-                              pics[i].width!.toInt() / pics[i].height!.toInt(),
-                        ),
-                      ),
-                      if (pics[i].height!.toInt() / pics[i].width!.toInt() > 2)
-                        const PBadge(
-                          text: '长图',
-                          top: null,
-                          right: 6.0,
-                          bottom: 6.0,
-                          left: null,
-                        )
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-        );
-      }
-      spanChilds.add(
-        WidgetSpan(
-          child: LayoutBuilder(
-            builder: (context, BoxConstraints box) {
-              double maxWidth = box.maxWidth.truncateToDouble();
-              double crossCount = len < 3 ? 2 : 3;
-              double height = maxWidth /
-                      crossCount *
-                      (len % crossCount == 0
-                          ? len ~/ crossCount
-                          : len ~/ crossCount + 1) +
-                  6;
-              return Container(
-                padding: const EdgeInsets.only(top: 6),
-                height: height,
-                child: GridView.count(
-                  padding: EdgeInsets.zero,
-                  physics: const NeverScrollableScrollPhysics(),
-                  crossAxisCount: crossCount.toInt(),
-                  mainAxisSpacing: 4.0,
-                  crossAxisSpacing: 4.0,
-                  childAspectRatio: 1,
-                  children: list,
-                ),
-              );
-            },
-          ),
-        ),
-      );
-    }
-    return TextSpan(
-      children: spanChilds,
-    );
-  }
+  final dynamic item;
+  final String? source;
 
   @override
   Widget build(BuildContext context) {
-    final bool showRichContent = hasRichContent;
-    if (!hasTopic && !showRichContent && !hasPics) {
-      return const SizedBox.shrink();
-    }
-
-    TextStyle authorStyle =
-        TextStyle(color: Theme.of(context).colorScheme.primary);
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(12, 0, 12, 6),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (hasTopic) ...[
-            GestureDetector(
-              child: Text(
-                '#${widget.item.modules.moduleDynamic.topic.name}',
-                style: authorStyle,
-              ),
-            ),
-          ],
-          if (showRichContent)
-            IgnorePointer(
-              ignoring: widget.source == 'detail' ? false : true,
-              child: SelectableRegion(
-                magnifierConfiguration: const TextMagnifierConfiguration(),
-                focusNode: FocusNode(),
-                selectionControls: MaterialTextSelectionControls(),
-                child: Text.rich(
-                  style: const TextStyle(height: 0),
-                  richNode(widget.item, context),
-                  maxLines: widget.source == 'detail' ? 999 : 3,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ),
-          if (hasPics) ...[Text.rich(picsNodes())],
-        ],
-      ),
+    return dynamicContent(
+      context,
+      theme: Theme.of(context),
+      item: item,
+      floor: 1,
+      isDetail: source == 'detail',
     );
   }
+}
+
+Widget dynamicContent(
+  BuildContext context, {
+  required int floor,
+  required ThemeData theme,
+  required dynamic item,
+  required bool isDetail,
+}) {
+  final moduleDynamic = item.modules?.moduleDynamic;
+  final topic = moduleDynamic?.topic;
+  final opusPics = moduleDynamic?.major?.opus?.pics ?? const [];
+  final drawPics = moduleDynamic?.major?.draw?.items ?? const [];
+  final pics = opusPics.isNotEmpty ? opusPics : drawPics;
+  final hasText = _hasVisibleText(moduleDynamic?.desc?.text) ||
+      _hasVisibleText(moduleDynamic?.major?.opus?.title) ||
+      _hasVisibleText(moduleDynamic?.major?.opus?.summary?.text) ||
+      (moduleDynamic?.desc?.richTextNodes?.isNotEmpty == true) ||
+      (moduleDynamic?.major?.opus?.summary?.richTextNodes?.isNotEmpty == true);
+
+  if (topic == null && !hasText && pics.isEmpty) {
+    return const SizedBox.shrink();
+  }
+
+  return Padding(
+    padding: floor == 1
+        ? const EdgeInsets.fromLTRB(12, 0, 12, 6)
+        : const EdgeInsets.only(bottom: 6),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (topic != null)
+          GestureDetector(
+            onTap: () => Get.toNamed(
+              '/searchResult',
+              parameters: {'keyword': topic.name ?? ''},
+            ),
+            child: Text.rich(
+              TextSpan(
+                children: [
+                  WidgetSpan(
+                    alignment: PlaceholderAlignment.middle,
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 4),
+                      child: Icon(
+                        Icons.tag_rounded,
+                        size: 18,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                  ),
+                  TextSpan(text: topic.name),
+                ],
+              ),
+              style: TextStyle(
+                fontSize: floor == 1 ? 15 : 14,
+                color: theme.colorScheme.primary,
+              ),
+            ),
+          ),
+        if (hasText)
+          Text.rich(
+            richNode(item, context),
+            style: TextStyle(fontSize: isDetail && floor == 1 ? 16 : 15),
+            maxLines: isDetail ? null : 6,
+            overflow: isDetail ? TextOverflow.visible : TextOverflow.ellipsis,
+          ),
+        if (pics.isNotEmpty) DynamicImageGrid(pictures: pics),
+      ],
+    ),
+  );
+}
+
+bool _hasVisibleText(dynamic text) {
+  return text is String && text.trim().isNotEmpty;
 }

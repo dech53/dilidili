@@ -6,6 +6,7 @@ import 'package:dilidili/pages/fan/view.dart';
 import 'package:dilidili/pages/fav/view.dart';
 import 'package:dilidili/pages/fav_detail/view.dart';
 import 'package:dilidili/pages/follow/view.dart';
+import 'package:dilidili/pages/follow_type/followed/view.dart';
 import 'package:dilidili/pages/history/view.dart';
 import 'package:dilidili/pages/home/view.dart';
 import 'package:dilidili/pages/later/view.dart';
@@ -51,6 +52,7 @@ class Routes {
     CustomGetPage(name: '/momentsDetail', page: () => const MomentsDetail()),
     CustomGetPage(name: '/favDetail', page: () => const FavDetailPage()),
     CustomGetPage(name: '/follow', page: () => const FollowPage()),
+    CustomGetPage(name: '/followed', page: () => const FollowedPage()),
     CustomGetPage(name: '/history', page: () => const HistoryPage()),
     CustomGetPage(name: '/fav', page: () => const FavPage()),
     CustomGetPage(name: '/subscription', page: () => const SubPage()),

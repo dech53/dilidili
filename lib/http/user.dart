@@ -1,5 +1,6 @@
 import 'package:dilidili/http/dio_instance.dart';
 import 'package:dilidili/http/static/api_string.dart';
+import 'package:dilidili/model/follow/result.dart';
 import 'package:dilidili/model/message/unread.dart';
 import 'package:dilidili/model/model_hot_video_item.dart';
 import 'package:dilidili/model/user/fav_detail.dart';
@@ -22,6 +23,35 @@ class UserHttp {
       return {'status': true, 'data': res.data['data']};
     } else {
       return {'status': false, 'msg': res.data['message']};
+    }
+  }
+
+  static Future<Map<String, dynamic>> followedUp({
+    required int mid,
+    required int pn,
+  }) async {
+    var res = await DioInstance.instance().get(
+      path: ApiString.baseUrl + ApiString.followedUp,
+      param: {
+        'csrf': await DioInstance.instance().getCsrf(),
+        'pn': pn,
+        'vmid': mid,
+        'web_location': 333.789,
+        'x-bili-device-req-json':
+            '{"platform":"web","device":"pc","spmid":"333.789"}',
+      },
+    );
+    if (res.data['code'] == 0) {
+      return {
+        'status': true,
+        'data': FollowDataModel.fromJson(res.data['data']),
+      };
+    } else {
+      return {
+        'status': false,
+        'data': [],
+        'msg': res.data['message'],
+      };
     }
   }
 

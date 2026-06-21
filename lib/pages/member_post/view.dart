@@ -8,7 +8,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class MemberPostPage extends StatefulWidget {
-  const MemberPostPage({super.key});
+  const MemberPostPage({
+    super.key,
+    required this.mid,
+  });
+
+  final int mid;
 
   @override
   State<MemberPostPage> createState() => _MemberPostPageState();
@@ -19,16 +24,19 @@ class _MemberPostPageState extends State<MemberPostPage>
   late MemberPostController _memberPostController;
   late Future _futureBuilderFuture;
   late ScrollController scrollController;
-  late int mid;
   @override
   bool get wantKeepAlive => true;
 
   @override
   void initState() {
     super.initState();
-    mid = int.parse(Get.arguments['mid']!);
-    _memberPostController =
-        Get.put(MemberPostController(), tag: mid.toString());
+    final String tag = widget.mid.toString();
+    _memberPostController = Get.isRegistered<MemberPostController>(tag: tag)
+        ? Get.find<MemberPostController>(tag: tag)
+        : Get.put(
+            MemberPostController(mid: widget.mid),
+            tag: tag,
+          );
     _futureBuilderFuture = _memberPostController.getMemberPost('init');
     scrollController = _memberPostController.scrollController;
     scrollController.addListener(

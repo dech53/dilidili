@@ -25,6 +25,17 @@ void main() async {
   await LiquidGlassWidgets.initialize();
   await ScreenUtil.ensureScreenSize();
   MediaKit.ensureInitialized();
+  if (Platform.isAndroid || Platform.isIOS) {
+    await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        systemNavigationBarColor: Colors.transparent,
+        systemNavigationBarDividerColor: Colors.transparent,
+        systemNavigationBarContrastEnforced: false,
+      ),
+    );
+  }
   await SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
   await SPStorage.init();

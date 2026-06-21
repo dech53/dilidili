@@ -4,14 +4,16 @@ import 'package:dilidili/http/static/api_string.dart';
 import 'package:dilidili/model/dynamics/result.dart';
 import 'package:dilidili/model/follow/result.dart';
 import 'package:dilidili/model/member/archive.dart';
+import 'package:dilidili/model/member/contribute_type.dart';
 import 'package:dilidili/model/member/folder_detail.dart';
 import 'package:dilidili/model/member/member_info.dart';
 import 'package:dilidili/model/member/tags.dart';
+import 'package:dilidili/model/space/space/data.dart';
+import 'package:dilidili/model/space/space_archive/data.dart';
 import 'package:dilidili/utils/storage.dart';
 import 'package:dilidili/utils/utils.dart';
 import 'package:dilidili/utils/wbi_utils.dart';
-import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
-import 'package:hive/hive.dart';
+import 'package:dio/dio.dart';
 
 class MemberHttp {
   static Future memberInfo({
@@ -245,52 +247,76 @@ class MemberHttp {
     }
   }
 
-  // 获取TV authCode
-  static Future getTVCode() async {
-    SmartDialog.showLoading();
-    var params = {
-      'appkey': Constants.appKey,
-      'local_id': '0',
+  static Future space({
+    int? mid,
+    dynamic fromViewAid,
+  }) async {
+    String? accessKey;
+    final dynamic userInfo = SPStorage.userInfo.get('userInfoCache');
+    final dynamic cachedAccessKey =
+        SPStorage.localCache.get(LocalCacheKey.accessKey);
+    final int? ownerMid = int.tryParse(userInfo?.mid?.toString() ?? '');
+    int? cacheMid;
+    if (cachedAccessKey is Map) {
+      final dynamic value = cachedAccessKey['value'];
+      cacheMid = int.tryParse(cachedAccessKey['mid']?.toString() ?? '');
+      if (value is String &&
+          value.isNotEmpty &&
+          (ownerMid == null || cacheMid == ownerMid)) {
+        accessKey = value;
+      }
+    }
+    print(
+      '[MemberHttp.space] access_key attached=${accessKey != null}, '
+      'targetMid=$mid, ownerMid=$ownerMid, cacheMid=$cacheMid',
+    );
+    final Map<String, dynamic> params = {
+      'build': 8430300,
+      'version': '8.43.0',
+      'c_locale': 'zh_CN',
+      'channel': 'master',
+      'mobi_app': 'android',
+      'platform': 'android',
+      's_locale': 'zh_CN',
+      if (fromViewAid != null) 'from_view_aid': fromViewAid,
+      if (accessKey != null) 'access_key': accessKey,
+      'statistics': Constants.statisticsApp,
+      'vmid': mid,
       'ts': (DateTime.now().millisecondsSinceEpoch ~/ 1000).toString(),
     };
-    String sign = Utils.appSign(
-      params,
-      Constants.appKey,
-      Constants.appSec,
-    );
-    var res = await DioInstance.instance()
-        .post(path: ApiString.getTVCode, param: {...params, 'sign': sign});
-    if (res.data['code'] == 0) {
-      return {
-        'status': true,
-        'data': res.data['data']['auth_code'],
-        'msg': '操作成功'
-      };
-    } else {
-      return {
-        'status': false,
-        'data': [],
-        'msg': res.data['message'],
-      };
-    }
-  }
-
-  // 获取access_key
-  static Future cookieToKey() async {
-    var authCodeRes = await getTVCode();
-    if (authCodeRes['status']) {
-      var res = await DioInstance.instance().post(
-        path: ApiString.cookieToKey,
-        data: {
-          'auth_code': authCodeRes['data'],
-          'build': 708200,
-          'csrf': await DioInstance.instance().getCsrf(),
-        },
+    try {
+      String sign = Utils.appSign(
+        params,
+        Constants.androidAppKey,
+        Constants.androidAppSec,
       );
-      await Future.delayed(const Duration(milliseconds: 300));
-      await qrcodePoll(authCodeRes['data']);
+      var res = await DioInstance.instance().get(
+        path: ApiString.appBaseUrl + ApiString.memberSpace,
+        param: {
+          ...params,
+          'sign': sign,
+        },
+        options: Options(
+          headers: {
+            'bili-http-engine': 'cronet',
+            'user-agent': Constants.userAgentApp,
+          },
+        ),
+      );
       if (res.data['code'] == 0) {
-        return {'status': true, 'data': [], 'msg': '操作成功'};
+        final SpaceData spaceData = SpaceData.fromJson(res.data['data']);
+        print(spaceData.toString());
+        final dynamic rawData = res.data['data'];
+        final dynamic rawCard = rawData is Map ? rawData['card'] : null;
+        print(
+          '[MemberHttp.space] raw card.followings_followed_upper: '
+          '${rawCard is Map ? rawCard['followings_followed_upper'] : null}',
+        );
+        _printSpaceFollowedUpper(spaceData);
+        return {
+          'status': true,
+          'data': spaceData,
+        };
       } else {
         return {
           'status': false,
@@ -298,37 +324,76 @@ class MemberHttp {
           'msg': res.data['message'],
         };
       }
-    }
-  }
-
-  static Future qrcodePoll(authCode) async {
-    var params = {
-      'appkey': Constants.appKey,
-      'auth_code': authCode.toString(),
-      'local_id': '0',
-      'ts': (DateTime.now().millisecondsSinceEpoch ~/ 1000).toString(),
-    };
-    String sign = Utils.appSign(
-      params,
-      Constants.appKey,
-      Constants.appSec,
-    );
-    var res = await DioInstance.instance()
-        .post(path: ApiString.qrcodePoll, param: {...params, 'sign': sign});
-    SmartDialog.dismiss();
-    if (res.data['code'] == 0) {
-      String accessKey = res.data['data']['access_token'];
-      Box localCache = SPStorage.localCache;
-      Box userInfoCache = SPStorage.userInfo;
-      var userInfo = userInfoCache.get('userInfoCache');
-      localCache.put(
-          LocalCacheKey.accessKey, {'mid': userInfo.mid, 'value': accessKey});
-      return {'status': true, 'data': [], 'msg': '操作成功'};
-    } else {
+    } catch (e) {
       return {
         'status': false,
         'data': [],
-        'msg': res.data['message'],
+        'msg': e.toString(),
+      };
+    }
+  }
+
+  static void _printSpaceFollowedUpper(SpaceData spaceData) {
+    final followedUpper = spaceData.card?.followingsFollowedUpper;
+    final items = followedUpper?.items ?? [];
+    print(
+      '[MemberHttp.space] parsed card.followingsFollowedUpper: '
+      'exists=${followedUpper != null}, '
+      'jumpUrl=${followedUpper?.jumpUrl}, '
+      'count=${items.length}, '
+      'items=${items.map((item) {
+        return '{mid: ${item.mid}, name: ${item.name}, face: ${item.face}}';
+      }).join(', ')}',
+    );
+  }
+
+  static Future spaceArchive({
+    required ContributeType type,
+    required int mid,
+    int? pn,
+  }) async {
+    final Map<String, dynamic> params = {
+      'build': 8430300,
+      'version': '8.43.0',
+      'c_locale': 'zh_CN',
+      'channel': 'master',
+      'mobi_app': 'android',
+      'platform': 'android',
+      's_locale': 'zh_CN',
+      'ps': 20,
+      if (pn != null) 'pn': pn,
+      'qn': 32,
+      'statistics': Constants.statisticsApp,
+      'vmid': mid,
+    };
+    try {
+      var res = await DioInstance.instance().get(
+        path: ApiString.appBaseUrl + type.api,
+        param: params,
+        options: Options(
+          headers: {
+            'bili-http-engine': 'cronet',
+            'user-agent': Constants.userAgentApp,
+          },
+        ),
+      );
+      if (res.data['code'] == 0) {
+        return {
+          'status': true,
+          'data': SpaceArchiveData.fromJson(res.data['data']),
+        };
+      } else {
+        return {
+          'status': false,
+          'data': [],
+          'msg': res.data['message'],
+        };
+      }
+    } catch (e) {
+      return {
+        'status': false,
+        'data': [],
+        'msg': e.toString(),
       };
     }
   }

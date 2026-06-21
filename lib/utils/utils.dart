@@ -42,9 +42,14 @@ class Utils {
   static String appSign(
       Map<String, dynamic> params, String appkey, String appsec) {
     params['appkey'] = appkey;
-    var searchParams = Uri(queryParameters: params).query;
-    var sortedParams = searchParams.split('&')..sort();
-    var sortedQueryString = sortedParams.join('&');
+    final sortedParams = params.entries.toList()
+      ..sort((a, b) => a.key.compareTo(b.key));
+    final sortedQueryString = sortedParams.map((entry) {
+      final key = Uri.encodeQueryComponent(entry.key).replaceAll('+', '%20');
+      final value = Uri.encodeQueryComponent(entry.value.toString())
+          .replaceAll('+', '%20');
+      return '$key=$value';
+    }).join('&');
 
     var appsecString = sortedQueryString + appsec;
     var md5Digest = md5.convert(utf8.encode(appsecString));
@@ -52,6 +57,7 @@ class Utils {
 
     return md5String;
   }
+
   static List<int> matchNum(String str) {
     final RegExp regExp = RegExp(r'\d+');
     final Iterable<Match> matches = regExp.allMatches(str);

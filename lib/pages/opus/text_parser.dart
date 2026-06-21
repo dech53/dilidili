@@ -2,6 +2,13 @@ import 'package:dilidili/model/read/opus.dart';
 import 'package:flutter/material.dart';
 
 class TextHelper {
+  static double _fontSize(int? fontSize) {
+    if (fontSize == null || fontSize <= 0) {
+      return 14;
+    }
+    return fontSize * 0.95;
+  }
+
   static Color _parseWordColor(String? color, Color fallback) {
     final String value = color?.trim() ?? '';
     if (value.isEmpty) return fallback;
@@ -36,15 +43,14 @@ class TextHelper {
       return TextSpan(
         text: node.word?.words ?? '',
         style: TextStyle(
-          fontSize:
-              node.word?.fontSize != null ? node.word!.fontSize! * 0.95 : 14,
-          fontWeight: node.word?.style?.bold != null
+          fontSize: _fontSize(node.word?.fontSize),
+          fontWeight: node.word?.style?.bold == true
               ? FontWeight.bold
               : FontWeight.normal,
           height: align == 1 ? 2 : 1.5,
           color: _parseWordColor(
             node.word?.color,
-            Theme.of(context).colorScheme.onBackground,
+            Theme.of(context).colorScheme.onSurface,
           ),
         ),
       );
@@ -54,16 +60,14 @@ class TextHelper {
           return TextSpan(
             text: node.word?.words ?? '',
             style: TextStyle(
-              fontSize: node.word?.fontSize != null
-                  ? node.word!.fontSize! * 0.95
-                  : 14,
-              fontWeight: node.word?.style?.bold != null
+              fontSize: _fontSize(node.word?.fontSize),
+              fontWeight: node.word?.style?.bold == true
                   ? FontWeight.bold
                   : FontWeight.normal,
               height: align == 1 ? 2 : 1.5,
               color: _parseWordColor(
                 node.word?.color,
-                Theme.of(context).colorScheme.onBackground,
+                Theme.of(context).colorScheme.onSurface,
               ),
             ),
           );

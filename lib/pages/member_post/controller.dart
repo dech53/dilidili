@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class MemberPostController extends GetxController {
-  late int mid;
+  MemberPostController({required this.mid});
+
+  final int mid;
   int pn = 1;
   int count = 0;
   RxMap<String, String> currentOrder = <String, String>{}.obs;
@@ -21,7 +23,6 @@ class MemberPostController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    mid = int.parse(Get.arguments['mid']!);
     currentOrder.value = orderList.first;
   }
 

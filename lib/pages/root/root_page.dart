@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lazy_load_indexed_stack/lazy_load_indexed_stack.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
+import 'package:flutter/services.dart';
 
 class RootPage extends StatefulWidget {
   const RootPage({super.key});
@@ -68,8 +69,9 @@ class _RootPageState extends State<RootPage> {
 
   @override
   Widget build(BuildContext context) {
+    final Widget child;
     if (!PlatformInfo.isIOS26OrHigher()) {
-      return Scaffold(
+      child = Scaffold(
         extendBody: true,
         appBar: AppBar(
           elevation: 0,
@@ -80,14 +82,26 @@ class _RootPageState extends State<RootPage> {
         bottomNavigationBar: _buildGlassBottomBar(context),
         body: _buildBody(),
       );
+    } else {
+      child = Obx(
+        () => AdaptiveScaffold(
+          bottomNavigationBar: _buildAdaptiveBottomBar(context),
+          minimizeBehavior: TabBarMinimizeBehavior.never,
+          body: _buildBody(),
+        ),
+      );
     }
 
-    return Obx(
-      () => AdaptiveScaffold(
-        bottomNavigationBar: _buildAdaptiveBottomBar(context),
-        minimizeBehavior: TabBarMinimizeBehavior.never,
-        body: _buildBody(),
+    final Brightness brightness = Theme.of(context).brightness;
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle(
+        systemNavigationBarColor: Colors.transparent,
+        systemNavigationBarDividerColor: Colors.transparent,
+        systemNavigationBarIconBrightness:
+            brightness == Brightness.dark ? Brightness.light : Brightness.dark,
+        systemNavigationBarContrastEnforced: false,
       ),
+      child: child,
     );
   }
 

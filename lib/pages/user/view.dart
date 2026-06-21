@@ -1,9 +1,8 @@
 import 'package:dilidili/common/constants.dart';
 import 'package:dilidili/common/widgets/network_img_layer.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:dilidili/pages/user/widgets/history_card_item.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 import 'controller.dart';
 
 class UserPage extends StatefulWidget {
@@ -51,9 +50,8 @@ class _UserPageState extends State<UserPage> {
       body: LayoutBuilder(
         builder: (context, constraint) {
           return SingleChildScrollView(
-            physics: const NeverScrollableScrollPhysics(),
-            child: SizedBox(
-              height: constraint.maxHeight,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraint.maxHeight),
               child: Column(
                 children: [
                   const SizedBox(height: 10),
@@ -66,13 +64,13 @@ class _UserPageState extends State<UserPage> {
                         }
                         if (snapshot.data['status']) {
                           return Obx(
-                            () => userInfoBuild(_userPageController, context),
+                            () => _buildUserInfo(context),
                           );
                         } else {
-                          return userInfoBuild(_userPageController, context);
+                          return _buildUserInfo(context);
                         }
                       } else {
-                        return userInfoBuild(_userPageController, context);
+                        return _buildUserInfo(context);
                       }
                     },
                   ),
@@ -85,7 +83,10 @@ class _UserPageState extends State<UserPage> {
     );
   }
 
-  Widget userInfoBuild(_userPageController, context) {
+  Widget _buildUserInfo(BuildContext context) {
+    final String? vipLabelUrl = _userPageController
+        .userInfo.value.vipLabel?['img_label_uri_hans_static']
+        ?.toString();
     return Column(
       children: [
         Padding(
@@ -95,7 +96,7 @@ class _UserPageState extends State<UserPage> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               GestureDetector(
-                onTap: () =>_userPageController.onLogin(),
+                onTap: () => _userPageController.onLogin(),
                 child: ClipOval(
                   child: Container(
                     width: 85,
@@ -129,11 +130,11 @@ class _UserPageState extends State<UserPage> {
                         ),
                       ],
                     ),
-                    if (_userPageController.userLogin.value) ...[
+                    if (_userPageController.userLogin.value &&
+                        vipLabelUrl?.isNotEmpty == true) ...[
                       const SizedBox(height: 2),
                       Image.network(
-                        _userPageController.userInfo.value
-                            .vipLabel['img_label_uri_hans_static'],
+                        vipLabelUrl!,
                         height: 20,
                       ),
                     ],
@@ -334,7 +335,115 @@ class _UserPageState extends State<UserPage> {
             );
           },
         ),
+        _buildHistory(),
       ],
+    );
+  }
+
+  Widget _buildHistory() {
+    return Obx(() {
+      if (!_userPageController.userLogin.value ||
+          _userPageController.historyLoadingState.value) {
+        return const SizedBox.shrink();
+      }
+
+      final ThemeData theme = Theme.of(context);
+      final Color secondary = theme.colorScheme.secondary;
+      return Column(
+        children: [
+          Divider(
+            height: 20,
+            color: theme.dividerColor.withValues(alpha: 0.1),
+          ),
+          ListTile(
+            onTap: () => Get.toNamed('/history'),
+            dense: true,
+            title: Padding(
+              padding: const EdgeInsets.only(left: 10),
+              child: Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(
+                      text: '观看记录  ',
+                      style: TextStyle(
+                        fontSize: theme.textTheme.titleMedium!.fontSize,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    WidgetSpan(
+                      child: Icon(
+                        Icons.arrow_forward_ios,
+                        size: 18,
+                        color: secondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            trailing: IconButton(
+              tooltip: '刷新',
+              onPressed: _userPageController.queryHistory,
+              icon: const Icon(Icons.refresh, size: 20),
+            ),
+          ),
+          _buildHistoryBody(theme, secondary),
+        ],
+      );
+    });
+  }
+
+  Widget _buildHistoryBody(ThemeData theme, Color secondary) {
+    final String? errMsg = _userPageController.historyError.value;
+    if (errMsg != null) {
+      return SizedBox(
+        height: 80,
+        child: Center(
+          child: Text(errMsg, textAlign: TextAlign.center),
+        ),
+      );
+    }
+
+    final List historyList = _userPageController.historyList;
+    if (historyList.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return SizedBox(
+      height: 173,
+      child: ListView.separated(
+        padding: const EdgeInsets.only(left: 20, top: 10, right: 20),
+        itemCount: historyList.length + 1,
+        scrollDirection: Axis.horizontal,
+        itemBuilder: (context, index) {
+          if (index == historyList.length) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 46),
+              child: Center(
+                child: IconButton(
+                  tooltip: '查看更多',
+                  style: ButtonStyle(
+                    padding: const WidgetStatePropertyAll(EdgeInsets.zero),
+                    backgroundColor: WidgetStatePropertyAll(
+                      theme.colorScheme.secondaryContainer.withValues(
+                        alpha: 0.5,
+                      ),
+                    ),
+                  ),
+                  onPressed: () => Get.toNamed('/history'),
+                  icon: Icon(
+                    Icons.arrow_forward_ios,
+                    size: 18,
+                    color: secondary,
+                  ),
+                ),
+              ),
+            );
+          }
+          return HistoryCardItem(item: historyList[index]);
+        },
+        separatorBuilder: (_, __) => const SizedBox(width: 14),
+      ),
     );
   }
 }
